@@ -79,6 +79,10 @@ public class Timer {
 	return (long) (duration + local - (server - start) / SERVER_RATIO);
     }
 
+    public synchronized long getDuration() {
+	return duration;
+    }
+
     @Override
     public String toString() {
 	long t = Math.abs(isWorking() ? remaining : duration) / 1000;

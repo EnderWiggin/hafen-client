@@ -1,6 +1,7 @@
 package haven;
 
 import me.ender.timer.Timer;
+import newsh.TimerWebhook;
 
 import java.util.Date;
 
@@ -91,11 +92,14 @@ public class TimerWdg extends Widget {
 	if(sender == start) {
 	    timer.start();
 	    updbtns();
+	    TimerWebhook.updateTimerBot(timer.getName(), timer.getDuration(),"add");
 	} else if(sender == stop) {
 	    timer.stop();
 	    updbtns();
+	    TimerWebhook.updateTimerBot(timer.getName(), timer.getDuration(),"stop");
 	} else if(sender == delete) {
 	    timer.destroy();
+	    TimerWebhook.updateTimerBot(timer.getName(), timer.getDuration(),"delete");
 	    ui.destroy(this);
 	} else {
 	    super.wdgmsg(sender, msg, args);

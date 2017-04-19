@@ -31,6 +31,9 @@
 	<pathelement path="lib/jglob.jar" />
 	<pathelement path="lib/gson-2.3.1.jar" />
         <pathelement path="lib/rxjava-1.1.5.jar" />
+	<pathelement path="lib/commons-logging-1.2.jar" />
+	<pathelement path="lib/httpclient-4.5.2.jar" />
+	<pathelement path="lib/httpcore-4.4.jar" />
       </classpath>
       <compilerarg value="-Xlint:unchecked" />
       <compilerarg value="-Xlint:-options" />
@@ -39,6 +42,7 @@
     <copy todir="build/classes">
       <fileset dir="src" excludes="**/*.java" />
     </copy>
+    <copy file="timerMobileNotifications.json" todir="build/"/>
     <copy todir="build/classes/haven" file="etc/ressrv.crt" />
     <copy todir="build/classes/haven" file="etc/authsrv.crt" />
     <copy todir="build/classes/haven" file="etc/res-preload" />
@@ -60,6 +64,15 @@
       <patternset excludes="META-INF/**" />
     </unjar>
     <unjar src="lib/rxjava-1.1.5.jar" dest="build/classes-lib">
+      <patternset excludes="META-INF/**" />
+    </unjar>
+    <unjar src="lib/commons-logging-1.2.jar" dest="build/classes-lib">
+      <patternset excludes="META-INF/**" />
+    </unjar>
+    <unjar src="lib/httpclient-4.5.2.jar" dest="build/classes-lib">
+      <patternset excludes="META-INF/**" />
+    </unjar>
+    <unjar src="lib/httpcore-4.4.jar" dest="build/classes-lib">
       <patternset excludes="META-INF/**" />
     </unjar>
   </target>
