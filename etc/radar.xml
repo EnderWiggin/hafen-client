@@ -81,7 +81,7 @@
         <marker exact="gfx/terobjs/trees/appletree" name="Apple" show="false" icon="gfx/invobjs/apple" />
         <marker exact="gfx/terobjs/trees/ash" name="Ash" show="false" icon="gfx/invobjs/seed-ash" />
         <marker exact="gfx/terobjs/trees/aspen" name="Aspen" show="false" icon="gfx/invobjs/seed-aspen" />
-        <marker exact="gfx/terobjs/trees/baywillow" name="Buckthorn" show="false" />
+        <marker exact="gfx/terobjs/trees/baywillow" name="Baywillow" show="false" />
         <marker exact="gfx/terobjs/trees/beech" name="Beech" show="false" />
         <marker exact="gfx/terobjs/trees/birch" name="Birch" show="false" />
         <marker exact="gfx/terobjs/trees/birdcherrytree" name="Bird Cherry" show="false" />
