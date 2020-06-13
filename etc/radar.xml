@@ -1,10 +1,10 @@
 <icons>
     <group name="Animals" icon="$diamond">
-        <marker startsWith="gfx/kritter/bear" name="Bear" show="true" priority="510" color="AE250D"/>
-        <marker startsWith="gfx/kritter/boar" name="Boar" show="true" priority="509" color="8A4B08"/>
-        <marker startsWith="gfx/kritter/wolverine" name="Wolverine" show="true" priority="508" color="8A4B08"/>
-        <marker startsWith="gfx/kritter/badger" name="Badger" show="true" priority="508" color="A4A4A4"/>
-        <marker startsWith="gfx/kritter/bat" name="Bat" show="true" priority="507" color="848484"/>
+        <marker startsWith="gfx/kritter/bear" name="Bear" show="true" priority="510" color="AE250D" />
+        <marker startsWith="gfx/kritter/boar" name="Boar" show="true" priority="509" color="8A4B08" />
+        <marker startsWith="gfx/kritter/wolverine" name="Wolverine" show="true" priority="508" color="8A4B08" />
+        <marker startsWith="gfx/kritter/badger" name="Badger" show="true" priority="508" color="A4A4A4" />
+        <marker startsWith="gfx/kritter/bat" name="Bat" show="true" priority="507" color="848484" />
         <marker startsWith="gfx/kritter/chicken" name="Chicken" show="true" priority="-5" />
         <marker startsWith="gfx/kritter/frog" name="Frog" icon="gfx/invobjs/frog" show="false" priority="-5" />
         <marker startsWith="gfx/kritter/toad" name="Toad" icon="gfx/invobjs/toad" show="false" priority="-5" />
@@ -73,7 +73,7 @@
         <marker startsWith="gfx/terobjs/bumlings/sandstone" name="Sandstone" icon="gfx/invobjs/sandstone" show="false" priority="-10" />
         <marker startsWith="gfx/terobjs/bumlings/schist" name="Schist" icon="gfx/invobjs/schist" show="false" priority="-10" />
         <marker startsWith="gfx/terobjs/bumlings/stalagmite" name="Stalagmite" show="false" priority="-10" />
-        <marker startsWith="gfx/terobjs/bumlings/" name="Unknown rock" show="true" resname="true" color="33dd00"/>
+        <marker startsWith="gfx/terobjs/bumlings/" name="Unknown rock" show="true" resname="true" color="33dd00" />
     </group>
     <group name="Trees" show="false" icon="$down">
         <marker exact="gfx/terobjs/trees/alder" name="Alder" show="false" icon="gfx/invobjs/seed-alder" />
@@ -100,7 +100,7 @@
         <marker exact="gfx/terobjs/trees/fir" name="Fir" show="false" />
         <marker exact="gfx/terobjs/trees/goldenchain" name="Goldenchain" show="false" />
         <marker exact="gfx/terobjs/trees/hazel" name="Hazel" show="false" icon="gfx/invobjs/hazelnut" />
-        <marker exact="gfx/terobjs/trees/treeheath" name="Heath Tree" show="false" icon="gfx/invobjs/seed-treeheath"/>
+        <marker exact="gfx/terobjs/trees/treeheath" name="Heath Tree" show="false" icon="gfx/invobjs/seed-treeheath" />
         <marker exact="gfx/terobjs/trees/hornbeam" name="Hornbeam" show="false" />
         <marker exact="gfx/terobjs/trees/juniper" name="Juniper" show="false" />
         <marker exact="gfx/terobjs/trees/kingsoak" name="King's Oak" show="false" icon="gfx/invobjs/seed-kingsoak" />
@@ -120,30 +120,30 @@
         <marker exact="gfx/terobjs/trees/planetree" name="Plane" show="false" />
         <marker exact="gfx/terobjs/trees/plumtree" name="Plum" show="false" icon="gfx/invobjs/plum" />
         <marker exact="gfx/terobjs/trees/poplar" name="Poplar" show="false" />
-        <marker exact="gfx/terobjs/trees/quincetree" name="Quince" show="false" icon="gfx/invobjs/quince"/>
+        <marker exact="gfx/terobjs/trees/quincetree" name="Quince" show="false" icon="gfx/invobjs/quince" />
         <marker exact="gfx/terobjs/trees/rowan" name="Rowan" show="false" />
         <marker exact="gfx/terobjs/trees/sallow" name="Sallow" show="false" />
-        <marker exact="gfx/terobjs/trees/silverfir" name="Silver Fir" show="false" icon="gfx/invobjs/seed-silverfir"/>
+        <marker exact="gfx/terobjs/trees/silverfir" name="Silver Fir" show="false" icon="gfx/invobjs/seed-silverfir" />
         <marker exact="gfx/terobjs/trees/sorbtree" name="Sorb Apple" show="false" icon="gfx/invobjs/sorbapple" />
         <marker exact="gfx/terobjs/trees/spruce" name="Spruce" show="false" />
         <marker exact="gfx/terobjs/trees/stonepine" name="Stonepine" show="false" />
         <marker exact="gfx/terobjs/trees/strawberrytree" name="Strawberry" show="false" />
         <marker exact="gfx/terobjs/trees/sweetgum" name="Sweetgum" show="false" />
-        <marker exact="gfx/terobjs/trees/terebinth" name="Terebinth Tree" show="false" icon="gfx/invobjs/seed-terebinth"/>
+        <marker exact="gfx/terobjs/trees/terebinth" name="Terebinth Tree" show="false" icon="gfx/invobjs/seed-terebinth" />
         <marker exact="gfx/terobjs/trees/towercap" name="Towercap" show="false" />
         <marker exact="gfx/terobjs/trees/walnuttree" name="Walnut" show="false" icon="gfx/invobjs/walnut" />
         <marker exact="gfx/terobjs/trees/whitebeam" name="Whitebeam" show="false" />
         <marker exact="gfx/terobjs/trees/willow" name="Willow" show="false" />
         <marker exact="gfx/terobjs/trees/yew" name="Yew" show="false" />
-        <marker regex="gfx/terobjs/trees/.+log" name="Log" text="Log" show="false" icon="$dot" color="8A2908"/>
-        <marker regex="gfx/terobjs/trees/.+stump" name="Stump" show="false" icon="$dot" color="9A5834"/>
-        <marker startsWith="gfx/terobjs/trees/" name="Unknown tree" show="true" resname="true" color="33dd00"/>
+        <marker regex="gfx/terobjs/trees/.+log" name="Log" text="Log" show="false" icon="$dot" color="8A2908" />
+        <marker regex="gfx/terobjs/trees/.+stump" name="Stump" show="false" icon="$dot" color="9A5834" />
+        <marker startsWith="gfx/terobjs/trees/" name="Unknown tree" show="true" resname="true" color="33dd00" />
     </group>
     <group name="Misc" show="true" icon="$pentagon">
         <marker exact="gfx/terobjs/items/arrow" name="Arrow" icon="gfx/invobjs/arrow-bone" show="true" priority="100" />
         <marker startsWith="gfx/terobjs/road/milestone" name="Milestone" icon="paginae/bld/woodendstone" show="false" />
         <marker exact="gfx/terobjs/vehicle/rowboat" name="Boat" icon="gfx/invobjs/barkboat" show="true" priority="10" />
-        <marker exact="gfx/terobjs/vehicle/bram" name="Battering Ram" icon="paginae/bld/bram" show="true"  priority="400"/>
+        <marker exact="gfx/terobjs/vehicle/bram" name="Battering Ram" icon="paginae/bld/bram" show="true"  priority="400" />
         <marker contains="gfx/borka/body" name="Player" icon="$circle" show="true" priority="1000" />
     </group>
 </icons>
