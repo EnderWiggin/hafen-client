@@ -85,6 +85,7 @@
         <marker exact="gfx/terobjs/trees/beech" name="Beech" show="false" />
         <marker exact="gfx/terobjs/trees/birch" name="Birch" show="false" />
         <marker exact="gfx/terobjs/trees/birdcherrytree" name="Bird Cherry" show="false" />
+        <marker exact="gfx/terobjs/trees/blackpine" name="Blackpine" show="false" />
         <marker exact="gfx/terobjs/trees/buckthorn" name="Buckthorn" show="false" />
         <marker exact="gfx/terobjs/trees/cedar" name="Cedar" show="false" />
         <marker exact="gfx/terobjs/trees/chastetree" name="Chaste Tree" show="false" icon="gfx/invobjs/seed-chastetree" />
@@ -94,6 +95,7 @@
         <marker exact="gfx/terobjs/trees/corkoak" name="Cork" show="false" />
         <marker exact="gfx/terobjs/trees/crabappletree" name="Crabapple" show="false" />
         <marker exact="gfx/terobjs/trees/cypress" name="Cypress" show="false" />
+        <marker exact="gfx/terobjs/trees/dogwood" name="Dogwood" show="false" />
         <marker exact="gfx/terobjs/trees/elm" name="Elm" show="false" />
         <marker exact="gfx/terobjs/trees/fir" name="Fir" show="false" />
         <marker exact="gfx/terobjs/trees/goldenchain" name="Goldenchain" show="false" />
@@ -124,8 +126,11 @@
         <marker exact="gfx/terobjs/trees/silverfir" name="Silver Fir" show="false" icon="gfx/invobjs/seed-silverfir"/>
         <marker exact="gfx/terobjs/trees/sorbtree" name="Sorb Apple" show="false" icon="gfx/invobjs/sorbapple" />
         <marker exact="gfx/terobjs/trees/spruce" name="Spruce" show="false" />
+        <marker exact="gfx/terobjs/trees/stonepine" name="Stonepine" show="false" />
+        <marker exact="gfx/terobjs/trees/strawberrytree" name="Strawberry" show="false" />
         <marker exact="gfx/terobjs/trees/sweetgum" name="Sweetgum" show="false" />
         <marker exact="gfx/terobjs/trees/terebinth" name="Terebinth Tree" show="false" icon="gfx/invobjs/seed-terebinth"/>
+        <marker exact="gfx/terobjs/trees/towercap" name="Towercap" show="false" />
         <marker exact="gfx/terobjs/trees/walnuttree" name="Walnut" show="false" icon="gfx/invobjs/walnut" />
         <marker exact="gfx/terobjs/trees/whitebeam" name="Whitebeam" show="false" />
         <marker exact="gfx/terobjs/trees/willow" name="Willow" show="false" />
