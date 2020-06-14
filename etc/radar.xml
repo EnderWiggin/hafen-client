@@ -87,7 +87,7 @@
         <marker exact="gfx/terobjs/trees/birdcherrytree" name="Bird Cherry" show="false" />
         <marker exact="gfx/terobjs/trees/blackpine" name="Blackpine" show="false" />
         <marker exact="gfx/terobjs/trees/buckthorn" name="Buckthorn" show="false" />
-        <marker exact="gfx/terobjs/trees/carobtree" name="Carob" show="true" />
+        <marker exact="gfx/terobjs/trees/carobtree" name="Carob" show="false" />
         <marker exact="gfx/terobjs/trees/cedar" name="Cedar" show="false" />
         <marker exact="gfx/terobjs/trees/chastetree" name="Chaste Tree" show="false" icon="gfx/invobjs/seed-chastetree" />
         <marker exact="gfx/terobjs/trees/cherry" name="Cherry" show="false" icon="gfx/invobjs/cherry" />
