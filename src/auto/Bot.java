@@ -170,8 +170,12 @@ public class Bot implements Defer.Callable<Void> {
     }
     
     private static double distanceToPlayer(Gob gob) {
-	Gob p = gob.glob.oc.getgob(gob.glob.sess.ui.gui.plid);
-	return p.rc.dist(gob.rc);
+        try {
+            Gob p = gob.glob.oc.getgob(gob.glob.sess.ui.gui.plid);
+            return p.rc.dist(gob.rc);
+        } catch (Exception e) {
+            return(0);
+        }
     }
     
     public static Comparator<Gob> byDistance = (o1, o2) -> {
