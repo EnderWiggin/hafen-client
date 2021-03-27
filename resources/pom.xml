@@ -1,0 +1,98 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.havenandhearth</groupId>
+	<artifactId>client-res</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<name>HnH Client Resources</name>
+	<description>Mavenized Haven and Hearth Client Resources, modified by EnderWiggin and ProgrammerDan</description>
+	
+	<parent>
+		<groupId>com.havenandhearth</groupId>
+		<artifactId>hafen-parent</artifactId>
+		<version>1.0.0</version>
+		<relativePath>../parent-pom.xml</relativePath>
+	</parent>
+	
+	<build>
+		<sourceDirectory>java</sourceDirectory>
+		<outputDirectory>classes</outputDirectory>
+		<finalName>client-res</finalName>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<!-- We use antrun to execute the java stuff. -->
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>resources</id>
+						<phase>process-classes</phase>
+						<configuration>
+							<target>
+						    <exec executable="${java.home}/bin/java" failifexecutionfails="false">
+						      <arg line="-jar LayerUtil.jar -re src/local compiled/res" />
+						    </exec>
+						    <exec executable="${java.home}/bin/java" failifexecutionfails="false">
+						      <arg line="-jar LayerUtil.jar -re src/remote compiled/res-preload" />
+						    </exec>
+								<echo message="done with java exec" />
+							</target>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <excludes>
+          	<exclude>haven/**</exclude>
+            <exclude>**/**.class</exclude>
+          </excludes>
+		      <outputDirectory>../target</outputDirectory>
+        </configuration>
+      </plugin>
+		</plugins>
+
+		<resources>
+			<resource>
+				<directory>compiled</directory>
+			</resource>
+			<resource>
+				<directory>.</directory>
+				<includes>
+					<include>item_data/**</include>
+				</includes>
+			</resource>
+			<resource>
+				<directory>../</directory>
+				<includes>
+					<include>i10n/**/**.json</include>
+				</includes>
+			</resource>
+			<resource>
+				<directory>../etc</directory>
+				<includes>
+					<include>radar.xml</include>
+					<include>gob_path.json</include>
+					<include>gob_radius.json</include>
+				</includes>
+			</resource>
+		</resources>
+	</build>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.havenandhearth</groupId>
+			<artifactId>hafen</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+		</dependency>
+	</dependencies>
+</project>

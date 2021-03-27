@@ -1,0 +1,228 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.havenandhearth</groupId>
+	<artifactId>hafen</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<name>HnH Client</name>
+	<description>Mavenized Haven and Hearth Client, modified by EnderWiggin and ProgrammerDan</description>
+
+	<parent>
+		<groupId>com.havenandhearth</groupId>
+		<artifactId>hafen-parent</artifactId>
+		<version>1.0.0</version>
+		<relativePath>parent-pom.xml</relativePath>
+	</parent>
+
+	<build>
+		<sourceDirectory>src</sourceDirectory>
+		<finalName>hafen</finalName>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<!-- We use antrun b/c fetch and filegen is just easier with original build.xml fragments. -->
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>res-jars</id>
+						<phase>generate-resources</phase>
+						<configuration>
+							<target>
+								<get src="http://www.havenandhearth.com/java/hafen-res.jar" dest="lib/hafen-res.jar" usetimestamp="true" />
+								<get src="http://www.havenandhearth.com/java/builtin-res.jar" dest="lib/builtin-res.jar" usetimestamp="true" />
+								<exec executable="git" outputproperty="gitrev" failifexecutionfails="false">
+									<arg line="rev-parse HEAD" />
+								</exec>
+								<tstamp>
+									<format property="iversion" pattern="dd.MM.yyyy HH:mm" />
+								</tstamp>
+								<echo file="target/classes/buildinfo">
+									git-rev = ${gitrev}
+									version = ${iversion}
+								</echo>
+								<echo message="done with generate" />
+							</target>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<!-- Shade is superior to expanding the jars into the classpath; same outcome but clearer steps -->
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<configuration>
+					<transformers>
+						<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+							<manifestEntries>
+								<Main-Class>haven.MainFrame</Main-Class>
+								<Class-Path>jogl.jar gluegen-rt.jar client-res.jar builtin-res.jar hafen-res.jar</Class-Path>
+							</manifestEntries>
+						</transformer>
+						<transformer implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
+							<resource>changelog.txt</resource>
+							<file>changelog.txt</file>
+						</transformer>
+						<transformer implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
+							<resource>haven/ressrv.crt</resource>
+							<file>etc/ressrv.crt</file>
+						</transformer>
+						<transformer implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
+							<resource>haven/authsrv.crt</resource>
+							<file>etc/authsrv.crt</file>
+						</transformer>
+						<transformer implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
+							<resource>haven/res-preload</resource>
+							<file>etc/res-preload</file>
+						</transformer>
+						<transformer implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
+							<resource>haven/res-bgload</resource>
+							<file>etc/res-bgload</file>
+						</transformer>
+						<transformer implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
+							<resource>haven/icon.png</resource>
+							<file>etc/icon.png</file>
+						</transformer>
+						<transformer implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
+							<resource>haven/font.ttf</resource>
+							<file>etc/font.ttf</file>
+						</transformer>
+						<transformer implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
+							<resource>META-INF/glob</resource>
+							<file>target/META-INF/glob</file>
+						</transformer>
+					</transformers>
+					<filters>
+						<filter>
+							<artifact>dolda:jglob</artifact>
+							<includes>
+								<include>**</include>
+							</includes>
+							<excludes>
+								<exclude>META-INF/**</exclude>
+							</excludes>
+						</filter>
+						<filter>
+							<artifact>com.google.code.gson:gson</artifact>
+							<includes>
+								<include>**</include>
+							</includes>
+							<excludes>
+								<exclude>META-INF/**</exclude>
+							</excludes>
+						</filter>
+						<filter>
+							<artifact>io.reactivex:rxjava</artifact>
+							<includes>
+								<include>**</include>
+							</includes>
+							<excludes>
+								<exclude>META-INF/**</exclude>
+							</excludes>
+						</filter>
+					</filters>
+					<artifactSet>
+						<excludes>
+							<exclude>org.jogamp.gluegen:*</exclude>
+							<exclude>org.jogamp.jogl:*</exclude>
+							<exclude>javax.jnlp:*</exclude>
+						</excludes>
+					</artifactSet>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<!-- We also need to shape the "target" folder, so that it's runnable from there. -->
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-resources</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${basedir}/target</outputDirectory>
+							<resources>
+								<resource>
+									<directory>lib</directory>
+									<filtering>false</filtering>
+									<includes>
+										<include>hafen-res.jar</include>
+										<include>builtin-res.jar</include>
+										<include>gluegen-rt.jar</include>
+										<include>jogl.jar</include>
+									</includes>
+								</resource>
+								<resource>
+									<directory>lib/jogl-natives</directory>
+									<filtering>false</filtering>
+									<includes>
+										<include>*.jar</include>
+									</includes>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+		<resources>
+			<resource>
+				<directory>src</directory>
+				<excludes>
+					<exclude>**/*.java</exclude>
+				</excludes>
+			</resource>
+		</resources>
+	</build>
+
+	<!-- For build purposes, all depedencies are listed here. Some public, some from local repo. -->
+	<dependencies>
+		<dependency>
+			<groupId>io.reactivex</groupId>
+			<artifactId>rxjava</artifactId>
+			<version>1.1.5</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jogamp.gluegen</groupId>
+			<artifactId>gluegen-rt-main</artifactId>
+			<version>2.3.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jogamp.jogl</groupId>
+			<artifactId>jogl-all-main</artifactId>
+			<version>2.3.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.3.1</version>
+		</dependency>
+		<dependency>
+			<groupId>javax.jnlp</groupId>
+			<artifactId>jnlp-api</artifactId>
+			<version>7.0</version>
+		</dependency>
+		<dependency>
+			<groupId>dolda</groupId>
+			<artifactId>jglob</artifactId>
+			<version>1.0</version>
+		</dependency>
+	</dependencies>
+</project>

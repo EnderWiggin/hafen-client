@@ -1,7 +1,12 @@
 /.classpath
 /.project
 /build
+/.settings
 *~
 out
 /resources/compiled
 /resources/classes
+/resources/target
+/target/
+**/dependency-reduced-pom.xml
+*.json
