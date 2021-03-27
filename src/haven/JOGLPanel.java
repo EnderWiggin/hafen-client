@@ -619,6 +619,9 @@ public class JOGLPanel extends GLCanvas implements Runnable, UIPanel, Console.Di
 	if(getParent() instanceof Console.Directory)
 	    ui.cons.add((Console.Directory)getParent());
 	ui.cons.add(this);
+	if(ui.sess != null){
+	    ui.sess.ui = ui;
+	}
 	return(ui);
     }
 

@@ -172,8 +172,6 @@ public class UI {
 	root = new RootWidget(this, sz);
 	widgets.put(0, root);
 	rwidgets.put(root, 0);
-	this.sess = sess;
-	if(sess != null) {sess.ui = this;}
 	if(fun != null)
 	    fun.init(this);
     }
