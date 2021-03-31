@@ -1248,25 +1248,25 @@ public class Utils {
     public static FloatBuffer bufcp(float[] a) {
 	FloatBuffer b = mkfbuf(a.length);
 	b.put(a);
-	b.rewind();
+	((Buffer)b).rewind();
 	return(b);
     }
     public static ShortBuffer bufcp(short[] a) {
 	ShortBuffer b = mksbuf(a.length);
 	b.put(a);
-	b.rewind();
+	((Buffer)b).rewind();
 	return(b);
     }
     public static FloatBuffer bufcp(FloatBuffer a) {
-	a.rewind();
+	((Buffer)a).rewind();
 	FloatBuffer ret = mkfbuf(a.remaining());
-	ret.put(a).rewind();
+	((Buffer)ret.put(a)).rewind();
 	return(ret);
     }
     public static IntBuffer bufcp(IntBuffer a) {
-	a.rewind();
+	((Buffer)a).rewind();
 	IntBuffer ret = mkibuf(a.remaining());
-	ret.put(a).rewind();
+	((Buffer)ret.put(a)).rewind();
 	return(ret);
     }
     public static ByteBuffer mkbbuf(int n) {
@@ -1317,15 +1317,15 @@ public class Utils {
 	return(ShortBuffer.wrap(new short[n]));
     }
     public static FloatBuffer wbufcp(FloatBuffer a) {
-	a.rewind();
+	((Buffer)a).rewind();
 	FloatBuffer ret = wfbuf(a.remaining());
-	ret.put(a.slice()).rewind();
+	((Buffer)ret.put(a.slice())).rewind();
 	return(ret);
     }
     public static IntBuffer wbufcp(IntBuffer a) {
-	a.rewind();
+	((Buffer)a).rewind();
 	IntBuffer ret = wibuf(a.remaining());
-	ret.put(a.slice()).rewind();
+	((Buffer)ret.put(a.slice())).rewind();
 	return(ret);
     }
 
@@ -1335,7 +1335,7 @@ public class Utils {
 	int sz = buf.capacity();
 	while(sz - buf.position() < req)
 	    sz <<= 1;
-	return(ByteBuffer.allocate(sz).order(buf.order()).put((ByteBuffer)buf.flip()));
+	return(ByteBuffer.allocate(sz).order(buf.order()).put((ByteBuffer)((Buffer)buf).flip()));
     }
 
     public static float[] c2fa(Color c) {

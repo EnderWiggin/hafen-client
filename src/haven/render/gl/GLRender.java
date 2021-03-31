@@ -223,7 +223,7 @@ public class GLRender implements Render, Disposable {
 				    if(data.va.bufs[i].usage == EPHEMERAL)
 					buf.put(((HeapBuffer)bufs[i]).buf);
 				}
-				buf.flip();
+				((Buffer)buf).flip();
 				gl.glBufferData(GL.GL_ARRAY_BUFFER, jdsz, buf, GL3.GL_STREAM_DRAW);
 			    }
 			});
@@ -436,7 +436,7 @@ public class GLRender implements Render, Disposable {
 		    cgl.glBindBuffer(GL3.GL_PIXEL_PACK_BUFFER, 0);
 		    pbo.dispose();
 		    GLException.checkfor(cgl, env);
-		    data.rewind();
+		    ((Buffer)data).rewind();
 		    /* XXX: It's not particularly nice to do the
 		     * flipping on the dispatch thread, but OpenGL
 		     * does not seem to offer any GPU-assisted
@@ -486,7 +486,7 @@ public class GLRender implements Render, Disposable {
 		    cgl.glBindBuffer(GL3.GL_PIXEL_PACK_BUFFER, 0);
 		    pbo.dispose();
 		    GLException.checkfor(cgl, env);
-		    data.rewind();
+		    ((Buffer)data).rewind();
 		    /* XXX: It's not particularly nice to do the
 		     * flipping on the dispatch thread, but OpenGL
 		     * does not seem to offer any GPU-assisted

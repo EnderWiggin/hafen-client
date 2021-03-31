@@ -228,11 +228,11 @@ public abstract class BGL {
     public void bglCopyBufferf(final FloatBuffer dst, final int doff, final FloatBuffer src, final int soff, final int len) {
 	add(new Command() {
 		public void run(GL3 gl) {
-		    dst.position(doff);
-		    src.position(soff).limit(len);
+		    ((Buffer)dst).position(doff);
+		    ((Buffer)src).position(soff).limit(len);
 		    dst.put(src);
-		    dst.rewind();
-		    src.rewind().limit(src.capacity());
+		    ((Buffer)dst).rewind();
+		    ((Buffer)src).rewind().limit(src.capacity());
 		}
 	    });
     }
@@ -240,9 +240,9 @@ public abstract class BGL {
     public void bglCopyBufferf(final FloatBuffer dst, final int doff, final float[] src, final int soff, final int len) {
 	add(new Command() {
 		public void run(GL3 gl) {
-		    dst.position(doff);
+		    ((Buffer)dst).position(doff);
 		    dst.put(src, soff, len);
-		    dst.rewind();
+		    ((Buffer)dst).rewind();
 		}
 	    });
     }

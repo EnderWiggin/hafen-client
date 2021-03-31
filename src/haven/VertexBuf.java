@@ -158,7 +158,7 @@ public class VertexBuf {
 		throw(new AssertionError());
 	    FloatBuffer dst = bdst.asFloatBuffer();
 	    if(stride == elfmt.size()) {
-		dst.position(offset / 4);
+		((Buffer)dst).position(offset / 4);
 		dst.put(data);
 	    } else if((stride % 4) == 0) {
 		for(int i = 0, o = offset / 4, fs = stride / 4; i < data.capacity(); i += elfmt.nc, o += fs) {
@@ -188,7 +188,7 @@ public class VertexBuf {
 		throw(new AssertionError());
 	    IntBuffer dst = bdst.asIntBuffer();
 	    if(stride == elfmt.size()) {
-		dst.position(offset / 4);
+		((Buffer)dst).position(offset / 4);
 		dst.put(data);
 	    } else if((stride % 4) == 0) {
 		for(int i = 0, o = offset / 4, fs = stride / 4; i < data.capacity(); i += elfmt.nc, o += fs) {
