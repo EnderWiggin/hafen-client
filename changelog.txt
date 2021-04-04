@@ -1,6 +1,9 @@
+$size[14]{$u{Update for 04.04.21 v2:}
+  * added options to reverse bad camera rotation axis
+
 $size[14]{$u{Update for 04.04.21:}
   * fixed widget shortcuts not working in same session they were re-bound
-  * fixed couple crashes related to fvourites in Extended Craft window
+  * fixed couple crashes related to favourites in Extended Craft window
  
 $size[14]{$u{Update for 03.04.21:}
   * fixed object highlight by ALT+LClick not working

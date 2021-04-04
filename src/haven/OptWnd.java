@@ -698,7 +698,12 @@ public class OptWnd extends Window {
 		}
 	    }
 	}, x, y).val = (int) (1000 * CFG.CAMERA_BRIGHT.get());
-
+ 
+	y += 35;
+	camera.add(new CFGBox("Reverse Bad Cam X", CFG.CAMERA_REVERSE_BAD_X), x, y);
+	
+	y += 25;
+	camera.add(new CFGBox("Reverse Bad Cam Y", CFG.CAMERA_REVERSE_BAD_Y), x, y);
 
 	y += 25;
 	my = Math.max(my, y);

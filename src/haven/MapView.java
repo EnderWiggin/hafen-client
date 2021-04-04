@@ -306,6 +306,10 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	}
 
 	public void drag(Coord c) {
+	    if (CFG.CAMERA_REVERSE_BAD_X.get())
+		c = new Coord(c.x + (dragorig.x - c.x) * 2, c.y);
+	    if (CFG.CAMERA_REVERSE_BAD_Y.get())
+		c = new Coord(c.x, c.y + (dragorig.y - c.y) * 2);
 	    telev = elevorig - ((float)(c.y - dragorig.y) / 100.0f);
 	    if(telev < 0.0f) telev = 0.0f;
 	    if(telev > (Math.PI / 2.0)) telev = (float)Math.PI / 2.0f;
@@ -319,6 +323,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	    tdist = d;
 	    return(true);
 	}
+	
     }
     static {camtypes.put("bad", FreeCam.class);}
     

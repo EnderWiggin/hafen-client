@@ -65,6 +65,10 @@ public class CFG<T> {
     public static final CFG<SingleType> Q_ALT_TYPE = new CFG<>("ui.q.alttype", SingleType.All);
     public static final CFG<Boolean> Q_SHOW_CTRL = new CFG<>("ui.q.showctrl", true);
     public static final CFG<SingleType> Q_CTRL_TYPE = new CFG<>("ui.q.ctrltype", SingleType.All);
+    
+    
+    public static final CFG<Boolean> CAMERA_REVERSE_BAD_X = new CFG<>("camera.bad.reverse.x", false);
+    public static final CFG<Boolean> CAMERA_REVERSE_BAD_Y = new CFG<>("camera.bad.reverse.y", false);
 
     private static final String CONFIG_JSON = "config.json";
     private static final Map<Object, Object> cfg;
