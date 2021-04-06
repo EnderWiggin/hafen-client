@@ -46,6 +46,7 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
     public boolean matches = false;
     public boolean sendttupdate = false;
     private long filtered = 0;
+    public double studytime = 0;
 
     public static void setFilter(ItemFilter filter) {
 	GItem.filter = filter;

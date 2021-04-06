@@ -39,6 +39,7 @@ import rx.functions.Action1;
 import rx.functions.Action3;
 
 import static haven.Inventory.sqsz;
+import static haven.Text.*;
 
 public class WItem extends Widget implements DTarget2 {
     public static final Resource missing = Resource.local().loadwait("gfx/invobjs/missing");
@@ -288,6 +289,15 @@ public class WItem extends Widget implements DTarget2 {
 		g.aimage(tex, sz.div(2), 0.5, 0.5);
 		tex.dispose();
 	    } else {
+		GItem itm = WItem.this.item;
+		if (itm.studytime > 0 && meter > 0) {
+		    int timeleft = (int) (itm.studytime * (1.0 - meter));
+		    int hoursleft = timeleft / 60;
+		    int minutesleft = timeleft - hoursleft * 60;
+		    Tex tex = Text.renderstroked(String.format("%d:%02d", hoursleft, minutesleft)).tex();
+		    g.aimage(tex, TEXT_PADD_BOT.add(sz), 1, 1);
+		    tex.dispose();
+		}
 		g.chcolor(255, 255, 255, 64);
 		Coord half = sz.div(2);
 		g.prect(half, half.inv(), half, meter * Math.PI * 2);

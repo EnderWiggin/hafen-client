@@ -44,6 +44,8 @@ public class Curiosity extends ItemInfo.Tip {
 	this.enc = enc;
 	this.time = time;
 	this.lph = (exp > 0 && time > 0) ? (3600 * exp / time) : 0;
+	if (owner instanceof GItem)
+	    ((GItem) owner).studytime = (CFG.REAL_TIME_CURIO.get() ? time / Timer.SERVER_RATIO : time) / 60;
     }
 
     static String[] units = {"s", "m", "h", "d"};
