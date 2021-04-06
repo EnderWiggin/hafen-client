@@ -35,7 +35,7 @@ import static haven.QualityList.SingleType.*;
 
 public class Curiosity extends ItemInfo.Tip {
     public final int exp, mw, enc, time;
-    private transient final int lph;
+    public transient final int lph;
 
     public Curiosity(Owner owner, int exp, int mw, int enc, int time) {
 	super(owner);
@@ -72,7 +72,7 @@ public class Curiosity extends ItemInfo.Tip {
 	return(buf.toString());
     }
     
-    static int lph(int lph){
+    public static int lph(int lph){
         return CFG.REAL_TIME_CURIO.get() ? ((int) (Timer.SERVER_RATIO * lph)) : lph;
     }
 
