@@ -35,6 +35,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.awt.image.BufferedImage;
 import haven.ItemInfo.AttrCache;
+import me.ender.timer.Timer;
 import rx.functions.Action1;
 import rx.functions.Action3;
 
@@ -291,7 +292,8 @@ public class WItem extends Widget implements DTarget2 {
 	    } else {
 		GItem itm = WItem.this.item;
 		if (itm.studytime > 0 && meter > 0) {
-		    int timeleft = (int) (itm.studytime * (1.0 - meter));
+		    double studytime = CFG.REAL_TIME_CURIO.get() ? itm.studytime / Timer.SERVER_RATIO : itm.studytime;
+		    int timeleft = (int) (studytime * (1.0 - meter));
 		    int hoursleft = timeleft / 60;
 		    int minutesleft = timeleft - hoursleft * 60;
 		    Tex tex = Text.renderstroked(String.format("%d:%02d", hoursleft, minutesleft)).tex();
