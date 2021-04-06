@@ -40,7 +40,6 @@ import rx.functions.Action1;
 import rx.functions.Action3;
 
 import static haven.Inventory.sqsz;
-import static haven.Text.*;
 
 public class WItem extends Widget implements DTarget2 {
     public static final Resource missing = Resource.local().loadwait("gfx/invobjs/missing");
