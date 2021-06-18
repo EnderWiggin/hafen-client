@@ -441,7 +441,7 @@ public class CharWnd extends WindowX {
 	public final Color bg;
 	public final Resource res;
 	private double lvlt = 0.0;
-	private Text ct;
+	private Text ct, bt;
 	private int cbv = -1, ccv = -1;
 
 	private Attr(Glob glob, String attr, Color bg) {
@@ -458,6 +458,7 @@ public class CharWnd extends WindowX {
 	    if((attr.base != cbv) || (attr.comp != ccv)) {
 		cbv = attr.base; ccv = attr.comp;
 		Color c = Color.WHITE;
+		bt = attrf.render(String.format("(%d)", cbv), c);
 		if(ccv > cbv) {
 		    c = buff;
 		    tooltip = Text.render(String.format("%d + %d", cbv, ccv - cbv));
@@ -484,6 +485,7 @@ public class CharWnd extends WindowX {
 	    g.aimage(img, cn.add(5, 0), 0, 0.5);
 	    g.aimage(rnm.tex(), cn.add(img.sz().x + margin2, 1), 0, 0.5);
 	    g.aimage(ct.tex(), cn.add(sz.x - UI.scale(7), 1), 1, 0.5);
+	    g.aimage(bt.tex(), cn.add(sz.x - UI.scale(7), 1), 2, 0.5);
 	}
 
 	public void lvlup() {
