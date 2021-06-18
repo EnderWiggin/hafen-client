@@ -86,8 +86,9 @@ public class Curiosity extends ItemInfo.Tip {
 	if(remaining != null) {
 	    buf.append(String.format("Remaining: $col[255,224,192]{%s}\n", remaining));
 	}
-	if(CFG.SHOW_CURIO_LPH.get() && lph > 0){
+	if(CFG.SHOW_CURIO_LPH.get() && lph > 0) {
 	    buf.append(String.format("LP/H: $col[192,255,255]{%d}\n", lph(this.lph)));
+	    buf.append(String.format("LP/H/Weight: $col[192,255,255]{%d}\n", lph(this.lph / mw)));
 	}
 	if(mw > 0)
 	    buf.append(String.format("Mental weight: $col[255,192,255]{%d}\n", mw));
