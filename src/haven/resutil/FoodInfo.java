@@ -43,7 +43,7 @@ public class FoodInfo extends ItemInfo.Tip {
     public final Effect[] efs;
     public final int[] types;
     private final CharacterInfo.Constipation constipation;
-
+    
     public FoodInfo(Owner owner, double end, double glut, double cons, Event[] evs, Effect[] efs, int[] types) {
 	super(owner);
 	this.end = end;
@@ -52,7 +52,7 @@ public class FoodInfo extends ItemInfo.Tip {
 	this.evs = evs;
 	this.efs = efs;
 	this.types = types;
-
+	
 	CharacterInfo.Constipation constipation = null;
 	try {
 	    constipation = owner.context(Session.class).character.constipation;
@@ -62,19 +62,19 @@ public class FoodInfo extends ItemInfo.Tip {
 	} catch (NullPointerException | OwnerContext.NoContext ignore) {}
 	this.constipation = constipation;
     }
-
-
+    
+    
     public FoodInfo(Owner owner, double end, double glut, Event[] evs, Effect[] efs, int[] types) {
 	this(owner, end, glut, 0, evs, efs, types);
     }
-
+    
     public static class Event {
 	public static final Coord imgsz = new Coord(Text.std.height(), Text.std.height());
 	public final CharWnd.FoodMeter.Event ev;
 	public final BufferedImage img;
 	public final double a;
 	private final String res;
- 
+	
 	public Event(Resource res, double a) {
 	    this.ev = res.layer(CharWnd.FoodMeter.Event.class);
 	    this.img = PUtils.convolve(res.layer(Resource.imgc).img, imgsz, CharWnd.iconfilter);
@@ -82,24 +82,31 @@ public class FoodInfo extends ItemInfo.Tip {
 	    this.res = res.name;
 	}
     }
-
+    
     public static class Effect {
 	public final List<ItemInfo> info;
 	public final double p;
-
+	
 	public Effect(List<ItemInfo> info, double p) {this.info = info; this.p = p;}
     }
-
+    
     public BufferedImage tipimg() {
-	String head = String.format("Energy: $col[128,128,255]{%s%%}, Hunger: $col[255,192,128]{%s%%}", Utils.odformat2(end * 100, 2), Utils.odformat2(glut * 100, 2));
+	String head = String.format("Energy: $col[128,128,255]{%s%%}, Hunger: $col[255,192,128]{%s%%}, Energy/Hunger: $col[128,128,255]{%s%%}",
+	    Utils.odformat2(end * 100, 2), Utils.odformat2(glut * 100, 2), Utils.odformat2(end / glut, 2));
 	if(cons != 0)
 	    head += String.format(", Satiation: $col[192,192,128]{%s%%}", Utils.odformat2(cons * 100, 2));
 	BufferedImage base = RichText.render(head, 0).img;
 	Collection<BufferedImage> imgs = new LinkedList<BufferedImage>();
 	imgs.add(base);
+	double fepSum = 0;
+	for (int i = 0; i < evs.length; i++) {
+	    fepSum += evs[i].a;
+	}
 	for(int i = 0; i < evs.length; i++) {
+	    double probability = evs[i].a / fepSum;
+	    String fepItemString = String.format("%s (%s%%)", Utils.odformat2(evs[i].a, 2), Utils.odformat2(probability, 2));
 	    Color col = Utils.blendcol(evs[i].ev.col, Color.WHITE, 0.5);
-	    imgs.add(catimgsh(5, evs[i].img, RichText.render(String.format("%s: $col[%d,%d,%d]{%s}", evs[i].ev.nm, col.getRed(), col.getGreen(), col.getBlue(), Utils.odformat2(evs[i].a, 2)), 0).img));
+	    imgs.add(catimgsh(5, evs[i].img, RichText.render(String.format("%s: $col[%d,%d,%d]{%s}", evs[i].ev.nm, col.getRed(), col.getGreen(), col.getBlue(), fepItemString), 0).img));
 	}
 	for(int i = 0; i < efs.length; i++) {
 	    BufferedImage efi = ItemInfo.longtip(efs[i].info);
@@ -120,9 +127,10 @@ public class FoodInfo extends ItemInfo.Tip {
 	    Color col = color(effective);
 	    imgs.add(RichText.render(String.format("Effective: $col[%d,%d,%d]{%s%%}", col.getRed(), col.getGreen(), col.getBlue(), Utils.odformat2(100 * effective, 2)), 0).img);
 	}
+	imgs.add(RichText.render(String.format("FEP Sum: $col[128,255,0]{%s}, FEP/Hunger: $col[128,255,0]{%s}", Utils.odformat2(fepSum, 2), Utils.odformat2(fepSum / (100 * glut), 2)), 0).img);
 	return(catimgs(0, imgs.toArray(new BufferedImage[0])));
     }
-
+    
     private static BufferedImage renderConstipation(CharacterInfo.Constipation.Data data) {
 	int h = 14;
 	BufferedImage img = data.res.get().layer(Resource.imgc).img;
@@ -134,7 +142,7 @@ public class FoodInfo extends ItemInfo.Tip {
 	g.drawImage(convolvedown(img, new Coord(h, h), tflt), 0, 0, null);
 	g.drawImage(rnm.img, h + 5, ((h - rnm.sz().y) / 2) + 1, null);
 	g.dispose();
-
+	
 	return tip;
     }
     
@@ -143,7 +151,7 @@ public class FoodInfo extends ItemInfo.Tip {
 	private final double glut;
 	private final List<Pair<String, Double>> fep;
 	private final int[] types;
- 
+	
 	public Data(FoodInfo info, QualityList q) {
 	    end = info.end;
 	    glut = info.glut;
