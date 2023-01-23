@@ -628,9 +628,11 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	Moving m = getattr(Moving.class);
 	if(m != null)
 	    m.move(c);
-	if(Boolean.TRUE.equals(isMe()) && CFG.AUTOMAP_TRACK.get()) {
+	if(Boolean.TRUE.equals(isMe()) && (CFG.AUTOMAP_UPLOAD.get() || CFG.AUTOMAP_TRACK.get())) {
 	    MappingClient.getInstance().CheckGridCoord(c);
-	    MappingClient.getInstance().Track(id, c);
+	    if(CFG.AUTOMAP_TRACK.get()) {
+		MappingClient.getInstance().Track(id, c);
+	    }
 	}
 	this.rc = c;
 	this.a = a;
