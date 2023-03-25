@@ -333,6 +333,23 @@ public class ExtInventory extends Widget {
 	QualityList q = item.itemq.get();
 	return (q == null || q.isEmpty()) ? null : quantifyQ(q.single().value, g);
     }
+    private static int curiosityMentalWeight(ItemsGroup item){
+	Curiosity curioInfo = item.sample.curio.get();
+	if(curioInfo != null) {
+	    return curioInfo.mw;
+	} else {
+	    return 0;
+	}
+    }
+    
+    private static int curiosityLPH(ItemsGroup item){
+	Curiosity curioInfo = item.sample.curio.get();
+	if(curioInfo != null) {
+	    return curioInfo.lph(curioInfo.lph);
+	} else {
+	    return 0;
+	}
+    }
     
     private static Double quantifyQ(Double q, Grouping g) {
 	if(q == null) {return null;}
@@ -416,26 +433,47 @@ public class ExtInventory extends Widget {
 	    this.ui = ui;
 	    this.type = type;
 	    this.items = items;
-	    items.sort(ExtInventory::byQuality);
 	    this.sample = items.get(0);
-	    double quality;
-	    if(type.quality == null) {
-		quality = items.stream().map(ExtInventory::quality).filter(Objects::nonNull).reduce(0.0, Double::sum)
-		    / items.stream().map(ExtInventory::quality).filter(Objects::nonNull).count();
+	    
+	    // Grouping
+	    if(g == Grouping.Curios){
+		Curiosity curioInfo = this.sample.curio.get();
+		if(curioInfo != null) {
+		    this.text[0] = fnd.render(String.format("mw: %s - %s", curioInfo.mw, type.name)).tex();
+		}else{
+		    this.text[0] = fnd.render(String.format("%s", type.name)).tex();
+		}
+	    } else if (g == Grouping.CuriosLPH) {
+		Curiosity curioInfo = this.sample.curio.get();
+		if(curioInfo != null) {
+		    this.text[0] = fnd.render(String.format("lph: %s - %s", curioInfo.lph(curioInfo.lph), type.name)).tex();
+		}else{
+		    this.text[0] = fnd.render(String.format("%s", type.name)).tex();
+		}
 	    } else {
-		quality = type.quality;
+		items.sort(ExtInventory::byQuality);
+		double quality;
+		if(type.quality == null) {
+		    quality = items.stream().map(ExtInventory::quality).filter(Objects::nonNull).reduce(0.0, Double::sum)
+			/ items.stream().map(ExtInventory::quality).filter(Objects::nonNull).count();
+		} else {
+		    quality = type.quality;
+		}
+		String quantity = Utils.f2s(items.stream().map(wItem -> wItem.quantity.get()).reduce(0f, Float::sum));
+		this.text[1] = fnd.render(String.format("×%s %s", quantity, type.name)).tex();
+		if(!Double.isNaN(quality)) {
+		    String avg = type.quality != null ? "" : "~";
+		    String sign = (g == Grouping.NONE || g == Grouping.Q) ? "" : "+";
+		    String q = String.format("%sq%s%s", avg, Utils.f2s(quality, 1), sign);
+		
+		    this.text[0] = fnd.render(String.format("×%s %s", quantity, q)).tex();
+		} else {
+		    this.text[0] = text[1];
+		}
+	 
+		this.text[2] = info(sample, quantity, text[1]);
 	    }
-	    String quantity = Utils.f2s(items.stream().map(wItem -> wItem.quantity.get()).reduce(0f, Float::sum));
-	    this.text[1] = fnd.render(String.format("×%s %s", quantity, type.name)).tex();
-	    if(!Double.isNaN(quality)) {
-		String avg = type.quality != null ? "" : "~";
-		String sign = (g == Grouping.NONE || g == Grouping.Q) ? "" : "+";
-		String q = String.format("%sq%s%s", avg, Utils.f2s(quality, 1), sign);
-		this.text[0] = fnd.render(String.format("×%s %s", quantity, q)).tex();
-	    } else {
-		this.text[0] = text[1];
-	    }
-	    this.text[2] = info(sample, quantity, text[1]);
+	    
 	    flowerSubscription = Reactor.FLOWER_CHOICE.subscribe(this::flowerChoice);
 	}
     
@@ -574,6 +612,18 @@ public class ExtInventory extends Widget {
 	return Double.compare(qb, qa);
     }
     
+    private static int byCuriosMentalWeight(ItemsGroup a, ItemsGroup b){
+	int qa = curiosityMentalWeight(a);
+	int qb = curiosityMentalWeight(b);
+	return Integer.compare(qb, qa);
+    }
+    
+    private static int byCuriosLPH(ItemsGroup a, ItemsGroup b){
+	int qa = curiosityLPH(a);
+	int qb = curiosityLPH(b);
+	return Integer.compare(qb, qa);
+    }
+    
     public static boolean needDisableExtraInventory(String title) {
 	return EXCLUDES.contains(title);
     }
@@ -640,6 +690,15 @@ public class ExtInventory extends Widget {
 		} else {
 		    groups = ExtInventory.this.groups.entrySet().stream()
 			.map(v -> new ItemsGroup(ExtInventory.this, v.getKey(), v.getValue(), ui, grouping.sel)).collect(Collectors.toList());
+		    
+		    if(grouping.sel == Grouping.Curios) {
+			groups.sort(ExtInventory::byCuriosMentalWeight);
+		    }
+		    if(grouping.sel == Grouping.CuriosLPH){
+			groups.sort(ExtInventory::byCuriosLPH);
+		    }
+		    
+		    
 		}
 	    }
 	    needsUpdate = false;
@@ -716,7 +775,10 @@ public class ExtInventory extends Widget {
 	Q("Quality"),
 	Q1("Quality 1"),
 	Q5("Quality 5"),
-	Q10("Quality 10");
+	Q10("Quality 10"),
+	Curios("Curiosities MentalWeight"),
+	CuriosLPH("Curiosities LPH");
+	
 	
 	private final String name;
 	

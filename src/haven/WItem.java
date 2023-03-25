@@ -120,14 +120,21 @@ public class WItem extends Widget implements DTarget2 {
 		shorttip = longtip = null;
 		ttinfo = info;
 	    }
-	    if(now - hoverstart < 1.0) {
-		if(shorttip == null)
-		    shorttip = new ShortTip(info);
-		return(shorttip);
-	    } else {
+	    
+	    if(CFG.UI_ALWAYS_SHOW_LONG_TOOLTIPS.get()){
 		if(longtip == null)
 		    longtip = new LongTip(info);
 		return(longtip);
+	    } else { /* normal behaviour */
+		if(now - hoverstart < 1.0) {
+		    if(shorttip == null)
+			shorttip = new ShortTip(info);
+		    return(shorttip);
+		} else {
+		    if(longtip == null)
+			longtip = new LongTip(info);
+		    return(longtip);
+		}
 	    }
 	} catch(Loading e) {
 	    return("...");
