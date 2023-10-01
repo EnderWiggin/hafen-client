@@ -52,7 +52,7 @@ public class ItemData {
     public void init(List<ItemInfo> info) {
 	for (ItemInfo ii : info) {
 	    String className = ii.getClass().getCanonicalName();
-	    QualityList q = new QualityList(ItemInfo.findall(QualityList.classname, info));
+	    QualityList q = QualityList.make(ItemInfo.findall(QualityList.classname, info));
 
 	    if(ii instanceof Curiosity) {
 		curiosity = new Curiosity.Data((Curiosity) ii, q);

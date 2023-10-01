@@ -193,7 +193,7 @@ public class AttrBonusesWdg extends Widget implements ItemInfo.Owner {
 	    args[i + 1] = entry.getValue();
 	    i += 2;
 	}
-	return f.build(this, args);
+	return f.build(this, null, args);
     }
 
     private int BY_PRIORITY(Entry<Resource, Integer> o1, Entry<Resource, Integer> o2) {

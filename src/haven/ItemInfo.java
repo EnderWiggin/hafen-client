@@ -316,7 +316,7 @@ public abstract class ItemInfo {
 	}
     
 	public Content content() {
-	    QualityList q = new QualityList(sub);
+	    QualityList q = QualityList.make(sub);
 	    for (ItemInfo i : sub) {
 		if(i instanceof Name) {
 		    return content(((Name) i).original, q);
@@ -326,7 +326,7 @@ public abstract class ItemInfo {
 	}
 	
 	public static Content content(String name){
-	    return content(name, new QualityList(Collections.emptyList()));
+	    return content(name, QualityList.make(Collections.emptyList()));
 	}
 	
 	public static Content content(String name, QualityList q){
@@ -348,7 +348,7 @@ public abstract class ItemInfo {
 	    public final QualityList q;
 	    
 	    public Content(String name, String unit, float count) {
-		this(name, unit, count, new QualityList(Collections.emptyList()));
+		this(name, unit, count, QualityList.make(Collections.emptyList()));
 	    }
 	    
 	    public Content(String name, String unit, float count, QualityList q) {
@@ -606,7 +606,7 @@ public abstract class ItemInfo {
 	if(attrs != null) {
 	    Glob.CAttr str = attrs.get("str");
 	    Name name = ItemInfo.find(Name.class, infos);
-	    QualityList q = new QualityList(infos);
+	    QualityList q = QualityList.make(infos);
 	    if(str != null && name != null && !q.isEmpty() && GobTag.ofType(name.original, mining_tools)) {
 		double miningStrength = str.comp * q.single().value;
 		if(name.original.equals("Pickaxe")) {

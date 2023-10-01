@@ -115,7 +115,7 @@ public class ItemFilter {
 	for (ItemInfo item : info) {
 	    if(match(item)) {return true;}
 	}
-	return match(new QualityList(info));
+	return match(QualityList.make(info));
 
     }
     

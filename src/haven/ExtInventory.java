@@ -24,6 +24,8 @@ public class ExtInventory extends Widget {
     private static final String CFG_SHOW = "ext.show";
     private static final String CFG_INV = "ext.inv";
     private static final String[] TYPES = new String[]{"Quality", "Name", "Info"};
+    //TODO: remove name as it is not really needed
+    private static final List<Widget> INVENTORIES = new LinkedList<>();
     private static final Set<String> EXCLUDES = Collections.unmodifiableSet(new HashSet<>(Arrays.asList("Steelbox", "Pouch", "Frame", "Tub", "Fireplace", "Rack", "Pane mold", "Table", "Purse")));
     public final Inventory inv;
     private final ItemGroupList list;
@@ -45,6 +47,11 @@ public class ExtInventory extends Widget {
 	inv.ext = this;
 	extension = new Extension();
 	chb_repeat.settip("$b{Toggle repeat mode}\nApply any menu action to\nall items in the group.", true);
+	chb_show
+	    .rclick(this::toggleInventory)
+	    .changed(this::setVisibility)
+	    .settip("LClick to toggle extra info\nRClick to hide inventory when info is visible\nTapping ALT toggles between displaying quality, name and info", true);
+    
 	Composer composer = new Composer(extension).hmrgn(margin).vmrgn(margin);
 	grouping = new Dropbox<Grouping>(UI.scale(75), 5, UI.scale(16)) {
 	    {bgcolor = new Color(16, 16, 16, 128);}
@@ -118,24 +125,45 @@ public class ExtInventory extends Widget {
     }
     
     @Override
-    protected void added() {
-	wnd = getparent(WindowX.class);
+    public void unlink() {
+	remInventory(this);
+	if(chb_show.parent != null) {
+	    chb_show.unlink();
+	}
 	if(wnd != null) {
+	    wnd.remtwdg(chb_show);
+	}
+	super.unlink();
+    }
+    
+    @Override
+    protected void added() {
+	addInventory(this);
+	wnd = null;//just in case
+	Window tmp;
+	//do not try to add if we are in small floaty contents widget 
+	if(!(parent instanceof GItem.Contents)
+	    //or in the contents window
+	    && !(parent instanceof GItem.ContentsWindow)
+	    //or in the item
+	    && !(parent instanceof GItem)
+	    //or if we have no window parent, 
+	    && (tmp = getparent(Window.class)) != null
+	    //or it is not WindowX for some reason
+	    && tmp instanceof WindowX) {
+	
+	    wnd = (WindowX) tmp;
 	    disabled = disabled || needDisableExtraInventory(wnd.caption());
 	    boolean vis = !disabled && wnd.cfg.getValue(CFG_SHOW, false);
 	    showInv = wnd.cfg.getValue(CFG_INV, true);
 	    if(!disabled) {
 		chb_show.a = vis;
-		wnd.addtwdg(wnd.add(chb_show)
-		    .rclick(this::toggleInventory)
-		    .changed(this::setVisibility)
-		    .settip("LClick to toggle extra info\nRClick to hide inventory when info is visible\nTapping ALT toggles between displaying quality, name and info", true)
-		);
+		wnd.addtwdg(wnd.add(chb_show));
 		grouping.sel = Grouping.valueOf(wnd.cfg.getValue(CFG_GROUP, Grouping.NONE.name()));
 		needUpdate = true;
 	    }
-	    hideExtension();
 	}
+	hideExtension();
     }
     
     private void setVisibility(boolean v) {
@@ -161,6 +189,11 @@ public class ExtInventory extends Widget {
     
     private void updateLayout() {
 	inv.visible = showInv || !extension.visible;
+    
+	if(wnd == null) {
+	    pack();
+	    return;
+	}
 	
 	int szx = 0;
 	int szy = inv.pos("br").y;
@@ -246,16 +279,7 @@ public class ExtInventory extends Widget {
 	if(needUpdate && extension.visible && waitUpdate <= 0) {
 	    needUpdate = false;
 	    SortedMap<ItemType, List<WItem>> groups = new TreeMap<>();
-	    inv.forEachItem((g, w) -> {
-		try {
-		    Double quality = quality(w, grouping.sel);
-		    ItemType type = new ItemType(w, quality);
-		    if(type.loading) {needUpdate = true;}
-		    groups.computeIfAbsent(type, k -> new ArrayList<>()).add(w);
-		} catch (Loading ignored) {
-		    needUpdate = true;
-		}
-	    });
+	    inv.forEachItem((g, w) -> processItem(groups, w));
 	    this.groups = groups;
 	    list.changed();
 	}
@@ -274,6 +298,22 @@ public class ExtInventory extends Widget {
 	    }
 	}
 	super.tick(dt);
+    }
+    
+    private void processItem(SortedMap<ItemType, List<WItem>> groups, WItem witem) {
+	try {
+	    Widget winv = witem.item.contents;
+	    if(winv != null && CFG.UI_STACK_EXT_INV_UNPACK.get()) {
+		winv.children(WItem.class).forEach((w) -> processItem(groups, w));
+	    } else {
+		Double quality = quality(witem, grouping.sel);
+		ItemType type = new ItemType(witem, quality);
+		if(type.loading) {needUpdate = true;}
+		groups.computeIfAbsent(type, k -> new ArrayList<>()).add(witem);
+	    }
+	} catch (Loading ignored) {
+	    needUpdate = true;
+	}
     }
     
     private static String name(WItem item) {
@@ -473,11 +513,18 @@ public class ExtInventory extends Widget {
 
 	@Override
 	public boolean mousedown(Coord c, int button) {
-	    if(ui.modshift && (button == 1 || button == 3)) {
-		process(items, "transfer", ui.modmeta, button == 3);
+	    boolean properButton = button == 1 || button == 3;
+	    boolean reverse = button == 3;
+	    if(ui.modshift && properButton) {
+		Object[] args = extInventory.getTransferTargets();
+		if(args == null) {
+		    process(items, ui.modmeta, reverse, "transfer", sqsz.div(2), 1);
+		} else {
+		    process(items, ui.modmeta, reverse, "invxf2", args);
+		}
 		return true;
-	    } else if(ui.modctrl && (button == 1 || button == 3)) {
-		process(items, "drop", ui.modmeta, button == 3);
+	    } else if(ui.modctrl && properButton) {
+		process(items, ui.modmeta, reverse, "drop", sqsz.div(2), 1);
 		return true;
 	    } else {
 		WItem item = items.get(0);
@@ -488,7 +535,7 @@ public class ExtInventory extends Widget {
 	    return (false);
 	}
     
-	private static void process(final List<WItem> items, String action, boolean all, boolean reverse) {
+	private static void process(final List<WItem> items, boolean all, boolean reverse, String action, Object... args) {
 	    if(reverse) {
 		items.sort(ExtInventory::byReverseQuality);
 	    } else {
@@ -497,12 +544,12 @@ public class ExtInventory extends Widget {
 	    if(!all) {
 		WItem item = items.get(0);
 		if(!item.disposed()) {
-		    item.item.wdgmsg(action, sqsz.div(2), 1);
+		    item.item.wdgmsg(action, args);
 		}
 	    } else {
 		for (WItem item : items) {
 		    if(!item.disposed()) {
-			item.item.wdgmsg(action, sqsz.div(2), 1);
+			item.item.wdgmsg(action, args);
 		    }
 		}
 	    }
@@ -622,6 +669,46 @@ public class ExtInventory extends Widget {
 	} else {
 	    return null;
 	}
+    }
+    public static void addInventory(Widget ext) {
+	WindowX wnd = ext.getparent(WindowX.class);
+	if(wnd == null) {return;}
+	String name = wnd.cfgName(wnd.caption()).toLowerCase();
+	if(name.contains("inventory")
+	    || name.contains("character sheet")
+	    || name.contains("equipment")
+	    || name.contains("study")) {
+	    return;
+	}
+	INVENTORIES.add(ext);
+    }
+    
+    public static void remInventory(Widget ext) {
+	for (int i = 0; i < INVENTORIES.size(); i++) {
+	    if(INVENTORIES.get(i) == ext) {
+		INVENTORIES.remove(i);
+		return;
+	    }
+	}
+    }
+    
+    //TODO: should we sort inventories based on z-order of windows?
+    private Object[] getTransferTargets() {
+	//use default transfer logic if transferring not from main inventory
+	if(inv != ui.gui.maininv) {
+	    return null;
+	}
+	if(INVENTORIES.isEmpty()) {
+	    return null;
+	}
+	Object[] args = new Object[2 + INVENTORIES.size()];
+	int i = 0;
+	args[i++] = 0; //flags
+	args[i++] = 1; //how many to transfer
+	for (Widget wdg : INVENTORIES) {
+	    args[i++] = wdg.wdgid();
+	}
+	return args;
     }
     
     enum Grouping {

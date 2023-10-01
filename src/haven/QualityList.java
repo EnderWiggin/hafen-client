@@ -16,11 +16,10 @@ public class QualityList extends ItemInfo {
     private TexI tex;
     private final Map<SingleType, Quality> singles = new HashMap<>();
     private final boolean isEmpty;
-    public static final Quality DEFAULT = new Quality(QualityType.Quality, 10); 
-
-    public QualityList(List<ItemInfo> list) {
-	super(null);
-	qualities = new LinkedList<>();
+    public static final Quality DEFAULT = new Quality(QualityType.Quality, 10);
+    
+    public static QualityList make(List<ItemInfo> list) {
+	List<Quality> qualities = new LinkedList<>();
 	for (ItemInfo inf : list) {
 	    if(inf.getClass().getName().equals(classname)) {
 		String name = Reflect.getFieldValueString(inf, "original");
@@ -34,6 +33,27 @@ public class QualityList extends ItemInfo {
 		}
 	    }
 	}
+	return new QualityList(qualities);
+    }
+    
+    public QualityList(List<Quality> list) {
+	super(null);
+	qualities = new LinkedList<>();
+	qualities.addAll(list);
+	qualities.sort(QSORTER);
+	isEmpty = qualities.isEmpty();
+	if(!isEmpty) {
+	    SingleType[] types = SingleType.values();
+	    for (SingleType type : types) {
+		singles.put(type, type.get(qualities));
+	    }
+	}
+    }
+    
+    public QualityList(Quality quality) {
+	super(null);
+	qualities = new LinkedList<>();
+	qualities.add(quality);
 	qualities.sort(QSORTER);
 	isEmpty = qualities.isEmpty();
 	if(!isEmpty) {
@@ -115,7 +135,7 @@ public class QualityList extends ItemInfo {
 		return new AllQualities(QualityType.Quality, qualities);
 	    }
 	},
-	Average {
+	Mean {
 	    @Override
 	    public Quality get(List<Quality> qualities) {
 		if(qualities.isEmpty()) {
@@ -126,6 +146,19 @@ public class QualityList extends ItemInfo {
 		    sum += q.value * q.value;
 		}
 		return new Quality(Max.get(qualities).type, (float) Math.sqrt(sum / qualities.size()));
+	    }
+	},
+	Average {
+	    @Override
+	    public Quality get(List<Quality> qualities) {
+		if(qualities.isEmpty()) {
+		    return null;
+		}
+		float sum = 0;
+		for (Quality q : qualities) {
+		    sum += q.value;
+		}
+		return new Quality(Max.get(qualities).type, sum / qualities.size());
 	    }
 	},
 	Min {

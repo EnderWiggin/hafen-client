@@ -9,12 +9,12 @@ public class EquipProxy extends DraggableWidget implements DTarget2 {
     public static final Color BG_COLOR = new Color(91, 128, 51, 202);
     private Equipory.SLOTS[] slots;
     
-    public EquipProxy(Equipory.SLOTS ...slots) {
+    public EquipProxy(Equipory.SLOTS... slots) {
 	super("EquipProxy");
 	setSlots(slots);
     }
     
-    public void setSlots(Equipory.SLOTS ...slots) {
+    public void setSlots(Equipory.SLOTS... slots) {
 	this.slots = slots;
 	sz = invsz(new Coord(slots.length, 1));
     }
@@ -24,6 +24,25 @@ public class EquipProxy extends DraggableWidget implements DTarget2 {
 	if(slot < 0) {slot = 0;}
 	if(slot >= slots.length) {slot = slots.length - 1;}
 	return slots[slot];
+    }
+    
+    @Override
+    public boolean mousehover(Coord c) {
+	Equipory e = ui.gui.equipory;
+	if(e != null) {
+	    WItem w = e.slots[slot(c).idx];
+	    if(w != null) {
+	    	GItem g = w.item;
+		g.hovering_pos = null;
+		boolean wasNull = g.contentswdg == null;
+		boolean hovered = w.mousehover(Coord.z);
+		if(hovered && wasNull && (g.contents != null) && (g.contentswnd == null)) {
+		    g.hovering_pos = parentpos(parent, sqroff(c).add(1, 1).mul(sqsz).sub(5, 5).sub(GItem.Contents.hovermarg));
+		}
+		return hovered;
+	    }
+	}
+	return false;
     }
     
     @Override
@@ -110,7 +129,7 @@ public class EquipProxy extends DraggableWidget implements DTarget2 {
     }
     
     private void activate(int i, int button) {
-        Coord mc = ui.mc;
+	Coord mc = ui.mc;
 	Coord c = sqoff(new Coord(i, 0)).add(rootpos());
 	ui.mousedown(c, button);
 	ui.mouseup(c, button);

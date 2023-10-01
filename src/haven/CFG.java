@@ -74,6 +74,11 @@ public class CFG<T> {
     public static final CFG<Boolean> FEP_METER = new CFG<>("ui.fep_meter", false);
     public static final CFG<Boolean> HUNGER_METER = new CFG<>("ui.hunger_meter", false);
     public static final CFG<Boolean> SHOW_BOT_MESSAGES = new CFG<>("ui.hide_bot_messages", true);
+    
+    /**Show stack's hover inventory widgets only if SHIFT is pressed*/
+    public static final CFG<Boolean> UI_STACK_SUB_INV_ON_SHIFT = new CFG<>("ui.stack.sub_inv_on_shift", false);
+    /**Unpack stacks into single items for extra inventory's list*/
+    public static final CFG<Boolean> UI_STACK_EXT_INV_UNPACK = new CFG<>("ui.stack.ext_inv_unpack", true);
 
     public static final CFG<Float> CAMERA_BRIGHT = new CFG<>("camera.bright", 0f);
     public static final CFG<Boolean> CAMERA_INVERT_X = new CFG<>("camera.invert_x", false);

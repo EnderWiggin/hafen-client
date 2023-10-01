@@ -57,6 +57,7 @@ public class Makewindow extends Widget {
     }
 
     private static final OwnerContext.ClassResolver<Makewindow> ctxr = new OwnerContext.ClassResolver<Makewindow>()
+	.add(Makewindow.class, wdg -> wdg)
 	.add(Glob.class, wdg -> wdg.ui.sess.glob)
 	.add(Session.class, wdg -> wdg.ui.sess);
     public class Spec implements GSprite.Owner, ItemInfo.SpriteOwner {
@@ -492,7 +493,7 @@ public class Makewindow extends Widget {
 	public Tip shortvar() {return(this);}
     }
 
-    public static class MakePrep extends ItemInfo implements GItem.ColorInfo {
+    public static class MakePrep extends ItemInfo implements GItem.ColorInfo, GItem.ContentsInfo {
 	private final static Color olcol = new Color(0, 255, 0, 64);
 	public MakePrep(Owner owner) {
 	    super(owner);
@@ -500,6 +501,11 @@ public class Makewindow extends Widget {
 
 	public Color olcol() {
 	    return(olcol);
+	}
+
+	public void propagate(List<ItemInfo> buf, Owner outer) {
+	    if(ItemInfo.find(MakePrep.class, buf) == null)
+		buf.add(new MakePrep(outer));
 	}
     }
 }

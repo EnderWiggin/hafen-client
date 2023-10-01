@@ -68,6 +68,12 @@ public class ISBox extends Widget implements DTarget {
     }
     
     @Override
+    public void unlink() {
+	ExtInventory.remInventory(this);
+	super.unlink();
+    }
+    
+    @Override
     protected void added() {
 	if(parent instanceof Window) {
 	    boolean isStockpile = "Stockpile".equals(((Window) parent).caption());
@@ -81,6 +87,8 @@ public class ISBox extends Widget implements DTarget {
 		take.canactivate = true;
 
 		sz = sz.add(0, UI.scale(25));
+		
+		ExtInventory.addInventory(this);
 	    }
 	}
     }

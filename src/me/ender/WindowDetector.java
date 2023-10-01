@@ -29,10 +29,6 @@ public class WindowDetector {
 		String eventName = event.b;
 		switch (eventName) {
 		    case Window.ON_DESTROY:
-			if(isBelt(window.caption())) {
-			    window.ui.gui.beltwnd = null;
-			    window.ui.gui.beltinv = null;
-			}
 			toDetect.remove(window);
 			detected.remove(window);
 			break;
@@ -50,12 +46,6 @@ public class WindowDetector {
     
     private static void recognize(Window window) {
 	AnimalFarm.processCattleInfo(window);
-	if(isBelt(window.caption())) {
-	    window.ui.gui.beltwnd = (GameUI.Hidewnd) window;
-	    ExtInventory extInventory = window.getchild(ExtInventory.class);
-	    extInventory.disable();
-	    window.ui.gui.beltinv = extInventory.inv;
-	}
     }
     
     private static Widget.Factory convert(Widget parent, Widget.Factory f, Object[] cargs) {
@@ -87,10 +77,6 @@ public class WindowDetector {
     public static Widget newWindow(Coord sz, String title, boolean lg) {
 	if(isPortal(title)) {
 	    return new CharterBook(sz, title, lg, Coord.z, Coord.z);
-	} else if(isBelt(title)) {
-	    GameUI.Hidewnd belt = new GameUI.Hidewnd(sz, title, lg);
-	    belt.hide();
-	    return belt;
 	} else if(isProspecting(title)) {
 	    return new ProspectingWnd(sz, title);
 	}

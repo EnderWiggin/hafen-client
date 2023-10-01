@@ -1196,6 +1196,12 @@ public class OptWnd extends WindowX {
 	y += STEP;
 	panel.add(new CFGBox("Show queued path on minimap", CFG.MMAP_SHOW_PATH), x, y);
     
+	y += 2*STEP;
+	panel.add(new CFGBox("Require SHIFT to show stack inventory", CFG.UI_STACK_SUB_INV_ON_SHIFT, "Show stack hover-inventories only if SHIFT is pressed"), x, y);
+    
+	y += STEP;
+	panel.add(new CFGBox("Unpack stacks in extra inventory", CFG.UI_STACK_EXT_INV_UNPACK, "Show stacked items 'unpacked' in extra inventory's list"), x, y);
+    
 	//second row
 	my = Math.max(my, y);
 	x += UI.scale(265);

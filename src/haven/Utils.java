@@ -366,7 +366,8 @@ public class Utils {
 
     public static void setprefc(String prefname, Coord val) {
 	try {
-	    prefs().put(prefname, val.x + "x" + val.y);
+	    String enc = (val == null) ? "" : val.x + "x" + val.y;
+	    prefs().put(prefname, enc);
 	} catch(SecurityException e) {
 	}
     }
@@ -696,6 +697,12 @@ public class Utils {
 	buf[0] = x * f;
 	buf[1] = y * f;
 	buf[2] = z * f;
+    }
+
+    public static Coord3f oct2uvec(float x, float y) {
+	float[] buf = new float[3];
+	oct2uvec(buf, x, y);
+	return(Coord3f.of(buf[0], buf[1], buf[2]));
     }
 
     static char num2hex(int num) {

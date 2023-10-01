@@ -112,7 +112,7 @@ public class Inventory extends Widget implements DTarget {
     public boolean mousewheel(Coord c, int amount) {
 	if(locked){return false;}
 	if(ui.modshift) {
-	    ExtInventory minv = getparent(GameUI.class).maininv;
+	    ExtInventory minv = getparent(GameUI.class).maininvext;
 	    if(minv != this.parent) {
 		if(amount < 0)
 		    wdgmsg("invxf", minv.wdgid(), 1);
@@ -369,4 +369,5 @@ public class Inventory extends Widget implements DTarget {
     public void forEachItem(BiConsumer<GItem, WItem> consumer) {
 	wmap.forEach(consumer);
     }
+    
 }
