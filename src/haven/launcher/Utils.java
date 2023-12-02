@@ -16,7 +16,7 @@
  *  rights. Please see the file `COPYING' in the root directory of the
  *  source tree for details.
  *
- *  A copy the GNU Lesser General Public License is distributed along
+ *  A copy of the GNU Lesser General Public License is distributed along
  *  with the source tree of which this file is a part in the file
  *  `doc/LPGL-3'. If it is missing for any reason, please see the Free
  *  Software Foundation's website at <http://www.fsf.org/>, or write
@@ -214,20 +214,30 @@ public class Utils {
 	}
     }
     public static Path getLauncherLocation() {
-	Path root = path(".");
-	try {
-	    URL location = getLocation(Config.class);
-	    root = urlToFile(location).getParentFile().toPath();
-	} catch (Exception ignored) {
-	}
-	return root;
+        // Define the default directory for Haven-Ender
+        String defaultDir = "Haven-Ender";
+        String userDir = System.getProperty("user.dir");
+        
+        // Adjust the root directory based on the operating system
+        if (!isWindows()) {
+            // For Unix-based systems (Ubuntu/MacOS), set the installation folder for configuration files
+            // to be in the directory where the game is executed
+            return Paths.get(userDir, defaultDir);
+        }
+        
+        // For Windows-based systems, use the existing root directory resolution
+        try {
+            URL location = getLocation(Config.class);
+            return urlToFile(location).getParentFile().toPath();
+        } catch (Exception ignored) {
+            // Return the default directory if any exception occurs during resolution
+            return Paths.get(userDir, defaultDir);
+        }
     }
-
     /** Whether the operating system is Windows-based. */
     public static boolean isWindows() {
-	return System.getProperty("os.name", "Unknown").startsWith("Win");
+        return System.getProperty("os.name", "Unknown").startsWith("Win");
     }
-
     /**
      * Gets the base location of the given class.
      * <p>
