@@ -1,9 +1,9 @@
 [![forthebadge cc-by](https://licensebuttons.net/l/by-nc-sa/4.0/88x31.png)](https://creativecommons.org/licenses/by/4.0)
-## Project Title
-Hafen-Client, the new Haven client
+## Hafen-Client
+the new Haven client
 
 ### Languages Used
-JAVA, json
+- JAVA, json
 -------------
 
 ### Project Description
