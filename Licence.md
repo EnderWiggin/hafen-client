@@ -5,9 +5,9 @@ The source tree is partitioned into a few sections, each with their own copying 
 These partitions and their respective licensing details are as follows:
 
 ### `src/haven` Directory
-The files in the `src/haven' directory and its subdirectories are the main source code of the client. 
+The files in the `src/haven` directory and its subdirectories are the main source code of the client. 
 It is subject to the GNU Lesser General Public License, version 3, as published by the Free Software Foundation. 
-A copy of this license can be found in the file `doc/LGPL-3' in this source tree. 
+A copy of this license can be found in the file `doc/LGPL-3` in this source tree. 
 The copyright to all these files is owned by Fredrik Tolf and Björn Johannessen.
 
 ### `lib` Directory
