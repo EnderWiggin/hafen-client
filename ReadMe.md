@@ -7,7 +7,9 @@ JAVA, json
 -------------
 
 ### Project Description
-Hafen-Client, the new Haven client with many settings and fixes, created by @[EnderWiggin](https://github.com/EnderWiggin) (Andrii Gook), @[dolda2000](https://github.com/dolda2000) (Fredrik Tolf). This client is used to connect to the server for the Haven & Hearth online game and play said game.
+Hafen-Client, the new Haven client with many settings and fixes, created by @[EnderWiggin](https://github.com/EnderWiggin) (Andrii Gook), @[dolda2000](https://github.com/dolda2000) (Fredrik Tolf). 
+
+This client is used to connect to the server for the Haven & Hearth online game and play said game.
 
 -------------
 ### Credits, Contributors, Organizations
