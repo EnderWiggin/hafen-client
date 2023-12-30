@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.1
+Type=Application
+Name=Haven-hearth
+Comment=try survive in haven and hearth world, good luck!
+Icon=./Games/Haven/cache/https/game.havenandhearth.com/java/icon.gif
+Exec=bash ./Games/Haven/haven-ender.sh
+Path=./Games/Haven/
+Actions=
+Categories=Game;
