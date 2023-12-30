@@ -450,9 +450,9 @@ public class MainFrame extends java.awt.Frame implements Console.Directory {
 	    URL errordest = null;
 	    try {
 		if(!(ed = Utils.getprop("haven.errorurl", "")).equals("")) {
-		    errordest = new java.net.URL(ed);
+		    errordest = new java.net.URI(ed).toURL();
 		}
-	    } catch (java.net.MalformedURLException e) {
+	    } catch (java.net.MalformedURLException | java.net.URISyntaxException e) {
 	    }
 	    final haven.error.ErrorHandler hg = new haven.error.ErrorHandler(errordest);
 	    hg.sethandler(new haven.error.ErrorGui(null) {

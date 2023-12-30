@@ -1055,7 +1055,7 @@ public class MapWnd extends WindowX implements Console.Directory {
     
     public Coord2d findMarkerPosition(String name) {
 	Location sessloc = view.sessloc;
-	if(sessloc == null) {return null;}
+	if(sessloc == null || name == null) {return null;}
 	for (Map.Entry<Long, SMarker> e : file.smarkers.entrySet()) {
 	    SMarker m = e.getValue();
 	    if(m.seg == sessloc.seg.id && m.nm.contains(name)) {

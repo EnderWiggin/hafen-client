@@ -239,6 +239,13 @@ public class Session implements Resource.Resolver {
 	return(getres(id, 0));
     }
     
+    public Indir<Resource> getres2(int id) {
+	synchronized (rescache) {
+	    CachedRes ret = rescache.get(id);
+	    return ret != null ? (ret.get()) : null;
+	}
+    }
+    
     public int getresid(Resource res) {
 	synchronized (rescache) {
 	    for (Map.Entry<Integer, CachedRes> entry : rescache.entrySet()) {

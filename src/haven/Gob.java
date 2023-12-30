@@ -526,6 +526,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 		if((!ol.delign || (ol.spr instanceof Sprite.CDel)) && done) {
 		    ol.remove0();
 		    i.remove();
+		    overlaysUpdated();
 		}
 	    }
 	}

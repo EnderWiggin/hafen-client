@@ -1786,27 +1786,20 @@ public class Utils {
 	return(buf.toString());
     }
 
-    public static URL urlparam(URL base, String... pars) {
-	/* Why is Java so horribly bad? */
-	String file = base.getFile();
-	int p = file.indexOf('?');
+    public static URI uriparam(URI base, String... pars) {
 	StringBuilder buf = new StringBuilder();
-	if(p >= 0) {
-	    /* For now, only add; don't augment. Since Java sucks. */
-	    buf.append('&');
-	} else {
-	    buf.append('?');
-	}
+	if(base.getQuery() != null)
+	    buf.append(base.getQuery());
 	for(int i = 0; i < pars.length; i += 2) {
-	    if(i > 0)
+	    if(buf.length() > 0)
 		buf.append('&');
 	    buf.append(urlencode(pars[i]));
 	    buf.append('=');
 	    buf.append(urlencode(pars[i + 1]));
 	}
 	try {
-	    return(new URL(base.getProtocol(), base.getHost(), base.getPort(), file + buf.toString()));
-	} catch(java.net.MalformedURLException e) {
+	    return(new URI(base.getScheme(), base.getAuthority(), base.getPath(), buf.toString(), base.getFragment()));
+	} catch(URISyntaxException e) {
 	    throw(new RuntimeException(e));
 	}
     }
@@ -2410,9 +2403,7 @@ public class Utils {
 	if(res == null) {return "???";}
 	try {
 	    return prettyResName(res.get());
-	} catch (Resource.Loading ignore) {
-	    
-	}
+	} catch (Loading ignore) {}
 	if(res instanceof Resource.Named) {
 	    return prettyResName(((Resource.Named) res).name);
 	}

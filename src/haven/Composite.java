@@ -331,11 +331,12 @@ public class Composite extends Drawable implements EquipTarget {
     
     private String makeResId() {
 	String name = baseres.name;
-	if(nmod2 == null) {return name;}
+	boolean isBorka = "gfx/borka/body".equals(name);
+	if(nmod2 == null) {return isBorka ? null : name;}
 	
 	Set<String> res = new HashSet<>();
 	try {
-	    if("gfx/borka/body".equals(name)) {
+	    if(isBorka) {
 		for (MD mod : nmod2) {
 		    if(mod.mod.get().name.contains("gfx/terobjs/mannequin")) {
 			return "gfx/terobjs/mannequin";

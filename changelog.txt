@@ -1,3 +1,18 @@
+$size[14]{$u{Update for 22.12.23:}
+  * merged loftar's code
+  * fixed crash when tracking some objects
+ 
+$size[14]{$u{Update for 05.12.23:}
+  * fixed gob info disabled parts not working on restart
+  * fixed mannequins triggering player warning
+ 
+$size[14]{$u{Update for 03.12.23:}
+  * made drink action silent
+  * fixed overlaps in the realm Blessings window
+  * added cheese rack contents to gob info (can be turned off in Display -> gear icon near Show gob info)
+  * fixed potential prospecting crash
+  * fixed potential crash related to display sign contents
+ 
 $size[14]{$u{Update for 01.12.23:}
   * made system messages use Interface sound volume and each message type doesn't play sound too often
   * fixed potential crashes on loading new zones

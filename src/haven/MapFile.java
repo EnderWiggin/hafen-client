@@ -42,7 +42,7 @@ import static haven.MCache.cmaps;
 import static me.ender.minimap.AutoMarkers.*;
 
 public class MapFile {
-    public static final Config.Variable<java.net.URL> mapbase = Config.Variable.propu("haven.mapbase", "");
+    public static final Config.Variable<java.net.URI> mapbase = Config.Variable.propu("haven.mapbase", "");
     public static boolean debug = false;
     public final ResCache store;
     public final String filename;
