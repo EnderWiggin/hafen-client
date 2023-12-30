@@ -7,12 +7,12 @@ JAVA, json
 -------------
 
 ### Project Description
-Hafen-Client, the new Haven client with many settings and fixes, created by @EnderWiggin (Andrii Gook) & @dolda2000 (Fredrik Tolf). This client is used to connect to the server for the Haven & Hearth online game and play said game.
+Hafen-Client, the new Haven client with many settings and fixes, created by @[EnderWiggin](https://github.com/EnderWiggin) (Andrii Gook), @[dolda2000](https://github.com/dolda2000) (Fredrik Tolf). This client is used to connect to the server for the Haven & Hearth online game and play said game.
 
 -------------
 ### Credits, Contributors, Organizations
 #### List of contributors: 
-@EnderWiggin (Andrii Gook), @dolda2000 (Fredrik Tolf), @tomventura (Tom Ventura), @elsid (Roman Siromakha), @k-t (Marat Vildanov), @ghandhikus (Daniel Debert), @Fr-Dae (Kervern Anthony), @surculus12, @jamesblack (James Black), @qbalukom (Jakub Łukomski), @stachowski, @ProgrammerDan (Daniel Boston), @romovs (Roman Ovseitsev)
+@[EnderWiggin](https://github.com/EnderWiggin) (Andrii Gook), @[dolda2000](https://github.com/dolda2000) (Fredrik Tolf), @[tomventura](https://github.com/tomventura) (Tom Ventura), @[elsid](https://github.com/elsid) (Roman Siromakha), @[k-t](https://github.com/k-t) (Marat Vildanov), @[ghandhikus](https://github.com/ghandhikus) (Daniel Debert), @[Fr-Dae](https://github.com/Fr-Dae) (Kervern Anthony), @[surculus12](https://github.com/surculus12), @[jamesblack](https://github.com/jamesblack) (James Black), @[qbalukom](https://github.com/qbalukom) (Jakub Łukomski), @[stachowski](https://github.com/stachowski), @[ProgrammerDan](https://github.com/ProgrammerDan) (Daniel Boston), @[romovs](https://github.com/romovs) (Roman Ovseitsev)
 
 #### License: License.md
 
