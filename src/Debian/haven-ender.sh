@@ -1,3 +1,3 @@
 #!/bin/bash
-cd ~/Games/Haven/Work
+cd ~/Games/Haven/Ender
 java -jar ./launcher-hafen.jar && exit
