@@ -49,11 +49,11 @@ make a new folder "haven" and download the jar ![here](https://enderwiggin.githu
 #### Ubuntu
 Open a terminal and copy paste this lign.
 ```properties
-sudo apt update && sudo apt install default-jre -y && mkdir -p ~/Games/Haven/ && cd ~/Games/Haven/ && wget https://enderwiggin.github.io/hafen/launcher-hafen.jar -O launcher-hafen.jar && chmod -R 775 ./ && exit
+sudo apt update && sudo apt install default-jre -y && mkdir -p ~/Games/Haven/Ender/ && cd ~/Games/Haven/Ender/ && wget https://enderwiggin.github.io/hafen/launcher-hafen.jar -O launcher-hafen.jar && chmod -R 775 ./ && exit
 ```
 **Make a launcher with icon**
 ```properties
-cp ~/Games/Haven/Haven-ender.desktop ~/.local/share/applications/
+cp ~/Games/Haven/Ender/Haven-ender.desktop ~/.local/share/applications/
 ```
 It *should* be in application menu => Games
 
