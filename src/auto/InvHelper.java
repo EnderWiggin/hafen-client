@@ -42,7 +42,7 @@ public class InvHelper {
     
     static boolean isDrinkContainer(WItem item) {
 	String resname = item.item.resname();
-	return resname.endsWith("/waterskin") || resname.endsWith("/waterflask") || resname.endsWith("/glassjug");
+	return resname.endsWith("/waterskin") || resname.endsWith("/waterflask") || resname.endsWith("/glassjug") || resname.endsWith("/kuksa");
     }
     
     static boolean isNotFull(ContainedItem item) {
