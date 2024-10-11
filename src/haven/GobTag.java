@@ -288,7 +288,7 @@ public enum GobTag {
                 tags.add(SPEED);
             }
             
-            if("Water".equals(gob.contents())) {
+            if(name.equals("gfx/terobjs/barrel") && barrelHasWater(gob)) {
                 tags.add(HAS_WATER);
             }
             
@@ -351,6 +351,11 @@ public enum GobTag {
         }
     
         return tags;
+    }
+    
+    private static boolean barrelHasWater(Gob gob) {
+        return gob.ols.stream()
+            .anyMatch(o -> o.name().equals("gfx/terobjs/barrel-water"));
     }
     
     private static boolean isDrying(String ol) {
