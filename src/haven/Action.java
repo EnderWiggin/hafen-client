@@ -1,7 +1,6 @@
 package haven;
 
 import auto.Actions;
-import auto.InventorySorter;
 import me.ender.CustomCursors;
 import me.ender.GobInfoOpts;
 
@@ -68,9 +67,7 @@ public enum Action {
     TOGGLE_GOB_INFO_TIMER(gui -> GobInfoOpts.toggle(GobInfoOpts.InfoPart.TIMER)),
     
     CLEAR_PLAYER_DAMAGE(GobDamageInfo::clearPlayerDamage, "Clear damage from player"),
-    CLEAR_ALL_DAMAGE(GobDamageInfo::clearAllDamage, "Clear damage from everyone"),
-
-    SORT_INVENTORY(InventorySorter::SortAll,"Sort inventory");
+    CLEAR_ALL_DAMAGE(GobDamageInfo::clearAllDamage, "Clear damage from everyone");
     
     
     public final String name;

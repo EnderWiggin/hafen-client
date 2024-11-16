@@ -419,15 +419,6 @@ public class WItem extends Widget implements DTarget {
 	return null;
     }
 
-    public double quality() {
-	QualityList ql = itemq.get();
-	return (ql != null && !ql.isEmpty()) ? ql.single().value : 0;
-    }
-
-    public String getname() {
-	return name.get(null) != null ? name.get(null) : "";
-    }
-
     private void drawq(GOut g) {
 	QualityList quality = itemq.get();
 	if(quality != null && !quality.isEmpty()) {
