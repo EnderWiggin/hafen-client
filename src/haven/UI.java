@@ -379,6 +379,19 @@ public class UI {
 	}
     }
 
+    public List<Widget> getwidgets(Class cl) {
+	List<Widget> w = new ArrayList<>();
+	synchronized(widgets) {
+	    for (Iterator<Map.Entry<Widget, Integer>> it = rwidgets.entrySet().iterator(); it.hasNext();) {
+		Map.Entry<Widget,Integer> entry = it.next();
+		if (cl.isInstance(entry.getKey())) {
+		    w.add(entry.getKey());
+		}
+	    }
+	}
+	return w;
+    }
+
     public int widgetid(Widget wdg) {
 	synchronized(widgets) {
 	    Integer id = rwidgets.get(wdg);
