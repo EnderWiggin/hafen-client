@@ -162,6 +162,10 @@ public class CFG<T> {
     public static final CFG<Set<BuddyWnd.Group>> AUTOMAP_MARKERS = new CFG<>("automap.markers", new HashSet<>(), new TypeToken<Set<BuddyWnd.Group>>(){});
     public static final CFG<String> AUTOMAP_ENDPOINT = new CFG<>("automap.andpoint", "");
 
+    public static final CFG<Boolean> ALWAYS_SHOW_DEWY_TIME = new CFG<>("addstg.always_show_dewy_time", false);
+    public static final CFG<Boolean> SHOW_TIME = new CFG<>("addstg.show_time", true);
+    public static final CFG<Boolean> SHOW_STATS = new CFG<>("addstg.show_stats", true);
+
     private static final String CONFIG_JSON = "config.json";
     private static final Map<Object, Object> cfg;
     private static final Map<String, Object> cache = new HashMap<>();

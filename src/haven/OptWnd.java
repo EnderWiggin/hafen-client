@@ -1207,7 +1207,16 @@ public class OptWnd extends WindowX {
 	y += STEP;
 	tx = panel.add(new CFGColorBtn(CFG.COLOR_GOB_CRITTERS, true), x + H_STEP, y).sz.x + H_STEP;
 	panel.add(new CFGBox("Critters", CFG.DISPLAY_AURA_CRITTERS), x + tx + H_STEP, y);
-    
+
+	y += STEP;
+	panel.add(new CFGBox("Show time", CFG.SHOW_TIME), x, y);
+
+	y += STEP;
+	panel.add(new CFGBox("Show stats (ping, players number)", CFG.SHOW_STATS), x, y);
+
+	y += STEP;
+	panel.add(new CFGBox("Always show time for dewy lady's mantle", CFG.ALWAYS_SHOW_DEWY_TIME), x, y);
+
 	my = Math.max(my, y);
 	
 	panel.add(new PButton(UI.scale(200), "Back", 27, main), new Coord(0, my + UI.scale(35)));
