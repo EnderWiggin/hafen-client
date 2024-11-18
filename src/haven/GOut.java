@@ -337,10 +337,16 @@ public class GOut {
     }
     */
 
+    public boolean contains(int x, int y) {
+	return((x >= ul.x) && (y >= ul.y) && (x <= br.x) && (y <= br.y));
+    }
+
     public void fellipse(Coord c, Coord r, double a1, double a2) {
 	if(a1 >= a2)
 	    return;
 	c = c.add(tx);
+	if(!contains(c.x, c.y))
+	    return;
 	double d = 0.1;
 	int n = (int)Math.floor((a2 - a1) / d);
 	float[] data = new float[(n + 3) * 2];
@@ -361,13 +367,29 @@ public class GOut {
 
     public void rect2(Coord ul, Coord br) {
 	ul = ul.add(tx); br = br.add(tx);
+	Coord ult = Coord.of(Math.max(ul.x, this.ul.x), Math.max(ul.y, this.ul.y));
+	Coord brt = Coord.of(Math.min(br.x, this.br.x), Math.min(br.y, this.br.y));
 	float h = 0.5f;
-	float[] data = {ul.x + h, ul.y + h,
-			br.x + h, ul.y + h,
-			br.x + h, br.y + h,
-			ul.x + h, br.y + h,
-			ul.x + h, ul.y + h};
-	drawp(Model.Mode.LINE_STRIP, data);
+	if(contains(ul.x, ult.y) && contains(ul.x, brt.y)) {
+	    float[] line1 = {ul.x + h, ult.y + h,
+		ul.x + h, brt.y + h};
+	    drawp(Model.Mode.LINES, line1);
+	}
+	if(contains(br.x, ult.y) && contains(br.x, brt.y)) {
+	    float[] line2 = {br.x + h, ult.y + h,
+		br.x + h, brt.y + h};
+	    drawp(Model.Mode.LINES, line2);
+	}
+	if(contains(ult.x, ul.y) && contains(brt.x, ul.y)) {
+	    float[] line3 = {ult.x + h, ul.y + h,
+		brt.x + h, ul.y + h};
+	    drawp(Model.Mode.LINES, line3);
+	}
+	if(contains(ult.x, br.y) && contains(brt.x, br.y)) {
+	    float[] line4 = {ult.x + h, br.y + h,
+		brt.x + h, br.y + h};
+	    drawp(Model.Mode.LINES, line4);
+	}
     }
 
     public void rect(Coord ul, Coord sz) {
