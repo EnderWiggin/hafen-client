@@ -1209,6 +1209,9 @@ public class OptWnd extends WindowX {
 	panel.add(new CFGBox("Critters", CFG.DISPLAY_AURA_CRITTERS), x + tx + H_STEP, y);
 
 	y += STEP;
+	panel.add(new Label("Stats widget:"), x, y);
+
+	y += STEP;
 	panel.add(new CFGBox("Show time", CFG.SHOW_TIME), x, y);
 
 	y += STEP;
@@ -1216,6 +1219,18 @@ public class OptWnd extends WindowX {
 
 	y += STEP;
 	panel.add(new CFGBox("Always show time for dewy lady's mantle", CFG.ALWAYS_SHOW_DEWY_TIME), x, y);
+
+	y += STEP;
+	panel.add(new Label("Quest markers:"), x, y);
+
+	y += STEP;
+	panel.add(new CFGBox("Highlight QuestGivers on map", CFG.QUESTHELPER_HIGHLIGHT_QUESTGIVERS, null, true), x, y);
+
+	y += STEP;
+	panel.add(new CFGBox("Highlight unready return tasks on map", CFG.QUESTHELPER_HIGHLIGHT_UNFINISHED), x, y);
+
+	y += STEP;
+	panel.add(new CFGBox("Show QuestGiver tasks in tooltip on map ", CFG.QUESTHELPER_SHOW_TASKS_IN_TOOLTIP), x, y);
 
 	my = Math.max(my, y);
 	

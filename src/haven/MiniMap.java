@@ -38,6 +38,7 @@ import haven.MapFile.Segment;
 import haven.MapFile.DataGrid;
 import haven.MapFile.GridInfo;
 import me.ender.ClientUtils;
+import me.ender.QuestListItem;
 import me.ender.gob.KinInfo;
 import me.ender.minimap.*;
 
@@ -421,6 +422,19 @@ public class MiniMap extends Widget {
 	    if (tip == null || !tip.text.equals(nm)) {
 		tip = Text.renderstroked(nm, Color.WHITE, Color.BLACK);
 	    }
+	    if (CFG.QUESTHELPER_SHOW_TASKS_IN_TOOLTIP.get() && m instanceof SMarker) {
+		StringBuilder sb = new StringBuilder(nm);
+		if (!((SMarker) m).qitems.isEmpty())
+		    sb.append("\n");
+		for (QuestListItem q : ((SMarker)m).qitems) {
+		    if (q.status != 1) {
+			sb.append("\n");
+			sb.append(q.name);
+		    }
+		}
+		tip = RichText.render(sb.toString(), 300);
+	    } else
+		tip = RichText.render(nm, 300);
 	}
 	
 	private Area hit(final UI ui) {

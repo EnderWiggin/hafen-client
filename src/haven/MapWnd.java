@@ -36,6 +36,7 @@ import java.awt.event.KeyEvent;
 import java.awt.image.*;
 import haven.MiniMap.*;
 import haven.BuddyWnd.GroupSelector;
+import me.ender.QuestListItem;
 import me.ender.minimap.*;
 
 import static haven.MCache.tilesz;
@@ -159,6 +160,11 @@ public class MapWnd extends WindowX implements Console.Directory {
 	    .set(CFG.MMAP_SHOW_PARTY_NAMES::set)
 	    .rclick(() -> CFG.MMAP_SHOW_PARTY_NAMES_STYLE.set((CFG.MMAP_SHOW_PARTY_NAMES_STYLE.get() + 1) % 3))
 	    .settip("Show party names. Right-click to change name coloring");
+
+	btn = topbar.add(new ICheckBox("gfx/hud/mmap/questgivers", "", "-d", "-h"), btn.pos("ur"))
+	    .state(CFG.QUESTHELPER_HIGHLIGHT_QUESTGIVERS::get)
+	    .set(CFG.QUESTHELPER_HIGHLIGHT_QUESTGIVERS::set)
+	    .settip("Highlight QuestGiver status:\n\nWhite - active task\nGreen - QG has a completed quest\nYellow - QG has an uncompleted quest");
 	
 	topbar.pack();
 	tool = add(new Toolbox2());;
@@ -345,6 +351,12 @@ public class MapWnd extends WindowX implements Console.Directory {
 		Gob gob = MarkerID.find(ui.sess.glob.oc, mark.m);
 		if(gob != null)
 		    mvclick(mv, null, loc, gob, button);
+		if(button == 3 && !press && !domark && !((SMarker) mark.m).qitems.isEmpty())
+		{
+		    QuestListItem quest = ((SMarker) mark.m).questiterator.next();
+		    if(quest != null)
+			this.ui.gui.chrwdg.wdgmsg("qsel", quest.parentid);
+		}
 	    }
 	    return(false);
 	}

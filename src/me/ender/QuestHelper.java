@@ -13,8 +13,8 @@ import static haven.MCache.*;
 
 public class QuestHelper extends GameUI.Hidewnd {
     private static final Pattern patt = Pattern.compile("(Tell|Greet|to|at) (\\w+)");
-    
     private final TaskList taskList;
+    public HashMap<Integer, List<QuestListItem>> quests = new HashMap<>();
     
     public QuestHelper() {
 	super(Coord.z, "Quest Helper");
@@ -23,10 +23,11 @@ public class QuestHelper extends GameUI.Hidewnd {
     }
     
     public void processQuest(List<QuestWnd.Quest.Condition> conditions, int id, boolean isCredo) {
+	long left = conditions.stream().filter(q -> q.done != 1).count();
+	addConds(conditions, id, isCredo, left <= 1);
 	if(!visible()) {return;}
 	synchronized (taskList) {
 	    taskList.tasks.removeIf(q -> q.id == id);
-	    long left = conditions.stream().filter(q -> q.done != 1).count();
 	    for (QuestWnd.Quest.Condition condition : conditions) {
 		String name = condition.desc;
 		TaskState status = TaskState.ACTIVE;
@@ -62,11 +63,84 @@ public class QuestHelper extends GameUI.Hidewnd {
 	super.toggle();
 	if(visible()) {refresh();}
     }
-    
+
+
+    // TODO: We should merge refreshes
     public void refresh() {
 	synchronized (taskList) {
 	    taskList.tasks.clear();
 	    taskList.refresh = true;
+	}
+	refreshQuests();
+    }
+
+    public void refreshQuests() {
+	if(ui != null && ui.gui != null && ui.gui.chrwdg != null) {
+	    for (Iterator<Map.Entry<Integer, List<QuestListItem>>> it = quests.entrySet().iterator(); it.hasNext();) {
+		Map.Entry<Integer, List<QuestListItem>> entry = it.next();
+		if (ui.gui.chrwdg.quest.cqst.get(entry.getKey()) == null) { // quest removed
+		    for (QuestListItem qitem : entry.getValue()) {
+			if (qitem.marker != null) {
+			    qitem.marker.qitems.remove(qitem);
+			}
+		    }
+		    it.remove();
+		}
+	    }
+	    try {
+		for (QuestWnd.Quest quest : ui.gui.chrwdg.quest.cqst.quests) {
+		    if (!quests.containsKey(quest.id))
+			ui.gui.chrwdg.wdgmsg("qsel", quest.id);
+		}
+	    } catch (NullPointerException var9) {
+		var9.printStackTrace();
+	    } catch (Loading var10) {
+		System.out.println("loading...");
+	    }
+	}
+    }
+
+    public QuestListItem findqitem(Integer id, String name) {
+	for(QuestListItem qitem : quests.get(id)) {
+	    if(qitem.name.equals(name))
+		return(qitem);
+	}
+	return(null);
+    }
+
+    public void addConds(List<QuestWnd.Quest.Condition> ncond, int id, boolean isCredo, boolean single) {
+	if (ui.gui.chrwdg.quest.cqst.get(id) == null)
+	    return;
+	if (ui.gui.chrwdg.quest.cqst.get(id).done != QuestWnd.Quest.QST_PEND)
+	    return;
+	List<QuestListItem> condList = new ArrayList<>();
+	boolean refreshAllConditions = false;
+	for (int i = 0; i < ncond.size(); ++i) {
+	    QuestListItem qitem = new QuestListItem(ncond.get(i).desc, ncond.get(i).done, (i == ncond.size() - 1) && !isCredo, single, id, isCredo);
+	    if (!refreshAllConditions && quests.containsKey(id)) {
+		QuestListItem oldqitem = findqitem(id, qitem.name);
+		if (oldqitem != null) {
+		    if (qitem.status != oldqitem.status)
+			oldqitem.status = qitem.status;
+		} else {
+		    refreshAllConditions = true; // new condition, rewrite all conditions for this quest
+		}
+	    }
+	    condList.add(qitem);
+	}
+	if (refreshAllConditions || !quests.containsKey(id)) {
+	    if (quests.containsKey(id)) { // clear old conditions
+		for (QuestListItem qitem: quests.get(id)) {
+		    if (qitem.marker != null)
+			if (qitem.marker.qitems.contains(qitem))
+			    qitem.marker.qitems.remove(qitem);
+		}
+	    }
+	    for (QuestListItem qitem: condList) {
+		if (!qitem.questGiver.isEmpty())
+		    qitem.AddMarker(ui);
+	    }
+	    quests.put(id, condList);
 	}
     }
     

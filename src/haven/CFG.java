@@ -166,6 +166,10 @@ public class CFG<T> {
     public static final CFG<Boolean> SHOW_TIME = new CFG<>("addstg.show_time", true);
     public static final CFG<Boolean> SHOW_STATS = new CFG<>("addstg.show_stats", true);
 
+    public static final CFG<Boolean> QUESTHELPER_HIGHLIGHT_QUESTGIVERS = new CFG<>("questhelper.highlight_questgivers", true);
+    public static final CFG<Boolean> QUESTHELPER_SHOW_TASKS_IN_TOOLTIP = new CFG<>("questhelper.show_tasks_in_tooltip", true);
+    public static final CFG<Boolean> QUESTHELPER_HIGHLIGHT_UNFINISHED = new CFG<>("questhelper.highlight_unfinished", true);
+
     private static final String CONFIG_JSON = "config.json";
     private static final Map<Object, Object> cfg;
     private static final Map<String, Object> cache = new HashMap<>();
