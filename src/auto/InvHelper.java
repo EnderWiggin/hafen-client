@@ -58,7 +58,7 @@ public class InvHelper {
 
     public static boolean isDrinkContainer(WItem item) {
 	String resname = item.item.resname();
-	return resname.endsWith("/waterskin") || resname.endsWith("/waterflask") || resname.endsWith("/glassjug") || resname.contains("/kuksa");
+	return resname.endsWith("/waterskin") || resname.endsWith("/waterflask") || resname.contains("/glassjug") || resname.contains("/kuksa");
     }
 
     static boolean isBucket(ContainedItem item) {
@@ -176,6 +176,40 @@ public class InvHelper {
 		item = gui.equipory.slots[Equipory.SLOTS.HAND_RIGHT.idx];
 		if(item != null) {
 		    items.add(new EquipItem(item, gui.equipory, Equipory.SLOTS.HAND_RIGHT));
+		}
+	    }
+	    return items;
+	};
+    }
+
+    public static Supplier<List<WItem>> POUCHES(GameUI gui) {
+	return () -> {
+	    List<WItem> items = new LinkedList<>();
+	    if(gui.equipory != null) {
+		WItem slot = gui.equipory.slots[Equipory.SLOTS.POUCH_LEFT.idx];
+		if(slot != null) {
+		    items.add(slot);
+		}
+		slot = gui.equipory.slots[Equipory.SLOTS.POUCH_RIGHT.idx];
+		if(slot != null) {
+		    items.add(slot);
+		}
+	    }
+	    return items;
+	};
+    }
+
+    static Supplier<List<ContainedItem>> POUCHES_CONTAINED(GameUI gui) {
+	return () -> {
+	    List<ContainedItem> items = new LinkedList<>();
+	    if(gui.equipory != null) {
+		WItem item = gui.equipory.slots[Equipory.SLOTS.POUCH_LEFT.idx];
+		if(item != null) {
+		    items.add(new EquipItem(item, gui.equipory, Equipory.SLOTS.POUCH_LEFT));
+		}
+		item = gui.equipory.slots[Equipory.SLOTS.POUCH_RIGHT.idx];
+		if(item != null) {
+		    items.add(new EquipItem(item, gui.equipory, Equipory.SLOTS.POUCH_RIGHT));
 		}
 	    }
 	    return items;

@@ -86,25 +86,34 @@ public class Glob {
     }
 
     public static class CAttr {
+	public final Glob glob;
 	public static final Text.Foundry fnd = new Text.Foundry(Text.sans, 12);
 	public final String nm;
 	public int base, comp;
+	public ItemInfo.Raw info;
 	private Text.Line compLine = null;
 	
-	public CAttr(String nm, int base, int comp) {
+	public CAttr(Glob glob, String nm, int base, int comp, ItemInfo.Raw info) {
+	    this.glob = glob;
 	    this.nm = nm.intern();
 	    this.base = base;
 	    this.comp = comp;
+	    this.info = info;
 	    compLine = null;
 	}
 	
-	public void update(int base, int comp) {
+	public void update(int base, int comp, ItemInfo.Raw info) {
 	    if((base == this.base) && (comp == this.comp))
 		return;
 	    this.base = base;
 	    this.comp = comp;
+	    this.info = info;
 	    compLine = null;
 	    Makewindow.invalidate(nm);
+	}
+
+	public Indir<Resource> res() {
+	    return(Resource.local().load("gfx/hud/chr/" + nm));
 	}
 
 	public Text.Line compline() {
@@ -355,21 +364,21 @@ public class Glob {
 	synchronized(cattr) {
 	    CAttr a = cattr.get(nm);
 	    if(a == null) {
-		a = new CAttr(nm, 0, 0);
+		a = new CAttr(this, nm, 0, 0, ItemInfo.Raw.nil);
 		cattr.put(nm, a);
 	    }
 	    return(a);
 	}
     }
 
-    public void cattr(String nm, int base, int comp) {
+    public void cattr(String nm, int base, int comp, ItemInfo.Raw info) {
 	synchronized(cattr) {
 	    CAttr a = cattr.get(nm);
 	    if(a == null) {
-		a = new CAttr(nm, base, comp);
+		a = new CAttr(this, nm, base, comp, info);
 		cattr.put(nm, a);
 	    } else {
-		a.update(base, comp);
+		a.update(base, comp, info);
 	    }
 	    attrseq++;
 	}

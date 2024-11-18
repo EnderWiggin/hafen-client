@@ -238,7 +238,9 @@
   </target>
 
   <target name="clean-assets">
-    <delete dir="resources/classes" />
+    <delete includeEmptyDirs="true">
+      <fileset dir="resources/classes" includes="**/*" excludes="placeholder" />
+    </delete>
     <delete dir="resources/compiled" />
     <delete file="build/client-res.jar" />
   </target>

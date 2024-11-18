@@ -49,10 +49,8 @@ public class BAttrWnd extends Widget {
 	}
     }
 
-    public static class Attr extends Widget {
-	public final String nm;
+    public static class Attr extends CharWnd.AttrWdg {
 	public final Text rnm;
-	public final Glob.CAttr attr;
 	public final Tex img;
 	public final Color bg;
 	public final Resource res;
@@ -62,12 +60,10 @@ public class BAttrWnd extends Widget {
 	private int cbv = -1, ccv = -1;
 
 	private Attr(Glob glob, String attr, Color bg) {
-	    super(new Coord(attrw, attrf.height() + UI.scale(2)));
-	    this.res = Resource.local().loadwait("gfx/hud/chr/" + attr);
-	    this.nm = attr;
+	    super(Coord.of(attrw, attrf.height() + UI.scale(2)), glob, attr);
+	    this.res = Loading.waitfor(this.attr.res());
 	    this.rnm = attrf.render(res.flayer(Resource.tooltip).t);
 	    this.img = new TexI(convolve(res.flayer(Resource.imgc).img, new Coord(this.sz.y, this.sz.y), iconfilter));
-	    this.attr = glob.getcattr(attr);
 	    this.bg = bg;
 	}
 
@@ -77,12 +73,8 @@ public class BAttrWnd extends Widget {
 		Color c = Color.WHITE;
 		if(ccv > cbv) {
 		    c = buff;
-		    tooltip = String.format("%d + %d", cbv, ccv - cbv);
 		} else if(ccv < cbv) {
 		    c = debuff;
-		    tooltip = String.format("%d - %d", cbv, cbv - ccv);
-		} else {
-		    tooltip = null;
 		}
 		ct = attrf.render(Integer.toString(ccv), c);
 		bt = attrf.render(String.format("(%d)", cbv), Color.WHITE);

@@ -511,7 +511,7 @@ public class WItem extends Widget implements DTarget {
 	if(meter <= 0) {return -1;}
 	
 	double remaining = -1;
-	if(WindowDetector.isWindowType(this, WND_SMELTER)) {
+	if(WindowDetector.isWindowType(this, WND_SMELTER, WND_STACK_FURNACE)) {
 	    remaining = WELL_MINED.matches(info()) ? 41.25d : 55d; //ore smelting time in minutes
 	} else if(WindowDetector.isWindowType(this, WND_FINERY_FORGE)) {
 	    //TODO: check for coin melting time

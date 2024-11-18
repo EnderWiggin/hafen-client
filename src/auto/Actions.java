@@ -106,6 +106,7 @@ public class Actions {
 	}
 
 	List<ITarget> targets = Stream.of(
+		POUCHES_CONTAINED(gui).get().stream().filter(InvHelper::isDrinkContainer),
 		INVENTORY_CONTAINED(gui).get().stream().filter(InvHelper::isDrinkContainer),
 		BELT_CONTAINED(gui).get().stream().filter(InvHelper::isDrinkContainer),
 		HANDS_CONTAINED(gui).get().stream().filter(InvHelper::isBucket)
@@ -161,7 +162,7 @@ public class Actions {
     }
     
     public static void drink(GameUI gui) {
-	Collection<Supplier<List<WItem>>> everywhere = Arrays.asList(HANDS(gui), INVENTORY(gui), BELT(gui));
+	Collection<Supplier<List<WItem>>> everywhere = Arrays.asList(HANDS(gui), POUCHES(gui), INVENTORY(gui), BELT(gui));
 	ClientUtils.chainOptionals(
 	    () -> findFirstMatching(HAS_TEA, everywhere),
 	    () -> findFirstMatching(HAS_WATER, everywhere)

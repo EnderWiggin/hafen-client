@@ -89,6 +89,7 @@ public class DrinkMeter extends Widget {
 
 	List<WItem> items = Stream.of(
 		InvHelper.HANDS(gui).get().stream().filter(InvHelper::isBucket),
+		InvHelper.POUCHES(gui).get().stream().filter(InvHelper::isDrinkContainer),
 		InvHelper.INVENTORY(gui).get().stream().filter(InvHelper::isDrinkContainer),
 		InvHelper.BELT(gui).get().stream().filter(InvHelper::isDrinkContainer)
 	    ).flatMap(x -> x)

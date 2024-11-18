@@ -1,3 +1,7 @@
+$size[14]{$u{Update for 18.11.24:}
+  * merged loftar's code
+  * added pouches support for drink. refill drinks and drink meter
+ 
 $size[14]{$u{Update for 15.11.24:}
   * fixed minesweper import removing numbers from tiles in some cases
  
