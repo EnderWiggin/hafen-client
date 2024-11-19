@@ -1,7 +1,6 @@
 package me.ender;
 
 import haven.CFG;
-import haven.Coord2d;
 import haven.UI;
 import me.ender.minimap.SMarker;
 
@@ -10,44 +9,52 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class QuestListItem implements Comparable<QuestListItem> {
-    private static final Pattern patt = Pattern.compile("(Tell|Greet|to|at) (\\w+)");
+    private static final Pattern pat = Pattern.compile("(Tell|Greet| to| at) (\\w+)");
     public String name;
-    public String prefix = "";
     public Color color;
     public int status;
-    public int parentid;
-    public Coord2d coord = null;
-    public String questGiver = "";
+    public int parent;
     public boolean last;
     public boolean single;
+    public String questGiver = "";
     public SMarker marker = null;
     public boolean isCredo;
     
-    public QuestListItem(String name, int status, boolean last, boolean single, int parentid, boolean isCredo) {
+    public QuestListItem(String name, int status, boolean last, boolean single, int parent, boolean isCredo) {
 	this.name = name;
 	this.status = status;
+	this.parent = parent;
 	this.last = last;
 	this.single = single;
-	this.parentid = parentid;
 	this.isCredo = isCredo;
 
-	Matcher matcher = patt.matcher(name);
+	Matcher matcher = pat.matcher(name);
 	if(matcher.find())
 	    this.questGiver = matcher.group(2);
     }
     
-    public String getDisplayName() {
-        return prefix + " " + name;
-    }
-    
     public void AddMarker(UI ui) {
-        if (questGiver.isEmpty())
-            return;
-
 	marker = ui.gui.mapfile.findMarker(questGiver);
 	if(marker != null) {
 	    if (!marker.qitems.contains(this))
 	    	marker.qitems.add(this);
+	}
+	UpdateColor();
+    }
+
+    public void UpdateColor() {
+	if(marker != null) {
+	    if(status == 0) {
+		if(last) {
+		    if(single) {
+			color = Color.GREEN;
+		    } else if(CFG.QUESTHELPER_HIGHLIGHT_UNFINISHED.get()) {
+			color = Color.YELLOW;
+		    }
+		} else {
+		    color = Color.WHITE;
+		}
+	    } else color = null;
 	}
     }
     

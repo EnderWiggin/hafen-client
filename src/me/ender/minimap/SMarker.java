@@ -42,22 +42,9 @@ public class SMarker extends Marker {
 	    final Coord ul = c.sub(cc);
 	    if(CFG.QUESTHELPER_HIGHLIGHT_QUESTGIVERS.get() && !qitems.isEmpty()) {
 		for(QuestListItem item : qitems) {
-		    if(!item.questGiver.isEmpty() && item.status == 0) {
-			if(item.last) {
-			    if (item.single) {
-				g.chcolor(Color.GREEN);
-				g.fellipse(c, img.ssz.div(2).sub(1, 1));
-			    }
-			    else if (CFG.QUESTHELPER_HIGHLIGHT_UNFINISHED.get()) {
-				g.chcolor(Color.YELLOW);
-				g.fellipse(c, img.ssz.div(2).sub(2, 1));
-			    }
-			}
-			else
-			{
-			    g.chcolor(Color.WHITE);
-			    g.fellipse(c, img.ssz.div(2).sub(1, 2));
-			}
+		    if(item.color != null) {
+			g.chcolor(item.color);
+			g.fellipse(c, img.ssz.div(2).sub(1, 1));
 		    }
 		}
 		g.chcolor();

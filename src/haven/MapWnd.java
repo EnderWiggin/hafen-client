@@ -164,7 +164,7 @@ public class MapWnd extends WindowX implements Console.Directory {
 	btn = topbar.add(new ICheckBox("gfx/hud/mmap/questgivers", "", "-d", "-h"), btn.pos("ur"))
 	    .state(CFG.QUESTHELPER_HIGHLIGHT_QUESTGIVERS::get)
 	    .set(CFG.QUESTHELPER_HIGHLIGHT_QUESTGIVERS::set)
-	    .settip("Highlight QuestGiver status:\n\nWhite - active task\nGreen - QG has a completed quest\nYellow - QG has an uncompleted quest");
+	    .settip("Highlight QuestGiver status:\n\nWhite - active task\nGreen - QuestGiver has a completed quest\nYellow - QuestGiver has an uncompleted quest");
 	
 	topbar.pack();
 	tool = add(new Toolbox2());;
@@ -354,8 +354,8 @@ public class MapWnd extends WindowX implements Console.Directory {
 		if(button == 3 && !press && !domark && !((SMarker) mark.m).qitems.isEmpty())
 		{
 		    QuestListItem quest = ((SMarker) mark.m).questiterator.next();
-		    if(quest != null)
-			this.ui.gui.chrwdg.wdgmsg("qsel", quest.parentid);
+		    if (quest != null)
+		    	this.ui.gui.chrwdg.wdgmsg("qsel", quest.parent);
 		}
 	    }
 	    return(false);

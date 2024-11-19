@@ -273,12 +273,13 @@ public class QuestWnd extends Widget {
 			ncond.add(cond);
 		    }
 		    this.cond = ncond.toArray(new Condition[0]);
-		    CharWnd cw = cw();
-		    boolean isCredo = cw != null && cw.skill != null && cw.skill.credos.pqid == questid();
-		    this.ui.gui.questHelper.processQuest(ncond, questid(), isCredo);
 		    refresh();
-		    if(cqv != null)
+		    if(cqv != null) {
 			cqv.update();
+			CharWnd cw = cw();
+			boolean isCredo = cw != null && cw.skill != null && cw.skill.credos.pqid == questid();
+			this.ui.gui.questHelper.processQuest(ncond, questid(), isCredo);
+		    }
 		} else {
 		    super.uimsg(msg, args);
 		}

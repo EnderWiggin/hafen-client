@@ -2400,7 +2400,7 @@ public class Utils {
 
 	    @Override
 	    public boolean hasNext() {
-		return list.size() > 0;
+		return !list.isEmpty();
 	    }
 
 	    @Override

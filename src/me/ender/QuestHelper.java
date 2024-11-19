@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 import static haven.MCache.*;
 
 public class QuestHelper extends GameUI.Hidewnd {
-    private static final Pattern patt = Pattern.compile("(Tell|Greet|to|at) (\\w+)");
+    private static final Pattern patt = Pattern.compile("(Tell|Greet| to| at) (\\w+)");
     private final TaskList taskList;
     public HashMap<Integer, List<QuestListItem>> quests = new HashMap<>();
     
@@ -24,123 +24,72 @@ public class QuestHelper extends GameUI.Hidewnd {
     
     public void processQuest(List<QuestWnd.Quest.Condition> conditions, int id, boolean isCredo) {
 	long left = conditions.stream().filter(q -> q.done != 1).count();
-	addConds(conditions, id, isCredo, left <= 1);
-	if(!visible()) {return;}
-	synchronized (taskList) {
-	    taskList.tasks.removeIf(q -> q.id == id);
-	    for (QuestWnd.Quest.Condition condition : conditions) {
-		String name = condition.desc;
-		TaskState status = TaskState.ACTIVE;
-		
-		if(isCredo) {name = "\uD83D\uDD6E " + name;}
-		
-		if(condition.done == 1) {//this task is done
-		    continue;
-		} else if(left <= 1) { //this is the last task
-		    status = TaskState.LAST;
-		    name = "★ " + name;
-		}
-		
-		Matcher matcher = patt.matcher(condition.desc);
-		SMarker marker = null;
-		String markerName = null;
-		if(matcher.find()) {
-		    markerName = matcher.group(2);
-		    marker = ui.gui.mapfile.findMarker(markerName);
-		}
-		
-		taskList.tasks.add(new Task(name, status, id, isCredo, markerName, marker));
+	taskList.tasks.removeIf(q -> q.id == id);
+	List<QuestListItem> condList = new ArrayList<>();
+	for (int i = 0; i < conditions.size(); ++i) {
+	    QuestWnd.Quest.Condition condition = conditions.get(i);
+	    QuestListItem item = new QuestListItem(condition.desc, condition.done, (i == conditions.size() - 1) && !isCredo, left <= 1, id, isCredo);
+	    if (!item.questGiver.isEmpty())
+	    	condList.add(item);
+
+	    String name = condition.desc;
+	    TaskState status = TaskState.ACTIVE;
+
+	    if(isCredo) {name = "\uD83D\uDD6E " + name;}
+
+	    if(condition.done == 1) {//this task is done
+		continue;
+	    } else if(left <= 1) { //this is the last task
+		status = TaskState.LAST;
+		name = "★ " + name;
 	    }
-	    
-	    taskList.tasks.sort(taskList.comp);
-	    taskList.change(-1);
-	    taskList.prevQuest = -2;
+
+	    Matcher matcher = patt.matcher(condition.desc);
+	    SMarker marker = null;
+	    String markerName = null;
+	    if(matcher.find()) {
+		markerName = matcher.group(2);
+		marker = ui.gui.mapfile.findMarker(markerName);
+	    }
+
+	    for (Task task : taskList.tasks)
+		if (task.id != id)
+		    task.current = false;
+	    taskList.tasks.add(new Task(name, status, id, isCredo, markerName, marker));
 	}
-    }
-    
-    @Override
-    public void toggle() {
-	super.toggle();
-	if(visible()) {refresh();}
+
+	if (quests.containsKey(id)) { // clear old conditions
+	    for (QuestListItem item: quests.get(id)) {
+		if (item.marker != null)
+		    item.marker.qitems.remove(item);
+	    }
+	}
+	for (QuestListItem item: condList) {
+	    if (!item.questGiver.isEmpty())
+		item.AddMarker(ui);
+	}
+	quests.put(id, condList);
+
+	Collections.sort(taskList.tasks);
     }
 
-
-    // TODO: We should merge refreshes
     public void refresh() {
-	synchronized (taskList) {
-	    taskList.tasks.clear();
-	    taskList.refresh = true;
-	}
-	refreshQuests();
-    }
-
-    public void refreshQuests() {
 	if(ui != null && ui.gui != null && ui.gui.chrwdg != null) {
 	    for (Iterator<Map.Entry<Integer, List<QuestListItem>>> it = quests.entrySet().iterator(); it.hasNext();) {
 		Map.Entry<Integer, List<QuestListItem>> entry = it.next();
 		if (ui.gui.chrwdg.quest.cqst.get(entry.getKey()) == null) { // quest removed
-		    for (QuestListItem qitem : entry.getValue()) {
-			if (qitem.marker != null) {
-			    qitem.marker.qitems.remove(qitem);
+		    for (QuestListItem item : entry.getValue()) {
+			if (item.marker != null) {
+			    item.marker.qitems.remove(item);
 			}
 		    }
+		    taskList.tasks.removeIf(q -> q.id == entry.getKey());
 		    it.remove();
 		}
 	    }
-	    try {
-		for (QuestWnd.Quest quest : ui.gui.chrwdg.quest.cqst.quests) {
-		    if (!quests.containsKey(quest.id))
-			ui.gui.chrwdg.wdgmsg("qsel", quest.id);
-		}
-	    } catch (NullPointerException var9) {
-		var9.printStackTrace();
-	    } catch (Loading var10) {
-		System.out.println("loading...");
-	    }
-	}
-    }
-
-    public QuestListItem findqitem(Integer id, String name) {
-	for(QuestListItem qitem : quests.get(id)) {
-	    if(qitem.name.equals(name))
-		return(qitem);
-	}
-	return(null);
-    }
-
-    public void addConds(List<QuestWnd.Quest.Condition> ncond, int id, boolean isCredo, boolean single) {
-	if (ui.gui.chrwdg.quest.cqst.get(id) == null)
-	    return;
-	if (ui.gui.chrwdg.quest.cqst.get(id).done != QuestWnd.Quest.QST_PEND)
-	    return;
-	List<QuestListItem> condList = new ArrayList<>();
-	boolean refreshAllConditions = false;
-	for (int i = 0; i < ncond.size(); ++i) {
-	    QuestListItem qitem = new QuestListItem(ncond.get(i).desc, ncond.get(i).done, (i == ncond.size() - 1) && !isCredo, single, id, isCredo);
-	    if (!refreshAllConditions && quests.containsKey(id)) {
-		QuestListItem oldqitem = findqitem(id, qitem.name);
-		if (oldqitem != null) {
-		    if (qitem.status != oldqitem.status)
-			oldqitem.status = qitem.status;
-		} else {
-		    refreshAllConditions = true; // new condition, rewrite all conditions for this quest
-		}
-	    }
-	    condList.add(qitem);
-	}
-	if (refreshAllConditions || !quests.containsKey(id)) {
-	    if (quests.containsKey(id)) { // clear old conditions
-		for (QuestListItem qitem: quests.get(id)) {
-		    if (qitem.marker != null)
-			if (qitem.marker.qitems.contains(qitem))
-			    qitem.marker.qitems.remove(qitem);
-		}
-	    }
-	    for (QuestListItem qitem: condList) {
-		if (!qitem.questGiver.isEmpty())
-		    qitem.AddMarker(ui);
-	    }
-	    quests.put(id, condList);
+	    for (QuestWnd.Quest quest : ui.gui.chrwdg.quest.cqst.quests)
+		if (!quests.containsKey(quest.id))
+		    ui.gui.chrwdg.wdgmsg("qsel", quest.id);
 	}
     }
     
@@ -154,62 +103,11 @@ public class QuestHelper extends GameUI.Hidewnd {
 	public static final Color BGCOLOR = new Color(0, 0, 0, 120);
 	private final Coord DIST_C;
 	public List<Task> tasks = new ArrayList<>(50);
-	public boolean refresh = true;
-	private long lastUpdateTime = System.currentTimeMillis();
-	private final Comparator<Task> comp = Comparator.comparing(a -> a.name);
-	private int prevQuest;
-	
+
 	public TaskList(int w, int h) {
 	    super(w, h, ITEM_H);
 	    bgcolor = BGCOLOR;
 	    DIST_C = Coord.of(w - UI.scale(16), ITEM_H / 2);
-	}
-	
-	@Override
-	public void tick(double dt) {
-	    if(!tvisible()) {return;}
-	    GameUI gui = ui.gui;
-	    if(gui == null || gui.chrwdg == null) {return;}
-	    Optional<QuestWnd> optQuestWnd = Optional.ofNullable(gui.chrwdg.quest);
-	    int currentQuest = optQuestWnd.map(q -> q.quest)
-		.map(QuestWnd.Quest.Info::questid).orElse(-1);
-	    
-	    if(!refresh) {
-		if(prevQuest != currentQuest) {
-		    for (Task item : tasks) {
-			item.current = currentQuest == item.id;
-		    }
-		    Collections.sort(tasks);
-		    prevQuest = currentQuest;
-		}
-		return;
-	    }
-	    if(System.currentTimeMillis() - lastUpdateTime < 500) {return;}
-	    
-	    prevQuest = -2;
-	    refresh = false;
-	    lastUpdateTime = System.currentTimeMillis();
-	    synchronized (this) {
-		tasks.clear();
-		if(!optQuestWnd.isPresent()) {return;}
-		QuestWnd questWnd = optQuestWnd.get();
-		boolean changed = false;
-		List<QuestWnd.Quest> quests = optQuestWnd.map(w -> w.cqst).map(c -> c.quests).orElse(Collections.emptyList());
-		for (QuestWnd.Quest quest : quests) {
-		    //currently selected quest will be selected last
-		    if(currentQuest == quest.id) {continue;}
-		    questWnd.wdgmsg("qsel", quest.id);
-		    changed = true;
-		}
-		if(currentQuest >= 0) {
-		    questWnd.wdgmsg("qsel", currentQuest);
-		    //if the only quest in the log is currently selected - send selection again to re-select it
-		    if(!changed) {questWnd.wdgmsg("qsel", currentQuest);}
-		} else {
-		    questWnd.wdgmsg("qsel", (Object) null);
-		}
-		Collections.sort(tasks);
-	    }
 	}
 	
 	protected Task listitem(int idx) {
@@ -255,7 +153,7 @@ public class QuestHelper extends GameUI.Hidewnd {
 	private final boolean credo;
 	private final String markerName;
 	private final SMarker marker;
-	private boolean current = false;
+	private boolean current = true;
 	
 	public Task(String name, TaskState status, int id, boolean credo, String markerName, SMarker marker) {
 	    this.name = name;
