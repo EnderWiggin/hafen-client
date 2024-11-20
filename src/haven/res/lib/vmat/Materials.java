@@ -43,19 +43,29 @@ public class Materials extends Mapping {
 	return(stdmerge(orig, var));
     }
     
-    public Materials(Gob gob, Map<Integer, Pair<Material, Resource>> data) {
+    public Materials(Gob gob, Map<Integer, Material> mats) {
 	super(gob);
-	this.mats = new HashMap<>();
-	this.res = new LinkedList<>();
+	this.mats = mats;
+	this.res = Collections.emptyList();
+    }
+    
+    public Materials(Gob gob, Map<Integer, Material> mats, List<Resource> res) {
+	super(gob);
+	this.mats = mats;
+	this.res = res;
+    }
+    
+    public static void parse(Gob gob, Message dat) {
+	Map<Integer, Pair<Material, Resource>> data = decode(gob.context(Resource.Resolver.class), dat);
+	
+	Map<Integer, Material> mats = new HashMap<>();
+	List<Resource> res = new LinkedList<>();
 	data.forEach((key, pair) -> {
 	    mats.put(key, pair.a);
 	    res.add(pair.b);
 	});
-    }
-    
-    public static void parse(Gob gob, Message dat) {
-	Map<Integer, Pair<Material, Resource>> mats = decode(gob.context(Resource.Resolver.class), dat);
-	gob.setattr(new Materials(gob, mats));
+	
+	gob.setattr(new Materials(gob, mats, res));
 	try {
 	    gob.setattr((GAttrib)Utils.construct(Class.forName("haven.res.lib.vmat.AttrMats").getConstructor(new Class[]{Gob.class, Map.class}), gob, mats));
 	} catch(ClassNotFoundException | NoSuchMethodException | LinkageError e) {

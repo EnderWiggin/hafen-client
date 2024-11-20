@@ -42,6 +42,7 @@ public class KeyBinder {
 	    ConfigBean configBean = gson.fromJson(json, ConfigBean.class);
 	    tmpGeneralCFG = configBean.general;
 	    Fightsess.updateKeybinds(configBean.combat);
+	    Reactor.event(COMBAT_KEYS_UPDATED);
 	} catch (Exception ignore) {}
     
 	if(tmpGeneralCFG == null) {
