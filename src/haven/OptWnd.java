@@ -1227,9 +1227,6 @@ public class OptWnd extends WindowX {
 	panel.add(new CFGBox("Highlight QuestGivers on map", CFG.QUESTHELPER_HIGHLIGHT_QUESTGIVERS, null, true), x, y);
 
 	y += STEP;
-	panel.add(new CFGBox("Highlight unready return tasks on map", CFG.QUESTHELPER_HIGHLIGHT_UNFINISHED), x, y);
-
-	y += STEP;
 	panel.add(new CFGBox("Show QuestGiver tasks in tooltip on map ", CFG.QUESTHELPER_SHOW_TASKS_IN_TOOLTIP), x, y);
 
 	my = Math.max(my, y);

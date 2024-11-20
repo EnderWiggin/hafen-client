@@ -53,7 +53,7 @@ public class QuestCondition implements Comparable<QuestCondition> {
 	    if(isEndpoint) {
 		if(isLast) {
 		    questGiverMarkerColor = Color.GREEN;
-		} else if(CFG.QUESTHELPER_HIGHLIGHT_UNFINISHED.get()) {
+		} else {
 		    questGiverMarkerColor = Color.YELLOW;
 		}
 	    } else {
