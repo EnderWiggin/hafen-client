@@ -43,13 +43,24 @@ public class QuestCondition implements Comparable<QuestCondition> {
 	if(isCredo) {name = "\uD83D\uDD6E " + description;}
 	if(isLast) {name = "★ " + name;}
 
-	if (!this.questGiver.isEmpty()) {
-	    AddMarker(gui);
-	    AddPointer(gui);
-	}
+	AddMarker(gui);
+	AddPointer(gui);
     }
 
-    public void UpdateColor() {
+    public void UpdateQuestCondition(int statusId, boolean isEndpoint, boolean isLast, GameUI gui)
+    {
+	this.statusId = statusId;
+	this.isEndpoint = isEndpoint;
+	this.isLast = isLast;
+
+	AddMarker(gui);
+	AddPointer(gui);
+
+	if (statusId == 1 && questGiverMarker != null)
+	    questGiverMarker.questConditions.remove(this);
+    }
+
+    private void UpdateColor() {
 	if(statusId == 0) {
 	    if(isEndpoint) {
 		if(isLast) {
@@ -69,13 +80,14 @@ public class QuestCondition implements Comparable<QuestCondition> {
 	    questGiverMarker = gui.mapfile.findMarker(questGiver);
 	if (questGiverMarker != null) {
 	    UpdateColor();
-	    questGiverMarker.questConditions.add(this);
+	    if (!questGiverMarker.questConditions.contains(this))
+	    	questGiverMarker.questConditions.add(this);
 	}
     }
 
     private void AddPointer(GameUI gui)
     {
-	if (!questGiverPointer.isPresent())
+	if (!questGiverPointer.isPresent() && !questGiver.isEmpty())
 	    questGiverPointer = gui.findPointer(questGiver);
     }
 

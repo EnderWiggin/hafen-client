@@ -20,14 +20,17 @@ public class QuestList extends Listbox<QuestCondition> {
 	DIST_C = Coord.of(w - UI.scale(16), ITEM_H / 2);
     }
 
+    @Override
     protected QuestCondition listitem(int i) {
 	return questConditions.get(i);
     }
 
+    @Override
     protected int listitems() {
 	return questConditions.size();
     }
 
+    @Override
     protected void drawitem(GOut g, QuestCondition questCondition, int i) {
 	Color color;
 	if(questCondition.isLast) {
@@ -45,18 +48,19 @@ public class QuestList extends Listbox<QuestCondition> {
 	}
     }
 
-    public void SelectQuest(Integer questId){
+    public void SelectedQuest(Integer questId){
 	for (QuestCondition questCondition : questConditions)
 	    questCondition.isCurrent = questCondition.questId == questId;
 	Collections.sort(questConditions);
     }
 
+    @Override
     public void change(QuestCondition questCondition) {
 	if(questCondition == null) {return;}
 	QuestWnd.Quest.Info quest = ui.gui.chrwdg.quest.quest;
 	if(quest != null && quest.questid() == questCondition.questId) {
 	    ui.gui.chrwdg.wdgmsg("qsel", (Object) null);
-	    SelectQuest(-2);
+	    SelectedQuest(-2);
 	} else {
 	    ui.gui.chrwdg.wdgmsg("qsel", questCondition.questId);
 	}

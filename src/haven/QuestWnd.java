@@ -278,7 +278,8 @@ public class QuestWnd extends Widget {
 			cqv.update();
 			CharWnd cw = cw();
 			boolean isCredo = cw != null && cw.skill != null && cw.skill.credos.pqid == questid();
-			this.ui.gui.questHelper.processQuest(ncond, questid(), isCredo);
+			boolean noTitled = title == null;
+			this.ui.gui.questHelper.processQuest(ncond, questid(), isCredo, noTitled);
 		    }
 		} else {
 		    super.uimsg(msg, args);

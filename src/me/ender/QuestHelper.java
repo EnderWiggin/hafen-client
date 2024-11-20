@@ -14,33 +14,26 @@ public class QuestHelper extends GameUI.Hidewnd {
 	pack();
     }
     
-    public void processQuest(List<QuestWnd.Quest.Condition> conditions, int id, boolean isCredo) {
-	for (int i = 0; i < conditions.size(); ++i) {
-	    long left = conditions.stream().filter(q -> q.done != 1).count();
-	    QuestWnd.Quest.Condition condition = conditions.get(i);
+    public void processQuest(List<QuestWnd.Quest.Condition> conditions, int id, boolean isCredo, boolean noTitled) {
+	if (!noTitled || isCredo)
+	    for (int i = 0; i < conditions.size(); ++i) {
+		long left = conditions.stream().filter(q -> q.done != 1).count();
+		QuestWnd.Quest.Condition condition = conditions.get(i);
 
-	    QuestCondition questCondition = questList.questConditions.stream().filter(x -> x.questId == id && Objects.equals(x.description, condition.desc)).findFirst().orElse(null);
-	    if (questCondition == null && condition.done != 1){
-		questCondition = new QuestCondition(condition.desc, condition.done, (i == conditions.size() - 1), left <= 1, id, isCredo, ui.gui);
-		questList.questConditions.add(questCondition);
-	    } else {
-		if (questCondition != null) {
-		    if (condition.done == 1) {
-			if(questCondition.questGiverMarker != null) {
-			    questCondition.questGiverMarker.questConditions.remove(questCondition);
+		QuestCondition questCondition = questList.questConditions.stream().filter(x -> x.questId == id && Objects.equals(x.description, condition.desc)).findFirst().orElse(null);
+		if (questCondition == null && condition.done != 1){
+		    questCondition = new QuestCondition(condition.desc, condition.done, (i == conditions.size() - 1), left <= 1, id, isCredo, ui.gui);
+		    questList.questConditions.add(questCondition);
+		} else {
+		    if (questCondition != null) {
+			questCondition.UpdateQuestCondition(condition.done, (i == conditions.size() - 1), left <= 1, ui.gui);
+			if (condition.done == 1) {
+			    questList.questConditions.remove(questCondition);
 			}
-			questList.questConditions.remove(questCondition);
-			continue;
 		    }
-		    questCondition.isEndpoint = (i == conditions.size() - 1);
-		    if (left <= 1) {
-			questCondition.isLast = true;
-		    }
-		    questCondition.UpdateColor();
 		}
 	    }
-	}
-	questList.SelectQuest(id);
+	questList.SelectedQuest(id);
     }
 
     public void refresh() {
