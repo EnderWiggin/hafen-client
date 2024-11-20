@@ -1,8 +1,5 @@
 package haven;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonSyntaxException;
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
@@ -11,8 +8,6 @@ import haven.res.ui.tt.attrmod.AttrMod;
 import haven.res.ui.tt.level.Level;
 import haven.res.ui.tt.slot.Slotted;
 import haven.res.ui.tt.slots.ISlots;
-import haven.res.ui.tt.wear.Wear;
-import haven.resutil.Curiosity;
 import haven.resutil.FoodInfo;
 import me.ender.Reflect;
 
@@ -20,8 +15,8 @@ import java.awt.*;
 import java.awt.font.TextAttribute;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -34,82 +29,16 @@ public class ItemData {
     public static final String WATER = "Water";
     public static final String TEA = "Tea";
     
-    private static final ItemData EMPTY = new ItemData();
-    private static Gson gson;
-    private static final Map<String, ItemData> item_data = new LinkedHashMap<String, ItemData>(9, 0.75f, true) {
-	private static final long serialVersionUID = 1L;
-
-	protected boolean removeEldestEntry(Map.Entry<String, ItemData> eldest) {
-	    return size() > 75;
-	}
-
-    };
-    private Curiosity.Data curiosity;
-    private FoodInfo.Data food;
-    private Integer wear;
-    private ArmorData armor;
-    private GastronomyData gast;
-    private Map<Resource, Integer> attributes;
-    private SlotsData slots;
-    private SlottedData gilding;
-    
-    
-    private ItemData(GItem item) {
-	this(item.info());
-    }
-
-    private ItemData(List<ItemInfo> info) {
-	init(info);
-    }
-
     private ItemData() {}
 
-    public void init(List<ItemInfo> info) {
-	for (ItemInfo ii : info) {
-	    String className = ii.getClass().getCanonicalName();
-	    QualityList q = QualityList.make(ItemInfo.findall(QualityList.classname, info));
-
-	    if(ii instanceof Curiosity) {
-		curiosity = new Curiosity.Data((Curiosity) ii, q);
-	    } else if(ii instanceof FoodInfo) {
-		food = new FoodInfo.Data((FoodInfo) ii, q);
-	    } else if("Gast".equals(className)) {
-		gast = new GastronomyData(ii, q);
-	    } else if(ii instanceof ISlots) {
-		slots = SlotsData.make((ISlots) ii);
-	    } else if(ii instanceof Slotted) {
-		gilding = SlottedData.make((Slotted) ii, q);
-	    }
-	    
-	    Pair<Integer, Integer> a = ItemInfo.getArmor(info);
-	    if(a != null) {
-		armor = new ArmorData(a, q);
-	    }
-	    
-	    Wear w = ItemInfo.getWear(info);
-	    if(w != null) {
-		QualityList.Quality single = q.single(Quality);
-		if(single == null) {
-		    single = QualityList.DEFAULT;
-		}
-		wear = (int) Math.round(w.m / (a != null ? single.value / 10.0 : single.multiplier));
-	    }
-	    
-	    List<AttrMod> attrs = ItemInfo.findall(AttrMod.class, info);
-	    if(!attrs.isEmpty()){
-		attributes = AttrData.parse(attrs, q);
-	    }
-	}
-    }
-
-    public static Tex longtip(Pagina pagina, Session sess, boolean widePagina) {
-        return longtip(pagina, sess, widePagina, 0, 0);
+    public static Tex longtip(Pagina pagina, boolean widePagina) {
+        return longtip(pagina, widePagina, 0, 0);
     }
     
-    public static Tex longtip(Pagina pagina, Session sess, boolean widePagina, int titleSize, int titleSpace) {
+    public static Tex longtip(Pagina pagina, boolean widePagina, int titleSize, int titleSpace) {
 	List<ItemInfo> infos = pagina.button().info();
 	if(infos == null || infos.isEmpty()) {
-	    return ItemData.get(pagina).longtip(pagina.res(), sess, widePagina, titleSize, titleSpace);
+	    return null;
 	}
 	return longtip(pagina.res(), infos, widePagina, titleSize, titleSpace);
     }
@@ -138,93 +67,6 @@ public class ItemData {
 	    img = ItemInfo.catimgs(UI.scale(20), img, ItemInfo.longtip(infos));
 	}
 	return new TexI(img);
-    }
-
-    private Tex longtip(Resource res, Session sess, boolean widePagina, int titleSize, int titleSpace) {
-	return longtip(res, iteminfo(sess), widePagina, titleSize, titleSpace);
-    }
-    
-    public List<ItemInfo> iteminfo(Session sess) {
-	ITipData[] data = new ITipData[]{
-	    curiosity,
-	    food,
-	    WearData.make(wear),
-	    armor,
-	    gast,
-	    AttrData.make(attributes),
-	    slots,
-	    gilding
-	    
-	};
-	List<ItemInfo> infos = new ArrayList<>(data.length);
-	for (ITipData tip : data) {
-	    if(tip != null) {
-		infos.add(tip.create(sess));
-	    }
-	}
-	return infos;
-    }
-    
-    public static ItemData get(String name) {
-	if(item_data.containsKey(name)) {
-	    return item_data.get(name);
-	}
-	ItemData data = load(name);
-	if(data == null) {data = EMPTY;}
-	return data;
-    }
-
-    public static ItemData get(Pagina p){
-	List<ItemInfo> infos = p.button().info();
-	if(infos == null || infos.isEmpty()){
-	    return ItemData.get(p.res().name);
-	}
-        return new ItemData(infos);
-    }
-
-    public static void actualize(GItem item, Pagina pagina) {
-	if(item.resname() == null) { return; }
-
-	ItemData data = new ItemData(item);
-	String name = pagina.res().name;
-	item_data.put(name, data);
-	store(name, data);
-    }
-
-    private static ItemData load(String name) {
-	ItemData data = parse(Config.loadFile(getFilename(name)));
-	if(data != null) {
-	    item_data.put(name, data);
-	}
-	return data;
-    }
-
-    private static void store(String name, ItemData data) {
-        Config.saveFile(getFilename(name), getGson().toJson(data));
-    }
-
-    private static String getFilename(String name) {
-	return "/item_data/" + name + ".json";
-    }
-
-    private static ItemData parse(String json) {
-	ItemData data = null;
-	try {
-	    data = getGson().fromJson(json, ItemData.class);
-	} catch (JsonSyntaxException ignore) {
-	}
-	return data;
-    }
-
-    private static Gson getGson() {
-	if(gson == null) {
-	    GsonBuilder builder = new GsonBuilder();
-	    builder.setPrettyPrinting();
-	    builder.registerTypeAdapter(Resource.class, new ResourceAdapter().nullSafe());
-	    builder.enableComplexMapKeySerialization();
-	    gson = builder.create();
-	}
-	return gson;
     }
 
     public static boolean hasFoodInfo(GItem item) {

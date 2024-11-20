@@ -114,6 +114,7 @@ public class ItemFilter {
     public static final String[] FILTER_HELP = {HELP_SIMPLE, HELP_FULL_TEXT, HELP_CONTENT, HELP_QUALITY, HELP_CURIO, HELP_FEP, HELP_ARMOR, HELP_SYMBEL, HELP_ATTR, HELP_INPUTS};
     
     public boolean matches(List<ItemInfo> info) {
+	if(info == null || info.isEmpty()) {return false;}
 	for (ItemInfo item : info) {
 	    if(match(item)) {return true;}
 	}
@@ -121,16 +122,8 @@ public class ItemFilter {
 
     }
     
-    final public boolean matches(ItemData data, Session sess) {
-	return data != null && matches(data.iteminfo(sess));
-    }
-
-    final public boolean matches(MenuGrid.Pagina pagina, Session sess) {
-	List<ItemInfo> infos = pagina.button().info();
-	if(infos == null || infos.isEmpty()) {
-	    return matches(ItemData.get(pagina), sess);
-	}
-	return matches(infos);
+    final public boolean matches(MenuGrid.Pagina pagina) {
+	return matches(pagina.button().info());
     }
 
     protected boolean match(ItemInfo item) { return false; }

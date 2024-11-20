@@ -12,7 +12,7 @@ public class DamageTip {
 	GItem item = (GItem) owner;
 	String name = item.resname();
 	ItemInfo tip = tips.stream().filter(inf -> Reflect.is(inf, "Damage")).findFirst().orElse(null);
-	boolean isMelee = tips.stream().anyMatch(inf -> Reflect.is(inf, "Range"));
+	boolean isMelee = name.endsWith("/cutthroatknuckles") || tips.stream().anyMatch(inf -> Reflect.is(inf, "Range"));
 	boolean isRanged = name.endsWith("/sling") || name.endsWith("/huntersbow") || name.endsWith("/rangersbow"); 
 	if(tip == null || (!isMelee && !isRanged)) {return;}
 	

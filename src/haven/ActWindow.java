@@ -113,7 +113,7 @@ public class ActWindow extends GameUI.Hidewnd {
 		try {
 		    Resource res = p.res.get();
 		    String name = res.layer(Resource.action).name.toLowerCase();
-		    if(name.contains(filter) || itemFilter.matches(p, ui.sess)) {
+		    if(name.contains(filter) || itemFilter.matches(p)) {
 			filtered.add(p);
 		    }
 		} catch (Loading e) {

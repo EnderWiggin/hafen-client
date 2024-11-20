@@ -231,7 +231,7 @@ public class ToolBelt extends DraggableWidget implements DTarget, DropTarget {
 	    try {
 		MenuGrid.Pagina p = getpagina(item);
 		if(p != null) {
-		    ttip = ItemData.longtip(p, ui.sess, false);
+		    ttip = ItemData.longtip(p, false);
 		} else if(item instanceof GameUI.ResBeltSlot) {
 		    Resource.Tooltip tt = ((GameUI.ResBeltSlot) item).getres().layer(Resource.tooltip);
 		    if(tt != null) {

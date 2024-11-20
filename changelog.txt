@@ -1,3 +1,8 @@
+$size[14]{$u{Update for 20.11.24:}
+  * merged loftar's code
+  * fixed some custom messages (notably animal warnings) not being displayed
+  * made damage tooltip enhancement work for cutthroat knuckles
+ 
 $size[14]{$u{Update for 18.11.24:}
   * merged loftar's code
   * added pouches support for drink. refill drinks and drink meter

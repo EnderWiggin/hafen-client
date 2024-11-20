@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 import static haven.CraftDBWnd.Mode.*;
 import static haven.ItemFilter.*;
 
-public class CraftDBWnd extends WindowX implements DTarget, ICraftParent {
+public class CraftDBWnd extends WindowX implements ICraftParent {
     private static final int PANEL_H = UI.scale(52);
     private static final Coord WND_SZ = UI.scale(635, 360).addy(PANEL_H);
     private static final Coord ICON_SZ = UI.scale(20, 20);
@@ -376,7 +376,7 @@ public class CraftDBWnd extends WindowX implements DTarget, ICraftParent {
 	}
 	if(description == null) {
 	    try {
-		description = ItemData.longtip(descriptionPagina, ui.sess, true, 20, 5);
+		description = ItemData.longtip(descriptionPagina, true, 20, 5);
 	    } catch (Loading ignored) {}
 	}
 	if(description != null) {
@@ -450,23 +450,6 @@ public class CraftDBWnd extends WindowX implements DTarget, ICraftParent {
 	return ui.gui.menu.findPagina(name);
     }
 
-    private void updateInfo(WItem item){
-	ItemData.actualize(item.item, current);
-	updateDescription(current);
-    }
-
-    @Override
-    public boolean drop(Drop ev) {
-	updateInfo(ev.src);
-	return true;
-    }
-
-    @Override
-    public boolean iteminteract(Interact ev) {
-	updateInfo(ev.src);
-	return true;
-    }
-    
     @Override
     public void tick(double dt) {
 	super.tick(dt);
@@ -508,7 +491,7 @@ public class CraftDBWnd extends WindowX implements DTarget, ICraftParent {
 		try {
 		    Resource res = p.res.get();
 		    String name = res.layer(Resource.action).name.toLowerCase();
-		    return (name.contains(filter) || itemFilter.matches(p, ui.sess));
+		    return (name.contains(filter) || itemFilter.matches(p));
 		} catch (Loading e) {
 		    needfilter = true;
 		}

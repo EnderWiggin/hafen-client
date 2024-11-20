@@ -29,6 +29,7 @@ package haven;
 import haven.rx.CharterBook;
 
 import java.util.*;
+import java.net.URI;
 import java.io.*;
 
 public class LoginScreen extends Widget {
@@ -58,11 +59,12 @@ public class LoginScreen extends Widget {
 	add(new Img(bg), Coord.z);
 	optbtn = adda(new Button(UI.scale(100), "Options"), pos("cbl").add(10, -10), 0, 1);
 	optbtn.setgkey(GameUI.kb_opt);
+	if(HttpStatus.mond.get() != null)
+	    adda(new StatusLabel(HttpStatus.mond.get(), 1.0), sz.x - UI.scale(10), UI.scale(10), 1.0, 0.0);
 	switch(authmech.get()) {
 	case "native":
 	    login = new Credbox();
 	    accounts = add(new AccountList(10));
-	    adda(new StatusLabel(hostname, 0.5), bgc.x, bg.sz().y, 0.5, 1);
 	    break;
 	case "steam":
 	    login = new Steambox();
@@ -319,9 +321,9 @@ public class LoginScreen extends Widget {
 	public final HttpStatus stat;
 	public final double ax;
 
-	public StatusLabel(String host, double ax) {
+	public StatusLabel(URI svc, double ax) {
 	    super(new Coord(UI.scale(150), FastText.h * 2));
-	    this.stat = new HttpStatus(host);
+	    this.stat = new HttpStatus(svc);
 	    this.ax = ax;
 	}
 
