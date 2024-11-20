@@ -7,6 +7,7 @@ import java.util.List;
 
 public class QuestHelper extends GameUI.Hidewnd {
     private final QuestList questList;
+    private boolean refreshed = false;
 
     public QuestHelper() {
 	super(Coord.z, "Quest Helper");
@@ -36,19 +37,12 @@ public class QuestHelper extends GameUI.Hidewnd {
 	questList.SelectedQuest(id);
     }
 
-    public void refresh() {
-	if(ui != null && ui.gui != null && ui.gui.chrwdg != null) {
-	    for (QuestCondition questCondition : new ArrayList<>(questList.questConditions)) {
-		if(ui.gui.chrwdg.quest.cqst.get(questCondition.questId) == null) { // quest removed
-		    if(questCondition.questGiverMarker != null) {
-			questCondition.questGiverMarker.questConditions.remove(questCondition);
-		    }
-		    questList.questConditions.remove(questCondition);
-		}
-	    }
+    public void selectAllQuestsOnce() {
+	if(!refreshed && ui != null && ui.gui != null && ui.gui.chrwdg != null) {
 	    for (QuestWnd.Quest quest : ui.gui.chrwdg.quest.cqst.quests)
 		if (questList.questConditions.stream().noneMatch(x -> x.questId == quest.id))
 		    ui.gui.chrwdg.wdgmsg("qsel", quest.id);
+	    refreshed = true;
 	}
     }
 }
