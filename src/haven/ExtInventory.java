@@ -60,6 +60,7 @@ public class ExtInventory extends Widget {
 	    .rclick(this::toggleInventory)
 	    .changed(this::setVisibility)
 	    .settip("LClick to toggle extra info\nRClick to hide inventory when info is visible", true);
+	btn_sort.settip("LClick to sort inventory", true);
     
 	Composer composer = new Composer(extension).hmrgn(margin).vmrgn(margin);
 	composer.add(0);

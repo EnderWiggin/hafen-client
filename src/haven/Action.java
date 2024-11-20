@@ -70,7 +70,7 @@ public enum Action {
     CLEAR_PLAYER_DAMAGE(GobDamageInfo::clearPlayerDamage, "Clear damage from player"),
     CLEAR_ALL_DAMAGE(GobDamageInfo::clearAllDamage, "Clear damage from everyone"),
 
-    SORT_INVENTORY(InventorySorter::SortAll,"Sort inventory");
+    SORT_INVENTORY(InventorySorter::SortAll,"Sort all opened inventories");
     
     
     public final String name;
