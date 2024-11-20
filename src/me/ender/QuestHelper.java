@@ -37,12 +37,22 @@ public class QuestHelper extends GameUI.Hidewnd {
 	questList.SelectedQuest(id);
     }
 
-    public void selectAllQuestsOnce() {
-	if(!refreshed && ui != null && ui.gui != null && ui.gui.chrwdg != null) {
-	    for (QuestWnd.Quest quest : ui.gui.chrwdg.quest.cqst.quests)
-		if (questList.questConditions.stream().noneMatch(x -> x.questId == quest.id))
-		    ui.gui.chrwdg.wdgmsg("qsel", quest.id);
-	    refreshed = true;
+    public void refresh() {
+	if(ui != null && ui.gui != null && ui.gui.chrwdg != null) {
+	    for (QuestCondition questCondition : new ArrayList<>(questList.questConditions)) {
+		if(ui.gui.chrwdg.quest.cqst.get(questCondition.questId) == null) { // quest removed
+		    if(questCondition.questGiverMarker != null) {
+			questCondition.questGiverMarker.questConditions.remove(questCondition);
+		    }
+		    questList.questConditions.remove(questCondition);
+		}
+	    }
+	    if(!refreshed) {
+		for (QuestWnd.Quest quest : ui.gui.chrwdg.quest.cqst.quests)
+		    if(questList.questConditions.stream().noneMatch(x -> x.questId == quest.id))
+			ui.gui.chrwdg.wdgmsg("qsel", quest.id);
+		refreshed = true;
+	    }
 	}
     }
 }

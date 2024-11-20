@@ -743,7 +743,7 @@ public class QuestWnd extends Widget {
 		}
 	    }
 	    if(ui.gui != null) {
-		ui.gui.questHelper.selectAllQuestsOnce();
+		ui.gui.questHelper.refresh();
 	    }
 	} else {
 	    super.uimsg(nm, args);
