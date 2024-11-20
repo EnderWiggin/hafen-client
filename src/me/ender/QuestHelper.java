@@ -4,6 +4,7 @@ import haven.*;
 
 import java.util.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class QuestHelper extends GameUI.Hidewnd {
     private final QuestList questList;
@@ -48,9 +49,8 @@ public class QuestHelper extends GameUI.Hidewnd {
 		}
 	    }
 	    if(!refreshed) {
-		for (QuestWnd.Quest quest : ui.gui.chrwdg.quest.cqst.quests)
-		    if(questList.questConditions.stream().noneMatch(x -> x.questId == quest.id))
-			ui.gui.chrwdg.wdgmsg("qsel", quest.id);
+		for (QuestWnd.Quest quest : ui.gui.chrwdg.quest.cqst.quests.stream().sorted(Comparator.comparing(QuestWnd.Quest::title)).collect(Collectors.toList()))
+		    ui.gui.chrwdg.wdgmsg("qsel", quest.id);
 		refreshed = true;
 	    }
 	}
