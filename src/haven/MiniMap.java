@@ -38,7 +38,7 @@ import haven.MapFile.Segment;
 import haven.MapFile.DataGrid;
 import haven.MapFile.GridInfo;
 import me.ender.ClientUtils;
-import me.ender.QuestListItem;
+import me.ender.QuestCondition;
 import me.ender.gob.KinInfo;
 import me.ender.minimap.*;
 
@@ -421,14 +421,12 @@ public class MiniMap extends Widget {
 	private void checkTip(final String nm) {
 	    if (CFG.QUESTHELPER_SHOW_TASKS_IN_TOOLTIP.get() && m instanceof SMarker) {
 		StringBuilder sb = new StringBuilder(nm);
-		if (!((SMarker) m).qitems.isEmpty())
+		if (!((SMarker) m).questConditions.isEmpty())
 		    sb.append("\n");
-		for (QuestListItem q : ((SMarker)m).qitems) {
-		    if (q.status != 1) {
+		for (QuestCondition questCondition : ((SMarker)m).questConditions) {
 			sb.append("\n");
-			sb.append(q.name);
+			sb.append(questCondition.description);
 		    }
-		}
 		tip = RichText.render(sb.toString(), 300);
 	    } else if (tip == null || !tip.text.equals(nm))
 		tip = Text.renderstroked(nm, Color.WHITE, Color.BLACK);

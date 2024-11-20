@@ -36,7 +36,7 @@ import java.awt.event.KeyEvent;
 import java.awt.image.*;
 import haven.MiniMap.*;
 import haven.BuddyWnd.GroupSelector;
-import me.ender.QuestListItem;
+import me.ender.QuestCondition;
 import me.ender.minimap.*;
 
 import static haven.MCache.tilesz;
@@ -351,11 +351,11 @@ public class MapWnd extends WindowX implements Console.Directory {
 		Gob gob = MarkerID.find(ui.sess.glob.oc, mark.m);
 		if(gob != null)
 		    mvclick(mv, null, loc, gob, button);
-		if(button == 3 && !press && !domark && !((SMarker) mark.m).qitems.isEmpty())
+		if(button == 3 && !press && !domark && !((SMarker) mark.m).questConditions.isEmpty())
 		{
-		    QuestListItem quest = ((SMarker) mark.m).questiterator.next();
-		    if (quest != null)
-		    	this.ui.gui.chrwdg.wdgmsg("qsel", quest.parent);
+		    QuestCondition questCondition = ((SMarker) mark.m).questIterator.next();
+		    if (questCondition != null)
+		    	this.ui.gui.chrwdg.wdgmsg("qsel", questCondition.questId);
 		}
 	    }
 	    return(false);

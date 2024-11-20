@@ -1,9 +1,8 @@
 package me.ender.minimap;
 
 import haven.*;
-import me.ender.QuestListItem;
+import me.ender.QuestCondition;
 
-import java.awt.*;
 import java.util.Objects;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -13,14 +12,14 @@ public class SMarker extends Marker {
     public final long oid;
     public final Resource.Saved res;
 
-    public List<QuestListItem> qitems = new ArrayList<>();
-    public Iterator<QuestListItem> questiterator;
+    public List<QuestCondition> questConditions = new ArrayList<>();
+    public Iterator<QuestCondition> questIterator;
 
     public SMarker(long seg, Coord tc, String nm, long oid, Resource.Saved res) {
 	super(seg, tc, nm);
 	this.oid = oid;
 	this.res = res;
-	questiterator = Utils.circularIterator(qitems);
+	questIterator = Utils.circularIterator(questConditions);
     }
     
     @Override
@@ -40,12 +39,10 @@ public class SMarker extends Marker {
 	    final Resource.Neg neg = res.layer(Resource.negc);
 	    final Coord cc = neg != null ? neg.cc : img.ssz.div(2);
 	    final Coord ul = c.sub(cc);
-	    if(CFG.QUESTHELPER_HIGHLIGHT_QUESTGIVERS.get() && !qitems.isEmpty()) {
-		for(QuestListItem item : qitems) {
-		    if(item.color != null) {
-			g.chcolor(item.color);
-			g.fellipse(c, img.ssz.div(2).sub(1, 1));
-		    }
+	    if(CFG.QUESTHELPER_HIGHLIGHT_QUESTGIVERS.get() && !questConditions.isEmpty()) {
+		for(QuestCondition item : new ArrayList<>(questConditions)) {
+		    g.chcolor(item.questGiverMarkerColor);
+		    g.fellipse(c, img.ssz.div(2).sub(1, 1));
 		}
 		g.chcolor();
 	    }
