@@ -36,7 +36,7 @@ public class QuestList extends Listbox<QuestCondition> {
 	    color = questCondition.isCurrent ? Color.WHITE : Color.LIGHT_GRAY;
 	}
 	g.chcolor(color);
-	g.atext(questCondition.description, TEXT_C, 0, 0.5);
+	g.atext(questCondition.name, TEXT_C, 0, 0.5);
 	if (!questCondition.questGiver.isEmpty()) {
 	    String distance = questCondition.distance(ui.gui);
 	    if(distance != null) {

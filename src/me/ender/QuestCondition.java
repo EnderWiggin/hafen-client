@@ -39,6 +39,7 @@ public class QuestCondition implements Comparable<QuestCondition> {
 	    this.questGiver = matcher.group(2);
 	}
 
+	this.name = description;
 	if(isCredo) {name = "\uD83D\uDD6E " + description;}
 	if(isLast) {name = "★ " + name;}
 
