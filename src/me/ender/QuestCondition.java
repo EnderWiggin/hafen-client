@@ -53,6 +53,11 @@ public class QuestCondition implements Comparable<QuestCondition> {
 	this.isEndpoint = isEndpoint;
 	this.isLast = isLast;
 
+	if(isCredo) {
+	    name = "\uD83D\uDD6E " + description;
+	    if(isLast) {name = "★ " + name;}
+	} else if(isLast) {name = "★ " + description;}
+
 	AddMarker(gui);
 	AddPointer(gui);
 

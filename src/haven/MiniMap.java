@@ -425,7 +425,7 @@ public class MiniMap extends Widget {
 		    sb.append("\n");
 		for (QuestCondition questCondition : ((SMarker)m).questConditions) {
 			sb.append("\n");
-			sb.append(questCondition.description);
+			sb.append(questCondition.name);
 		    }
 		tip = RichText.render(sb.toString(), 300);
 	    } else if (tip == null || !tip.text.equals(nm))
