@@ -20,19 +20,21 @@ public class QuestCondition implements Comparable<QuestCondition> {
     public SMarker questGiverMarker;
     public Color questGiverMarkerColor;
     public int questId;
+    public String questTitle;
     public int statusId;
     public boolean isEndpoint;
     public boolean isLast;
     public boolean isCredo;
     public boolean isCurrent = false;
 
-    public QuestCondition(String description, int statusId, boolean isEndpoint, boolean isLast, int questId, boolean isCredo, GameUI gui) {
+    public QuestCondition(String description, int statusId, boolean isEndpoint, boolean isLast, int questId, boolean isCredo, String questTitle, GameUI gui) {
 	this.description = description;
 	this.questId = questId;
 	this.statusId = statusId;
 	this.isEndpoint = isEndpoint;
 	this.isLast = isLast;
 	this.isCredo = isCredo;
+	this.questTitle = questTitle;
 
 	Matcher matcher = pat.matcher(description);
 	if(matcher.find()) {
@@ -41,22 +43,21 @@ public class QuestCondition implements Comparable<QuestCondition> {
 
 	this.name = description;
 	if(isCredo) {name = "\uD83D\uDD6E " + description;}
-	if(isLast) {name = "★ " + name;}
+	else if(isLast) {name = "★ " + description;}
 
 	AddMarker(gui);
 	AddPointer(gui);
     }
 
-    public void UpdateQuestCondition(int statusId, boolean isEndpoint, boolean isLast, GameUI gui)
+    public void UpdateQuestCondition(int statusId, boolean isEndpoint, boolean isLast, boolean isCredo, GameUI gui)
     {
 	this.statusId = statusId;
 	this.isEndpoint = isEndpoint;
 	this.isLast = isLast;
+	this.isCredo = isCredo;
 
-	if(isCredo) {
-	    name = "\uD83D\uDD6E " + description;
-	    if(isLast) {name = "★ " + name;}
-	} else if(isLast) {name = "★ " + description;}
+	if(isCredo) {name = "\uD83D\uDD6E " + description;}
+	else if(isLast) {name = "★ " + description;}
 
 	AddMarker(gui);
 	AddPointer(gui);
@@ -122,12 +123,15 @@ public class QuestCondition implements Comparable<QuestCondition> {
     }
 
     public int compareTo(QuestCondition o) {
-	int result = -Boolean.compare(isCurrent, o.isCurrent);
+	int result = -Boolean.compare(isCredo, o.isCredo);
 	if(result == 0) {
-	    result = Boolean.compare(isLast, o.isLast);
+	    result = -Boolean.compare(isCurrent, o.isCurrent);
 	}
 	if(result == 0) {
-	    result = -Boolean.compare(isCredo, o.isCredo);
+	    result = -Boolean.compare(questTitle != null, o.questTitle != null);
+	}
+	if(result == 0) {
+	    result = Boolean.compare(isLast, o.isLast);
 	}
 	if(result == 0) {
 	    result = description.compareTo(o.description);

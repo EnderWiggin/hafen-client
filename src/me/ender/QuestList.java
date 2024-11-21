@@ -33,7 +33,7 @@ public class QuestList extends Listbox<QuestCondition> {
     @Override
     protected void drawitem(GOut g, QuestCondition questCondition, int i) {
 	Color color;
-	if(questCondition.isLast) {
+	if(questCondition.isLast && !questCondition.isCredo) {
 	    color = questCondition.isCurrent ? Color.CYAN : Color.GREEN;
 	} else {
 	    color = questCondition.isCurrent ? Color.WHITE : Color.LIGHT_GRAY;

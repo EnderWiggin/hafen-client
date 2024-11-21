@@ -277,9 +277,11 @@ public class QuestWnd extends Widget {
 		    if(cqv != null) {
 			cqv.update();
 			CharWnd cw = cw();
-			boolean isCredo = cw != null && cw.skill != null && cw.skill.credos.pqid == questid();
-			boolean noTitled = title == null;
-			this.ui.gui.questHelper.processQuest(ncond, questid(), isCredo, noTitled);
+			if (cw != null) {
+			    boolean isCredo = cw.skill != null && cw.skill.credos.pqid == questid();
+			    if(cw.quest.cqst.quests.stream().filter(x -> x.id == questid()).findFirst().orElse(null) != null) //ignore completed quests
+				this.ui.gui.questHelper.processQuest(ncond, questid(), isCredo, title);
+			}
 		    }
 		} else {
 		    super.uimsg(msg, args);

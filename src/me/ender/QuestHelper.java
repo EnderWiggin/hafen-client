@@ -16,30 +16,30 @@ public class QuestHelper extends GameUI.Hidewnd {
 	pack();
     }
     
-    public void processQuest(List<QuestWnd.Quest.Condition> conditions, int id, boolean isCredo, boolean noTitled) {
-	if (!noTitled || isCredo)
-	    for (int i = 0; i < conditions.size(); ++i) {
-		long left = conditions.stream().filter(q -> q.done != 1).count();
-		QuestWnd.Quest.Condition condition = conditions.get(i);
+    public void processQuest(List<QuestWnd.Quest.Condition> conditions, int id, boolean isCredo, String questTitle) {
+	for (int i = 0; i < conditions.size(); ++i) {
+	    long left = conditions.stream().filter(q -> q.done != 1).count();
+	    QuestWnd.Quest.Condition condition = conditions.get(i);
 
-		QuestCondition questCondition = questList.questConditions.stream().filter(x -> x.questId == id && Objects.equals(x.description, condition.desc)).findFirst().orElse(null);
-		if (questCondition == null && condition.done != 1){
-		    questCondition = new QuestCondition(condition.desc, condition.done, (i == conditions.size() - 1), left <= 1, id, isCredo, ui.gui);
-		    questList.questConditions.add(questCondition);
-		} else {
-		    if (questCondition != null) {
-			questCondition.UpdateQuestCondition(condition.done, (i == conditions.size() - 1), left <= 1, ui.gui);
-			if (condition.done == 1) {
-			    questList.questConditions.remove(questCondition);
-			}
+	    QuestCondition questCondition = questList.questConditions.stream().filter(x -> x.questId == id && Objects.equals(x.description, condition.desc)).findFirst().orElse(null);
+	    if (questCondition == null && condition.done != 1){
+		questCondition = new QuestCondition(condition.desc, condition.done, (i == conditions.size() - 1), left <= 1, id, isCredo, questTitle, ui.gui);
+		questList.questConditions.add(questCondition);
+	    } else {
+		if (questCondition != null) {
+		    questCondition.UpdateQuestCondition(condition.done, (i == conditions.size() - 1), left <= 1, isCredo, ui.gui);
+		    if (condition.done == 1) {
+			questList.questConditions.remove(questCondition);
 		    }
 		}
 	    }
+	}
 	questList.SelectedQuest(id);
     }
 
     public void refresh() {
 	if(ui != null && ui.gui != null && ui.gui.chrwdg != null) {
+	    questList.SelectedQuest(-2);
 	    for (QuestCondition questCondition : new ArrayList<>(questList.questConditions)) {
 		if(ui.gui.chrwdg.quest.cqst.get(questCondition.questId) == null) { // quest removed
 		    if(questCondition.questGiverMarker != null) {
@@ -49,13 +49,12 @@ public class QuestHelper extends GameUI.Hidewnd {
 		}
 	    }
 	    if(!refreshed) {
-		for (QuestWnd.Quest quest : ui.gui.chrwdg.quest.cqst.quests.stream().sorted(Comparator.comparing(QuestWnd.Quest::title)).collect(Collectors.toList()))
-		    if(questList.questConditions.stream().noneMatch(x -> x.questId == quest.id))
-			ui.gui.chrwdg.wdgmsg("qsel", quest.id);
+		for (QuestWnd.Quest quest : ui.gui.chrwdg.quest.cqst.quests)
+		    ui.gui.chrwdg.wdgmsg("qsel", quest.id);
 		refreshed = true;
 	    }
 	    else {
-		for (QuestWnd.Quest quest : ui.gui.chrwdg.quest.cqst.quests.stream().filter(x -> x.title != null).collect(Collectors.toList()))
+		for (QuestWnd.Quest quest : ui.gui.chrwdg.quest.cqst.quests)
 		    if(questList.questConditions.stream().noneMatch(x -> x.questId == quest.id))
 			ui.gui.chrwdg.wdgmsg("qsel", quest.id);
 	    }
