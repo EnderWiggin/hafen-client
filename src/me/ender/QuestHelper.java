@@ -50,8 +50,14 @@ public class QuestHelper extends GameUI.Hidewnd {
 	    }
 	    if(!refreshed) {
 		for (QuestWnd.Quest quest : ui.gui.chrwdg.quest.cqst.quests.stream().sorted(Comparator.comparing(QuestWnd.Quest::title)).collect(Collectors.toList()))
-		    ui.gui.chrwdg.wdgmsg("qsel", quest.id);
+		    if(questList.questConditions.stream().noneMatch(x -> x.questId == quest.id))
+			ui.gui.chrwdg.wdgmsg("qsel", quest.id);
 		refreshed = true;
+	    }
+	    else {
+		for (QuestWnd.Quest quest : ui.gui.chrwdg.quest.cqst.quests.stream().filter(x -> x.title != null).collect(Collectors.toList()))
+		    if(questList.questConditions.stream().noneMatch(x -> x.questId == quest.id))
+			ui.gui.chrwdg.wdgmsg("qsel", quest.id);
 	    }
 	}
     }
