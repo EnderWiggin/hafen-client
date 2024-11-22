@@ -38,7 +38,7 @@ public class QuestCondition implements Comparable<QuestCondition> {
 	}
 
 	addMarker();
-	addPointer();
+	//addPointer();
     }
 
     public void UpdateQuestCondition(boolean isEndpoint, boolean isLast)
@@ -47,7 +47,7 @@ public class QuestCondition implements Comparable<QuestCondition> {
 	this.isLast = isLast;
 
 	addMarker();
-	addPointer();
+	//addPointer();
     }
 
     public void RemoveMarker()
@@ -88,8 +88,8 @@ public class QuestCondition implements Comparable<QuestCondition> {
 
 	if(questGiverMarker != null)
 	    if(questGiverMarker.seg == loc.seg.id) {tc = questGiverMarker.tc.sub(loc.tc);}
-     	else if (questGiverPointer.isPresent())
-	    tc = questGiverPointer.map(p -> p.tc(loc.seg.id).floor(tilesz)).orElse(null);
+     	//else if (questGiverPointer.isPresent())
+	    //tc = questGiverPointer.map(p -> p.tc(loc.seg.id).floor(tilesz)).orElse(null);
 
 	if(tc == null) {return null;}
 
