@@ -348,7 +348,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	opts.hide();
 	zerg = add(new Zergwnd(), Utils.getprefc("wndc-zerg", UI.scale(new Coord(187, 50))));
 	zerg.hide();
-	questHelper = add(new QuestHelper(), UI.scale(new Coord(187, 50)));
+	questHelper = add(new QuestHelper(this), UI.scale(new Coord(187, 50)));
 	questHelper.hide();
 	placemmap();
 	timewdg = add(new TimeWdg(), new Coord(umpanel.c.x - UI.scale(200), 0));

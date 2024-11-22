@@ -41,7 +41,7 @@ public class SMarker extends Marker {
 	    final Coord ul = c.sub(cc);
 	    if(CFG.QUESTHELPER_HIGHLIGHT_QUESTGIVERS.get() && !questConditions.isEmpty()) {
 		for(QuestCondition item : new ArrayList<>(questConditions)) {
-		    g.chcolor(item.questGiverMarkerColor);
+		    g.chcolor(item.QuestGiverMarkerColor());
 		    g.fellipse(c, img.ssz.div(2).sub(1, 1));
 		}
 		g.chcolor();

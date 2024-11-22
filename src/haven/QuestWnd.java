@@ -276,13 +276,8 @@ public class QuestWnd extends Widget {
 		    refresh();
 		    if(cqv != null) {
 			cqv.update();
-			CharWnd cw = cw();
-			if (cw != null) {
-			    boolean isCredo = cw.skill != null && cw.skill.credos.pqid == questid();
-			    if(cw.quest.cqst.quests.stream().filter(x -> x.id == questid()).findFirst().orElse(null) != null) //ignore completed quests
-				this.ui.gui.questHelper.processQuest(ncond, questid(), isCredo, title);
-			}
 		    }
+		    this.ui.gui.questHelper.ProcessQuest(ncond, id, title);
 		} else {
 		    super.uimsg(msg, args);
 		}
@@ -745,7 +740,7 @@ public class QuestWnd extends Widget {
 		}
 	    }
 	    if(ui.gui != null) {
-		ui.gui.questHelper.refresh();
+		ui.gui.questHelper.Refresh();
 	    }
 	} else {
 	    super.uimsg(nm, args);

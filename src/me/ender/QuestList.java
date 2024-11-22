@@ -8,17 +8,57 @@ import java.util.List;
 
 
 public class QuestList extends Listbox<QuestCondition> {
-    public List<QuestCondition> questConditions = new ArrayList<>();
-    public static final int ITEM_H = UI.scale(20);
-    public static final Coord TEXT_C = Coord.of(0, ITEM_H / 2);
-    public static final Color BGCOLOR = new Color(0, 0, 0, 120);
+    private final GameUI gui;
     private final Coord DIST_C;
+    private final List<QuestCondition> questConditions = new ArrayList<>();
+    private static final int ITEM_H = UI.scale(20);
+    private static final Coord TEXT_C = Coord.of(0, ITEM_H / 2);
+    private static final Color BGCOLOR = new Color(0, 0, 0, 120);
 
-    public QuestList(int w, int h) {
+    public QuestList(int w, int h, GameUI gui) {
 	super(w, h, ITEM_H);
+	this.gui = gui;
 	bgcolor = BGCOLOR;
 	DIST_C = Coord.of(w - UI.scale(16), ITEM_H / 2);
     }
+
+    public void SelectedQuest(Integer questId){
+	for (QuestCondition questCondition : questConditions)
+	    questCondition.isCurrent = questCondition.questId == questId;
+	Collections.sort(questConditions);
+    }
+
+    public QuestCondition GetQuestCondition(int questId, String questDescription) {return questConditions.stream().filter(x -> x.questId == questId && Objects.equals(x.description, questDescription)).findFirst().orElse(null);}
+
+    public void AddOrUpdateQuestCondition(int questId, String questDescription, boolean isEndpoint, boolean isLast, String questTitle) {
+	QuestCondition questCondition = GetQuestCondition(questId, questDescription);
+	if (questCondition == null)
+	    questConditions.add(new QuestCondition(questDescription, isEndpoint, isLast, questId, questTitle, gui));
+	else
+	    questCondition.UpdateQuestCondition(isEndpoint, isLast);
+	SelectedQuest(questId);
+    }
+
+    public void RemoveQuestCondition(int questId, String questDescription)
+    {
+	QuestCondition questCondition = GetQuestCondition(questId, questDescription);
+	if (questCondition != null) {
+	    questCondition.RemoveMarker();
+	    questConditions.remove(questCondition);
+	}
+    }
+
+    public void RemoveQuest(int questId)
+    {
+	for (QuestCondition questCondition: new ArrayList<>(questConditions))
+	    if (questCondition.questId == questId) {
+		questCondition.RemoveMarker();
+		questConditions.remove(questCondition);
+	}
+	SelectedQuest(-2);
+    }
+
+    public boolean ContainsQuestId(int questId) {return questConditions.stream().anyMatch(x -> x.questId == questId);}
 
     @Override
     protected QuestCondition listitem(int i) {
@@ -32,26 +72,12 @@ public class QuestList extends Listbox<QuestCondition> {
 
     @Override
     protected void drawitem(GOut g, QuestCondition questCondition, int i) {
-	Color color;
-	if(questCondition.isLast && !questCondition.isCredo) {
-	    color = questCondition.isCurrent ? Color.CYAN : Color.GREEN;
-	} else {
-	    color = questCondition.isCurrent ? Color.WHITE : Color.LIGHT_GRAY;
+	g.chcolor(questCondition.NameColor());
+	g.atext(questCondition.Name(), TEXT_C, 0, 0.5);
+	String distance = questCondition.Distance();
+	if(distance != null) {
+	    g.atext(distance, DIST_C, 1, 0.5);
 	}
-	g.chcolor(color);
-	g.atext(questCondition.name, TEXT_C, 0, 0.5);
-	if (!questCondition.questGiver.isEmpty()) {
-	    String distance = questCondition.distance(ui.gui);
-	    if(distance != null) {
-		g.atext(distance, DIST_C, 1, 0.5);
-	    }
-	}
-    }
-
-    public void SelectedQuest(Integer questId){
-	for (QuestCondition questCondition : questConditions)
-	    questCondition.isCurrent = questCondition.questId == questId;
-	Collections.sort(questConditions);
     }
 
     @Override
@@ -59,10 +85,10 @@ public class QuestList extends Listbox<QuestCondition> {
 	if(questCondition == null) {return;}
 	QuestWnd.Quest.Info quest = ui.gui.chrwdg.quest.quest;
 	if(quest != null && quest.questid() == questCondition.questId) {
-	    ui.gui.chrwdg.wdgmsg("qsel", (Object) null);
+	    gui.chrwdg.wdgmsg("qsel", (Object) null);
 	    SelectedQuest(-2);
 	} else {
-	    ui.gui.chrwdg.wdgmsg("qsel", questCondition.questId);
+	    gui.chrwdg.wdgmsg("qsel", questCondition.questId);
 	}
     }
 }
