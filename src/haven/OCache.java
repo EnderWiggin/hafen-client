@@ -34,6 +34,7 @@ import java.lang.reflect.*;
 import haven.render.Render;
 import java.util.stream.Stream;
 import haven.render.*;
+import haven.res.gfx.fx.msrad.MSRad;
 
 public class OCache implements Iterable<Gob> {
     public static final int OD_REM = 0;
@@ -266,6 +267,26 @@ public class OCache implements Iterable<Gob> {
 
     public synchronized Gob getgob(long id) {
 	return(objs.get(id));
+    }
+
+    private final List<SquareRadiiOverlay> msols = new LinkedList<>();
+    public boolean dirtyMSOls = true;
+
+    /**Returns list of mine support overlays*/
+    public List<SquareRadiiOverlay> msols() {
+	if(!dirtyMSOls) {return msols;}
+	synchronized (msols) {
+	    dirtyMSOls = false;
+	    msols.clear();
+	    synchronized (this) {
+		for (Gob gob : objs.values()) {
+		    MSRad spr = gob.findsprol(MSRad.class);
+		    if(spr == null) {continue;}
+		    msols.add(spr.overlay);
+		}
+	    }
+	}
+	return msols;
     }
 
     private java.util.concurrent.atomic.AtomicLong nextvirt = new java.util.concurrent.atomic.AtomicLong(-1);

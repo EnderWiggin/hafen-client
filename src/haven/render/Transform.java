@@ -105,6 +105,21 @@ public abstract class Transform extends State {
 	}
     };
 
+    public static final Function<Matrix4f, Matrix4f> nullz = new Function<Matrix4f, Matrix4f>() {
+	public Matrix4f apply(Matrix4f p) {
+	    if(p == Matrix4f.id)
+		return(p);
+	    Matrix4f r = new Matrix4f(p);
+	    r.m[14] = 0;
+
+	    return(r);
+	}
+
+	public String toString() {
+	    return("#nullz");
+	}
+    };
+
     public static Matrix4f makexlate(Matrix4f d, Coord3f c) {
 	d.m[ 0] = d.m[ 5] = d.m[10] = d.m[15] = 1.0f;
 	d.m[ 1] = d.m[ 2] = d.m[ 3] =

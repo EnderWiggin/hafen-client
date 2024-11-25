@@ -1,3 +1,7 @@
+$size[14]{$u{Update for 23.11.24:}
+  * merged loftar's code
+  * fixed gob circles/rings being under water if flat terrain is on
+ 
 $size[14]{$u{Update for 20.11.24:}
   * merged loftar's code
   * fixed some custom messages (notably animal warnings) not being displayed

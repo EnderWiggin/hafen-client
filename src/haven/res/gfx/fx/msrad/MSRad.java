@@ -14,20 +14,25 @@ import me.ender.CFGOverlayId;
 /* >spr: MSRad */
 @haven.FromResource(name = "gfx/fx/msrad", version = 16)
 public class MSRad extends Sprite {
+    private static final double TICK_RATE = 0.1;
+    public static final float LOW_HP = 0.25f;
     public static boolean show = false;
     public static Collection<MSRad> current = new WeakList<>();
     public static final String OL_TAG = "mine_support";
     final ColoredRadius circle;
-    final SquareRadiiOverlay overlay;
+    public final SquareRadiiOverlay overlay;
     final Collection<RenderTree.Slot> slots = new ArrayList<>(1);
     
     public static final MCache.OverlayInfo safeol = new CFGOverlayId(CFG.COLOR_MINE_SUPPORT_OVERLAY, OL_TAG);
+    public static final MCache.OverlayInfo dangerol = new CFGOverlayId(CFG.COLOR_MINE_SUPPORT_DAMAGED_OVERLAY, OL_TAG);
+    
+    private double timer = TICK_RATE;
     
     public MSRad(Owner owner, Resource res, float r, Color color1, Color color2) {
 	super(owner, res);
 	Gob gob = (Gob) owner;
 	circle = new ColoredRadius(gob, r, color1, color2);
-	overlay = new SquareRadiiOverlay(gob, r, safeol);
+	overlay = new SquareRadiiOverlay(gob, r, safeol, dangerol);
     }
     
     public MSRad(Owner owner, Resource res, float r, Color color) {
@@ -80,6 +85,16 @@ public class MSRad extends Sprite {
     @Override
     public void gtick(Render g) {
 	circle.gtick(g);
+    }
+    
+    @Override
+    public boolean tick(double dt) {
+	timer -= dt;
+	if(timer <= 0) {
+	    timer = TICK_RATE;
+	    overlay.checkHP();
+	}
+	return super.tick(dt);
     }
     
     public void removed(RenderTree.Slot slot) {

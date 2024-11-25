@@ -23,7 +23,7 @@ public class BPRad extends Sprite {
     float[] barda;
     
     public static final String OL_TAG = "show";
-    private static final Color col = new Color(251, 28, 95);
+    private static final Color col = new Color(190, 27, 255);
     private static final List<String> tags = Collections.singletonList(OL_TAG);
     private final SquareRadiiOverlay overlay;
     private static final MCache.OverlayInfo bpol = new MCache.OverlayInfo() {

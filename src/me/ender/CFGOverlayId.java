@@ -11,13 +11,13 @@ import java.util.Collection;
 import java.util.Collections;
 
 public class CFGOverlayId implements MCache.OverlayInfo {
-    Material mat = new Material(BaseColor.fromColorAndAlpha(CFG.COLOR_MINE_SUPPORT_OVERLAY.get(), 0.25f), States.maskdepth);
-    Material omat = new Material(BaseColor.fromColorAndAlpha(CFG.COLOR_MINE_SUPPORT_OVERLAY.get(), 0.75f), States.maskdepth);
+    Material mat, omat;
     private final Collection<String> tags;
     
     public CFGOverlayId(CFG<Color> cfg, String tag) {
 	tags = Collections.singletonList(tag);
 	cfg.observe(this::update);
+	update(cfg);
     }
     
     @Override

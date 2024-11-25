@@ -8,7 +8,7 @@ import java.nio.*;
 import static haven.MCache.tilesz;
 
 /* >wdg: LandSurvey */
-@haven.FromResource(name = "ui/surv", version = 42)
+@haven.FromResource(name = "ui/surv", version = 43)
 public class LandSurvey extends Window {
     final Coord ul, br;
     MapView mv;
@@ -186,8 +186,8 @@ public class LandSurvey extends Window {
 
     private double sendtz = 0;
     private static final Pipe.Op olmat = Pipe.Op.compose(new BaseColor(new Color(255, 0, 0, 64)),
-							 Rendered.postfx, // Rendered.eyesort, XXXRENDER
-							 new States.DepthBias(-2, -2));
+							 Rendered.eyesort,
+							 States.maskdepth, new States.DepthBias(-2, -2));
     private int olseq = -1;
     public void tick(double dt) {
 	if(tz == Integer.MIN_VALUE) {

@@ -254,6 +254,14 @@ public class MCache implements MapSource {
 	    }
 	}
 
+	public void update(OverlayInfo id, Area a) {
+	    if(!id.equals(this.id)) {
+		olseq++;
+		this.id = id;
+	    }
+	    update(a);
+	}
+
 	public void update(Area a) {
 	    if(!a.equals(this.a)) {
 		olseq++;

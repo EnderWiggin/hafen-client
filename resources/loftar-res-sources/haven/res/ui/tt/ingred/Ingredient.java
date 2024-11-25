@@ -6,7 +6,7 @@ import java.util.*;
 import java.awt.image.BufferedImage;
 
 /* >tt: Ingredient */
-@haven.FromResource(name = "ui/tt/ingred", version = 25)
+@haven.FromResource(name = "ui/tt/ingred", version = 26)
 public class Ingredient extends ItemInfo.Tip {
     public final String name;
     public final Double val;
@@ -50,7 +50,7 @@ public class Ingredient extends ItemInfo.Tip {
 	public BufferedImage tipimg() {
 	    StringBuilder buf = new StringBuilder();
 	    Collections.sort(all, (a, b) -> a.name.compareTo(b.name));
-	    buf.append("Made from ");
+	    buf.append("Made with ");
 	    buf.append(all.get(0).descr());
 	    if(all.size() > 2) {
 		for(int i = 1; i < all.size() - 1; i++) {
