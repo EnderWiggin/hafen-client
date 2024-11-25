@@ -1,3 +1,8 @@
+$size[14]{$u{Update for 25.11.24:}
+  * merged loftar's code
+  * added Cold Cut to Black Eye treatments
+  * show tiles under damaged (25% HP and lower) mine support in different color
+ 
 $size[14]{$u{Update for 23.11.24:}
   * merged loftar's code
   * fixed gob circles/rings being under water if flat terrain is on

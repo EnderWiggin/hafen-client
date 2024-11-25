@@ -1,7 +1,0 @@
-#CODEENTRY LAYER FOR RES www//\ui\locptr.res
-#int32 length
-1
-#String key[0]
-wdg
-#String value[0]
-Pointer

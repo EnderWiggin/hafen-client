@@ -27,6 +27,7 @@
 package haven;
 
 import haven.Equipory.SLOTS;
+import haven.res.ui.locptr.Pointer;
 import haven.rx.BuffToggles;
 import haven.rx.Reactor;
 import integrations.mapv4.MappingClient;
@@ -1910,15 +1911,9 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
     private final Map<Marker, Widget> trackedMarkers = new HashMap<>();
     public void track(Marker marker) {
 	untrack(marker);
-	try {
-	    Factory f = Widget.gettype2("ui/locptr");
-	    if(f != null) {
-		Widget wdg = f.create(ui, new Object[]{marker});
-		trackedMarkers.put(marker, wdg);
-		ui.gui.add(wdg);
-	    }
-	} catch (InterruptedException ignored) {
-	}
+	Widget wdg = new Pointer(marker);
+	trackedMarkers.put(marker, wdg);
+	ui.gui.add(wdg);
     }
     
     public void untrack(Marker marker) {

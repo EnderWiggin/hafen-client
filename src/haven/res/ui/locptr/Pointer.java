@@ -1,10 +1,14 @@
-import haven.*;
-import haven.render.BaseColor;
-import haven.render.Model;
-import me.ender.ClientUtils;
-import me.ender.minimap.*;
+/* Preprocessed source code */
+package haven.res.ui.locptr;
 
-import java.awt.*;
+import haven.*;
+import haven.render.*;
+import me.ender.ClientUtils;
+import me.ender.minimap.Marker;
+import me.ender.minimap.PMarker;
+import me.ender.minimap.SMarker;
+
+import java.awt.Color;
 import java.util.Objects;
 
 import static haven.MCache.*;
@@ -12,6 +16,7 @@ import static haven.OCache.*;
 import static java.lang.Math.*;
 
 /* >wdg: Pointer */
+@FromResource(name = "ui/locptr", version = 21)
 public class Pointer extends Widget implements MiniMap.IPointer, DTarget {
     private static final Color TRIANGULATION_COLOR = new Color(100, 100, 100);
     public static final BaseColor[] colors = new BaseColor[]{
@@ -36,12 +41,12 @@ public class Pointer extends Widget implements MiniMap.IPointer, DTarget {
     private boolean triangulating = false;
     long lastseg = -1;
     Coord lastsegtc = null;
-    
+
     public Pointer(Indir<Resource> icon) {
 	super(Coord.z);
 	this.icon = icon;
     }
-    
+
     public Pointer(Marker marker) {
 	super(Coord.z);
 	this.marker = marker;
@@ -60,29 +65,26 @@ public class Pointer extends Widget implements MiniMap.IPointer, DTarget {
     }
     
     public static Widget mkwidget(UI ui, Object... args) {
-	if(args[0] instanceof Marker) {
-	    return new Pointer((Marker) args[0]);
-	}
-	int iconid = (Integer) args[0];
+	int iconid = (Integer)args[0];
 	Indir<Resource> icon = (iconid < 0) ? null : ui.sess.getres(iconid);
-	return (new Pointer(icon));
+	return(new Pointer(icon));
     }
-    
+	
     public void presize() {
 	resize(parent.sz);
     }
-    
+
     protected void added() {
 	presize();
 	super.added();
     }
-    
+
     private int signum(int a) {
-	if(a < 0) return (-1);
-	if(a > 0) return (1);
-	return (0);
+	if(a < 0) return(-1);
+	if(a > 0) return(1);
+	return(0);
     }
-    
+
     private Pair<Coord, Coord> screenp(Coord tc, Coord sz) {
 	Coord hsz = sz.div(2);
 	tc = tc.sub(hsz);
@@ -90,7 +92,7 @@ public class Pointer extends Widget implements MiniMap.IPointer, DTarget {
 	    tc = new Coord(1, 1);
 	double d = Coord.z.dist(tc);
 	Coord sc = tc.mul((d - 25.0) / d);
-	float ak = ((float) hsz.y) / ((float) hsz.x);
+	float ak = ((float)hsz.y) / ((float)hsz.x);
 	if((abs(sc.x) > hsz.x) || (abs(sc.y) > hsz.y)) {
 	    if(abs(sc.x) * ak < abs(sc.y)) {
 		sc = new Coord((sc.x * hsz.y) / sc.y, hsz.y).mul(signum(sc.y));
@@ -100,7 +102,7 @@ public class Pointer extends Widget implements MiniMap.IPointer, DTarget {
 	}
 	Coord ad = sc.sub(tc).norm(UI.scale(30.0));
 	sc = sc.add(hsz);
-	
+
 	return new Pair<>(sc, ad);
     }
     
@@ -118,11 +120,11 @@ public class Pointer extends Widget implements MiniMap.IPointer, DTarget {
 	g.usestate(col != null ? col : colors[0]);
 	Coord tmp = sc;
 	sc = sc.add(g.tx);
-	g.drawp(Model.Mode.TRIANGLES, new float[]{
-	    sc.x, sc.y,
-	    sc.x + ad.x - (ad.y / 3), sc.y + ad.y + (ad.x / 3),
-	    sc.x + ad.x + (ad.y / 3), sc.y + ad.y - (ad.x / 3),
-	});
+	g.drawp(Model.Mode.TRIANGLES, new float[] {
+		sc.x, sc.y,
+		sc.x + ad.x - (ad.y / 3), sc.y + ad.y + (ad.x / 3),
+		sc.x + ad.x + (ad.y / 3), sc.y + ad.y - (ad.x / 3),
+	    });
 	sc = tmp.add(ad);
 	if(icon != null) {
 	    if(marker != null) {
@@ -134,13 +136,13 @@ public class Pointer extends Widget implements MiniMap.IPointer, DTarget {
 		if(licon == null)
 		    licon = icon.get().layer(Resource.imgc).tex();
 		g.aimage(licon, sc, 0.5, 0.5);
-	    } catch (Loading l) {
+	    } catch(Loading l) {
 	    }
 	}
 	g.chcolor();
 	this.lc = sc;
     }
-    
+
     public void draw(GOut g) {
 	this.lc = null;
 	MiniMap.Location curloc = ui.gui.mapfile.playerLocation();
@@ -155,7 +157,7 @@ public class Pointer extends Widget implements MiniMap.IPointer, DTarget {
 	if(gob != null) {
 	    try {
 		sl = getparent(GameUI.class).map.screenxf(gob.getc());
-	    } catch (Loading l) {
+	    } catch(Loading l) {
 		return;
 	    }
 	} else {
@@ -170,7 +172,7 @@ public class Pointer extends Widget implements MiniMap.IPointer, DTarget {
 	if(sl != null)
 	    drawarrow(g, new Coord(sl));
     }
-    
+
     Coord3f getMap3d(Coord2d mc) {
 	float z = 0;
 	MapView map = getparent(GameUI.class).map;
@@ -198,8 +200,8 @@ public class Pointer extends Widget implements MiniMap.IPointer, DTarget {
 	triangulate(tc);
 	this.gobid = gobid;
     }
-    
-    public boolean mousedown(MouseDownEvent ev) {
+
+    public boolean mousedown(Widget.MouseDownEvent ev) {
 	if(lc != null && lc.dist(ev.c) < 20) {
 	    if(ev.b == 1) {
 		Gob gob = getGob();
@@ -223,7 +225,7 @@ public class Pointer extends Widget implements MiniMap.IPointer, DTarget {
 		}
 	    }
 	    if(click) {wdgmsg("click", ev.b, ui.modflags());}
-	    return (true);
+	    return(true);
 	}
 	return (super.mousedown(ev));
     }
@@ -242,25 +244,25 @@ public class Pointer extends Widget implements MiniMap.IPointer, DTarget {
 	}
 	return (gobid < 0) ? null : ui.sess.glob.oc.getgob(gobid);
     }
-    
+
     public void uimsg(String name, Object... args) {
 	if(name == "upd") {
 	    if(args[0] == null)
 		tc = null;
 	    else
-		tc = ((Coord) args[0]).mul(OCache.posres);
+		tc = ((Coord)args[0]).mul(OCache.posres);
 	    triangulate(tc);
 	    if(args[1] == null)
 		gobid = -1;
 	    else
-		gobid = Utils.uint32((Integer) args[1]);
+		gobid = Utils.uint32((Integer)args[1]);
 	} else if(name == "icon") {
-	    int iconid = (Integer) args[0];
+	    int iconid = (Integer)args[0];
 	    Indir<Resource> icon = (iconid < 0) ? null : ui.sess.getres(iconid);
 	    this.icon = icon;
 	    licon = null;
 	} else if(name == "cl") {
-	    click = ((Integer) args[0]) != 0;
+	    click = ((Integer)args[0]) != 0;
 	} else if(name == "tip") {
 	    Object tt = args[0];
 	    if(tt instanceof String) {
@@ -276,11 +278,11 @@ public class Pointer extends Widget implements MiniMap.IPointer, DTarget {
     public String name() {
 	return tip;
     }
-    
+
     public Object tooltip(Coord c, Widget prev) {
 	if((lc != null) && (lc.dist(c) < 20))
 	    return tooltip();
-	return (null);
+	return(null);
     }
     
     public Object tooltip() {
@@ -315,9 +317,9 @@ public class Pointer extends Widget implements MiniMap.IPointer, DTarget {
     long firsSegment = -1;
     
     private void triangulate(Coord2d b) {
-        if(b == null) {
-            firstLine = null;
-            return;
+	if(b == null) {
+	    firstLine = null;
+	    return;
 	}
 	mc = null;
 	tc();
@@ -327,7 +329,7 @@ public class Pointer extends Widget implements MiniMap.IPointer, DTarget {
 	if(player != null) {
 	    Pair<Coord2d, Coord2d> line = new Pair<>(player.rc, b);
 	    if(firstLine == null) {
-	        firsSegment = curseg;
+		firsSegment = curseg;
 		firstLine = line;
 	    } else if(curseg == firsSegment) {
 		mc = ClientUtils.intersect(firstLine, line).orElse(mc);
@@ -337,7 +339,7 @@ public class Pointer extends Widget implements MiniMap.IPointer, DTarget {
 		}
 		triangulating = mc == null;
 	    } else {
-	        firstLine = null;
+		firstLine = null;
 	    }
 	}
     }
