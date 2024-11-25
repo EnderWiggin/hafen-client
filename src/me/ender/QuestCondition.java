@@ -4,6 +4,7 @@ import haven.*;
 import me.ender.minimap.SMarker;
 
 import java.awt.*;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -17,6 +18,7 @@ public class QuestCondition implements Comparable<QuestCondition> {
     private Optional<MiniMap.IPointer> questGiverPointer = Optional.empty();
     private SMarker questGiverMarker;
     private final String questTitle;
+    private final String searchDescription;
     private boolean isEndpoint;
     private boolean isLast;
 
@@ -37,14 +39,18 @@ public class QuestCondition implements Comparable<QuestCondition> {
 	    this.questGiver = matcher.group(2);
 	}
 
+	int i = description.lastIndexOf('(');
+	searchDescription = i > 0 ? description.substring(0, i) : description;
+
 	addMarker();
 	//addPointer();
     }
 
-    public void UpdateQuestCondition(boolean isEndpoint, boolean isLast)
+    public void UpdateQuestCondition(String description, boolean isEndpoint, boolean isLast)
     {
 	this.isEndpoint = isEndpoint;
 	this.isLast = isLast;
+	this.description = description;
 
 	addMarker();
 	//addPointer();
@@ -94,6 +100,12 @@ public class QuestCondition implements Comparable<QuestCondition> {
 	if(tc == null) {return null;}
 
 	return String.format("%.0fm", tc.sub(pc.floor(tilesz)).abs());
+    }
+
+    public boolean Equals(int questId, String questDescription) {
+	int i = questDescription.lastIndexOf('(');
+	String searchDescription = i > 0 ? questDescription.substring(0, i) : questDescription;
+	return this.questId == questId && Objects.equals(this.searchDescription, searchDescription);
     }
 
     public int compareTo(QuestCondition o) {

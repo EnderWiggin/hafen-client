@@ -28,14 +28,16 @@ public class QuestList extends Listbox<QuestCondition> {
 	Collections.sort(questConditions);
     }
 
-    public QuestCondition GetQuestCondition(int questId, String questDescription) {return questConditions.stream().filter(x -> x.questId == questId && Objects.equals(x.description, questDescription)).findFirst().orElse(null);}
+    public QuestCondition GetQuestCondition(int questId, String questDescription) {
+	return questConditions.stream().filter(x -> x.Equals(questId, questDescription)).findFirst().orElse(null);
+    }
 
     public void AddOrUpdateQuestCondition(int questId, String questDescription, boolean isEndpoint, boolean isLast, String questTitle) {
 	QuestCondition questCondition = GetQuestCondition(questId, questDescription);
 	if (questCondition == null)
 	    questConditions.add(new QuestCondition(questDescription, isEndpoint, isLast, questId, questTitle, gui));
 	else
-	    questCondition.UpdateQuestCondition(isEndpoint, isLast);
+	    questCondition.UpdateQuestCondition(questDescription, isEndpoint, isLast);
 	SelectedQuest(questId);
     }
 
