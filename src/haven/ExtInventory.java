@@ -575,9 +575,21 @@ public class ExtInventory extends Widget {
 		    item.item.wdgmsg(action, args);
 		}
 	    } else {
+		boolean isInvxf2Transfer = Objects.equals(action, "invxf2");
 		for (WItem item : items) {
 		    if(!item.disposed()) {
-			item.item.wdgmsg(action, args);
+			if (isInvxf2Transfer) {
+			    // bugfix: transfer all in stack at once to avoid stack becoming leftover item
+			    if (item.parent.parent instanceof GItem.ContentsWindow) {
+				args[1] = item.parent.children(WItem.class).size();
+				item.item.wdgmsg(action, args);
+			    } else {
+				args[1] = 1;
+				item.item.wdgmsg(action, args);
+			    }
+			} else {
+			    item.item.wdgmsg(action, args);
+			}
 		    }
 		}
 	    }
