@@ -1,6 +1,8 @@
 package haven;
 
 import me.ender.ContainerInfo;
+import me.ender.ResName;
+import me.ender.gob.GobTimerData;
 import me.ender.gob.KinInfo;
 
 import java.util.*;
@@ -26,7 +28,7 @@ public enum GobTag {
     HAS_WATER, DRINKING,
     
     PLAYER, ME, FRIEND, FOE, PARTY, LEADER, IN_COMBAT, COMBAT_TARGET, AGGRO_TARGET,
-    KO, DEAD, EMPTY, READY, FULL, IS_COLD,
+    KO, DEAD, EMPTY, READY, FULL, LIT, COLD,
     
     MENU, PICKUP, HIDDEN;
     
@@ -268,7 +270,7 @@ public enum GobTag {
                 boolean done = (sdt & 0b1000) != 0; //has leather
                 if(empty) { tags.add(EMPTY); }
                 if(done) { tags.add(READY); }
-            } else if(name.endsWith("/primsmelter")) {
+            } else if(name.equals(ResName.STACK_FURNACE)) {
                 tags.add(PROGRESSING);
                 tags.add(SMELTER);
                 //sdt bits: 0 - lit, 1 - ore, 2 - bars, 3 - partial heat or pumping, 4 - full heat
@@ -278,7 +280,24 @@ public enum GobTag {
                 //boolean cold = (sdt & 0b0001_1000) == 0;
                 boolean hot = (sdt & 0b0001_0000) != 0;
                 if(bars) {tags.add(READY);}
-                if(lit && !hot && ore) {tags.add(IS_COLD);}
+                if(lit) {
+                    tags.add(LIT);
+                    if(!hot && ore) {tags.add(COLD);}
+                }
+            } else if(name.equals(ResName.ORE_SMELTER)) {
+                tags.add(PROGRESSING);
+                tags.add(SMELTER);
+                //sdt bits: 0 - open; 1 - lit; 2 - melting ore; 3,4,5 - bars; 6 - closed
+                boolean lit = (sdt & 0b0010) != 0;
+                boolean bars = (sdt & 0b0011_1000) != 0;
+                if(bars) {tags.add(READY);}
+                if(lit) {tags.add(LIT);}
+            } else if(name.equals(ResName.FINERY_FORGE)) {
+                tags.add(PROGRESSING);
+                tags.add(SMELTER);
+                //TODO: read sdt flags
+                boolean lit = true;
+                if(lit) {tags.add(LIT);}
             } else if(name.endsWith("/beehive")) {
                 tags.add(PROGRESSING);
                 //sdt bits: 0 - honey, 1 - bees?, 2 - wax

@@ -295,7 +295,7 @@ public class GeneralGobInfo extends GobInfo {
 	    if(gob.is(GobTag.SMELTER)) {
 		parts = new BufferedImage[]{
 		    gob.is(GobTag.READY) ? getIcon(data.get(READY)) : null,
-		    gob.is(GobTag.IS_COLD) ? getIcon(data.get(COLD)) : null,
+		    gob.is(GobTag.COLD) ? getIcon(data.get(COLD)) : null,
 		};
 	    }
 	}

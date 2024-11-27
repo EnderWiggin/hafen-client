@@ -71,7 +71,7 @@ public class MeshUtils {
 	    ind.put(a).put(b).put(c);
 	}
 	
-	return new StateFastMesh(Pipe.Op.compose(MapMesh.postmap, NoFacecull, Location.nullrot),
+	return new StateFastMesh(Pipe.Op.compose(MapMesh.postmap, NoFacecull, Location.nullrot, Location.nullz),
 	    new VertexBuf(new VertexBuf.VertexData(vert), new VertexBuf.NormalData(vert)), ind);
     }
     
@@ -107,9 +107,12 @@ public class MeshUtils {
 	    }
 	}
 	
-	return new HeightFastMesh(Pipe.Op.compose(MapMesh.postmap, NoFacecull, Location.nullrot, Location.nullz, MixColor.nil),
+	return new HeightFastMesh(Pipe.Op.compose(MapMesh.postmap, NoFacecull, Location.nullrot, MixColor.nil),
 	    h, new VertexBuf(new VertexBuf.VertexData(vert), new VertexBuf.NormalData(vert)), ind);
     }
+    
+    private static final Pipe.Op RING_DYNAMIC = Pipe.Op.compose(MapMesh.postmap, NoFacecull, Clickable.No, Location.nullrot);
+    private static final Pipe.Op RING_STATIC = Pipe.Op.compose(MapMesh.postmap, NoFacecull, Clickable.No, Location.nullrot, Location.nullz);
     
     private static FastMesh makeRing(float r0, float width, boolean dynamic) {
 	float h = 0.25f;
@@ -152,13 +155,12 @@ public class MeshUtils {
 	    */
 	}
 	
-	Pipe.Op state = Pipe.Op.compose(MapMesh.postmap, NoFacecull, Clickable.No, Location.nullrot);
 	VertexBuf buf = new VertexBuf(new VertexBuf.VertexData(vert), new VertexBuf.NormalData(vert));
 	
 	if(dynamic) {
-	    return new HeightFastMesh(state, h, buf, ind);
+	    return new HeightFastMesh(RING_DYNAMIC, h, buf, ind);
 	} else {
-	    return new StateFastMesh(state, buf, ind);
+	    return new StateFastMesh(RING_STATIC, buf, ind);
 	}
     }
     

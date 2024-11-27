@@ -1,6 +1,8 @@
 package haven;
 
 public class WindowX extends Window {
+    public Gob gob;
+    
     public WindowX(Coord sz, String cap, boolean lg, Deco deco, boolean defdeco) {
 	super(sz, cap, lg, deco, defdeco);
     }

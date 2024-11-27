@@ -42,6 +42,9 @@ public class GobTimerData {
 	    Gob g = interacted;
 	    if(Window.ON_PACK.equals(pair.b) && g != null && WindowDetector.isWindowType(pair.a, awaitWnd)) {
 		g.info.timer.wnd = pair.a;
+		if(pair.a instanceof WindowX) {
+		    ((WindowX) pair.a).gob = g;
+		}
 		interacted = null;
 	    }
 	});
@@ -62,7 +65,7 @@ public class GobTimerData {
 	
 	public Integer value() {
 	    if(remainingSeconds <= 0 || lastUpdateTs <= 0) {return null;}
-	    float multiplier = gob.is(GobTag.IS_COLD) ? 2f : 1f;
+	    float multiplier = gob.is(GobTag.COLD) ? 2f : 1f;
 	    return (int) (multiplier * remainingSeconds - ((System.currentTimeMillis() - lastUpdateTs) / 1000f));
 	}
     };
@@ -106,7 +109,7 @@ public class GobTimerData {
     }
     
     public BufferedImage img() {
-	if(GobInfoOpts.disabled(InfoPart.TIMER)) {return null;}
+	if(GobInfoOpts.disabled(InfoPart.TIMER) || !gob.is(GobTag.LIT)) {return null;}
 	return Optional.ofNullable(text.get()).map(t -> t.back).orElse(null);
     }
     

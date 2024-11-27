@@ -1,3 +1,7 @@
+$size[14]{$u{Update for 27.11.24:}
+  * do not show progress timers if smelter is not lit
+  * small fix to critter auras vertical positioning
+ 
 $size[14]{$u{Update for 25.11.24:}
   * merged loftar's code
   * added Cold Cut to Black Eye treatments

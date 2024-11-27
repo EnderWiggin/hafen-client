@@ -520,10 +520,21 @@ public class WItem extends Widget implements DTarget {
 	
 	if(remaining > 0) {
 	    remaining *= 60 * (1d - meter); //remaining seconds
-	    remaining -= (System.currentTimeMillis() - item.meterUpdated) / 1000d; //adjust for time passed since last update
+	    Gob gob = gob();
+	    if(gob != null && gob.is(GobTag.LIT)) {
+		remaining -= (System.currentTimeMillis() - item.meterUpdated) / 1000d; //adjust for time passed since last update
+	    }
 	}
 	
 	return (int) remaining;
+    }
+
+    private Gob gob() {
+	WindowX wnd = getparent(WindowX.class);
+	if(wnd == null) {return null;}
+	Gob gob = wnd.gob;
+	if(gob == null || gob.disposed()) {return null;}
+	return gob;
     }
 
     private boolean checkXfer(int button) {
