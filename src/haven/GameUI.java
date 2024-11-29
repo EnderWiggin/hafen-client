@@ -1883,7 +1883,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
     }
     
     public void msg(String msg, MsgType type) {
-	msg(new UI.SimpleMessage(msg, type.color, type.sfx));
+	msg(new UI.NoticeEvent(new UI.SimpleMessage(msg, type.color, type.sfx)));
     }
     
     public enum MsgType {

@@ -1,3 +1,7 @@
+$size[14]{$u{Update for 29.11.24:}
+  * fixed some custom messages not displaying
+  * fixed crash related to gaining stats from eating
+ 
 $size[14]{$u{Update for 27.11.24:}
   * do not show progress timers if smelter is not lit
   * small fix to critter auras vertical positioning
