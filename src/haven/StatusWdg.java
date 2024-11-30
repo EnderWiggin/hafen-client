@@ -1,7 +1,5 @@
 package haven;
 
-import haven.*;
-
 import java.awt.*;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -17,125 +15,78 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class StatusWdg extends Widget {
-
     private static Tex players = Text.renderstroked("Players: ?", Color.WHITE, Color.BLACK).tex();
     private static Tex pingtime = Text.renderstroked("ping: ?", Color.WHITE, Color.BLACK).tex();
     private static String ping = "?";
     private static ThreadGroup tg = new ThreadGroup("StatusUpdaterThreadGroup");
-    private static long lastPingUpdate = 0;
+    private static long lastUpdateTime = System.currentTimeMillis();
+    private static boolean updatePingPending = false;
+    private static final HttpStatus httpStatus = new HttpStatus(HttpStatus.mond.get());
 
     private final static Pattern pattern = Pattern.compile(Config.iswindows ? ".+?=(\\d+)[^ \\d\\s]" : ".+?time=(\\d+\\.?\\d*) ms");
-    static {
-	startUpdater();
+
+    public void tick(double dt) {
+	if(!CFG.SHOW_STATS.get() || System.currentTimeMillis() - lastUpdateTime < 1000) {return;}
+
+	lastUpdateTime = System.currentTimeMillis();
+	players = Text.renderstroked(String.format("Players: %s", httpStatus.users), Color.WHITE, Color.BLACK).tex();
+
+	updatePing();
     }
 
-    public StatusWdg() {
-	super();
+    protected void added() {
+	httpStatus.start();
+    }
+
+    public void dispose() {
+	httpStatus.quit();
     }
 
     private static void updatePing() {
-	List<String> cmd = new ArrayList<>();
-	cmd.add("ping");
-	cmd.add(Config.iswindows ? "-n" : "-c");
-	cmd.add("1");
+	if (updatePingPending) return;
+	updatePingPending = true;
+	Thread pingUpdaterThread = new Thread(tg, () -> {
+	    List<String> cmd = new ArrayList<>();
+	    cmd.add("ping");
+	    cmd.add(Config.iswindows ? "-n" : "-c");
+	    cmd.add("1");
 
-	cmd.add("game.havenandhearth.com");
+	    cmd.add("game.havenandhearth.com");
 
-	BufferedReader standardOutput = null;
-	try {
-	    ProcessBuilder processBuilder = new ProcessBuilder(cmd);
-	    Process process = processBuilder.start();
+	    BufferedReader standardOutput = null;
+	    try {
+		ProcessBuilder processBuilder = new ProcessBuilder(cmd);
+		Process process = processBuilder.start();
 
-	    standardOutput = new BufferedReader(new InputStreamReader(process.getInputStream()));
+		standardOutput = new BufferedReader(new InputStreamReader(process.getInputStream()));
 
-	    StringBuilder output = new StringBuilder();
-	    String line;
-	    while ((line = standardOutput.readLine()) != null) {
-		output.append(line);
-	    }
-
-	    Matcher matcher = pattern.matcher(output.toString());
-	    if (matcher.find()) {
-		ping = matcher.group(1);
-	    }
-	} catch (IOException  ex) {
-	    // NOP
-	} finally {
-	    if (standardOutput != null)
-		try {
-		    standardOutput.close();
-		} catch (IOException e) { // ignored
+		StringBuilder output = new StringBuilder();
+		String line;
+		while ((line = standardOutput.readLine()) != null) {
+		    output.append(line);
 		}
-	}
 
-	if (ping.isEmpty())
-	    ping = "?";
-
-	pingtime = Text.renderstroked(String.format("Ping: %s ms", ping), Color.WHITE, Color.BLACK).tex();
-    }
-
-    private static void startUpdater() {
-	Thread statusupdaterthread = new Thread(tg, () -> {
-	    updatePing();
-	    while (true) {
-		URL url_;
-		BufferedReader br = null;
-		HttpURLConnection conn = null;
-
-		try {
-		    url_ = new URL("http://www.havenandhearth.com/mt/srv-mon");
-		    conn = (HttpURLConnection)url_.openConnection();
-		    InputStream is = conn.getInputStream();
-		    br = new BufferedReader(new InputStreamReader(is));
-
-		    String line;
-		    while ((line = br.readLine()) != null) {
-			if (line.startsWith("users ")) {
-			    String p = line.substring("users ".length());
-			    players = Text.renderstroked(String.format("Players: %s", p), Color.WHITE, Color.BLACK).tex();
-			}
-
-			// Update ping at least every 5 seconds.
-			// This of course might take more than 5 seconds in case there were no new logins/logouts
-			// but it's not critical.
-			long now = System.currentTimeMillis();
-			if (now - lastPingUpdate > 5000) {
-			    lastPingUpdate = now;
-			    updatePing();
-			}
-
-			if (Thread.interrupted())
-			    return;
-		    }
-		} catch (SocketException se) {
-		    // don't print socket exceptions when network is unreachable to prevent console spamming on bad connections
-		    if (!se.getMessage().equals("Network is unreachable"))
-			se.printStackTrace();
-		} catch (MalformedURLException mue) {
-		    mue.printStackTrace();
-		} catch (IOException ioe) {
-		    ioe.printStackTrace();
-		} finally {
+		Matcher matcher = pattern.matcher(output.toString());
+		if(matcher.find()) {
+		    ping = matcher.group(1);
+		}
+	    } catch (IOException ex) {
+		// NOP
+	    } finally {
+		if(standardOutput != null)
 		    try {
-			if (br != null)
-			    br.close();
-		    } catch (IOException ioe) {
+			standardOutput.close();
+		    } catch (IOException e) { // ignored
 		    }
-		    if (conn != null)
-			conn.disconnect();
-		}
-
-		if (Thread.interrupted())
-		    return;
-
-		try {
-		    Thread.sleep(5000);
-		} catch (InterruptedException ex) {
-		    return;
-		}
 	    }
-	}, "StatusUpdater");
-	statusupdaterthread.start();
+
+	    if(ping.isEmpty())
+		ping = "?";
+
+	    pingtime = Text.renderstroked(String.format("Ping: %s ms", ping), Color.WHITE, Color.BLACK).tex();
+	    updatePingPending = false;
+	}, "PingUpdater");
+	pingUpdaterThread.start();
     }
 
     @Override
