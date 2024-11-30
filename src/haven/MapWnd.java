@@ -160,11 +160,6 @@ public class MapWnd extends WindowX implements Console.Directory {
 	    .set(CFG.MMAP_SHOW_PARTY_NAMES::set)
 	    .rclick(() -> CFG.MMAP_SHOW_PARTY_NAMES_STYLE.set((CFG.MMAP_SHOW_PARTY_NAMES_STYLE.get() + 1) % 3))
 	    .settip("Show party names. Right-click to change name coloring");
-
-	btn = topbar.add(new ICheckBox("gfx/hud/mmap/questgivers", "", "-d", "-h"), btn.pos("ur"))
-	    .state(CFG.QUESTHELPER_HIGHLIGHT_QUESTGIVERS::get)
-	    .set(CFG.QUESTHELPER_HIGHLIGHT_QUESTGIVERS::set)
-	    .settip("Highlight QuestGiver status:\n\nWhite - active task\nGreen - QuestGiver has a completed quest\nYellow - QuestGiver has an uncompleted quest");
 	
 	topbar.pack();
 	tool = add(new Toolbox2());;
