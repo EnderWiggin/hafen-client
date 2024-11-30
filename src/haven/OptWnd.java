@@ -1208,27 +1208,6 @@ public class OptWnd extends WindowX {
 	tx = panel.add(new CFGColorBtn(CFG.COLOR_GOB_CRITTERS, true), x + H_STEP, y).sz.x + H_STEP;
 	panel.add(new CFGBox("Critters", CFG.DISPLAY_AURA_CRITTERS), x + tx + H_STEP, y);
 
-	y += STEP;
-	panel.add(new Label("Stats widget:"), x, y);
-
-	y += STEP;
-	panel.add(new CFGBox("Show time", CFG.SHOW_TIME), x, y);
-
-	y += STEP;
-	panel.add(new CFGBox("Show stats (ping, players number)", CFG.SHOW_STATS), x, y);
-
-	y += STEP;
-	panel.add(new CFGBox("Always show time for dewy lady's mantle", CFG.ALWAYS_SHOW_DEWY_TIME), x, y);
-
-	y += STEP;
-	panel.add(new Label("Quest markers:"), x, y);
-
-	y += STEP;
-	panel.add(new CFGBox("Highlight QuestGivers on map", CFG.QUESTHELPER_HIGHLIGHT_QUESTGIVERS, null, true), x, y);
-
-	y += STEP;
-	panel.add(new CFGBox("Show QuestGiver tasks in tooltip on map ", CFG.QUESTHELPER_SHOW_TASKS_IN_TOOLTIP), x, y);
-
 	my = Math.max(my, y);
 	
 	panel.add(new PButton(UI.scale(200), "Back", 27, main), new Coord(0, my + UI.scale(35)));
@@ -1391,7 +1370,28 @@ public class OptWnd extends WindowX {
 	
 	y += STEP;
 	panel.add(new CFGBox("Improve weapon damage tooltip", CFG.IMPROVE_DAMAGE_TIP, "Make damage tooltip show base damage and damage based on its quality and your strength"), new Coord(x, y));
-	
+
+	y += STEP;
+	panel.add(new Label("Stats widget:"), x, y);
+
+	y += STEP;
+	panel.add(new CFGBox("Show time", CFG.SHOW_TIME), x, y);
+
+	y += STEP;
+	panel.add(new CFGBox("Show stats (ping, players number)", CFG.SHOW_STATS), x, y);
+
+	y += STEP;
+	panel.add(new CFGBox("Always show time for dewy lady's mantle", CFG.ALWAYS_SHOW_DEWY_TIME), x, y);
+
+	y += STEP;
+	panel.add(new Label("Quest markers:"), x, y);
+
+	y += STEP;
+	panel.add(new CFGBox("Highlight QuestGivers on map", CFG.QUESTHELPER_HIGHLIGHT_QUESTGIVERS, null, true), x, y);
+
+	y += STEP;
+	panel.add(new CFGBox("Show QuestGiver tasks in tooltip on map ", CFG.QUESTHELPER_SHOW_TASKS_IN_TOOLTIP), x, y);
+
 	my = Math.max(my, y);
     
 	panel.add(new PButton(UI.scale(200), "Back", 27, main), new Coord(0, my + UI.scale(35)));
