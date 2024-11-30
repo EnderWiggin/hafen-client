@@ -1111,7 +1111,7 @@ public class MiniMap extends Widget {
 	    g.chcolor(VIEW_BG_COLOR);
 	    g.frect(rc, viewsz);
 	    g.chcolor(VIEW_BORDER_COLOR);
-	    g.rect(rc, viewsz);
+	    g.rectWithChecks(rc, viewsz);
 	    g.chcolor();
 	}
     }

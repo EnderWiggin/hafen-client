@@ -367,6 +367,17 @@ public class GOut {
 
     public void rect2(Coord ul, Coord br) {
 	ul = ul.add(tx); br = br.add(tx);
+	float h = 0.5f;
+	float[] data = {ul.x + h, ul.y + h,
+	    br.x + h, ul.y + h,
+	    br.x + h, br.y + h,
+	    ul.x + h, br.y + h,
+	    ul.x + h, ul.y + h};
+	drawp(Model.Mode.LINE_STRIP, data);
+    }
+
+    public void rect2WithChecks(Coord ul, Coord br) {
+	ul = ul.add(tx); br = br.add(tx);
 	Coord ult = Coord.of(Math.max(ul.x, this.ul.x), Math.max(ul.y, this.ul.y));
 	Coord brt = Coord.of(Math.min(br.x, this.br.x), Math.min(br.y, this.br.y));
 	float h = 0.5f;
@@ -394,6 +405,10 @@ public class GOut {
 
     public void rect(Coord ul, Coord sz) {
 	rect2(ul, ul.add(sz).sub(1, 1));
+    }
+
+    public void rectWithChecks(Coord ul, Coord sz) {
+	rect2WithChecks(ul, ul.add(sz).sub(1, 1));
     }
 
     public void prect(Coord c, Coord ul, Coord br, double a) {
