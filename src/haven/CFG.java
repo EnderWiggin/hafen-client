@@ -164,8 +164,8 @@ public class CFG<T> {
     public static final CFG<String> AUTOMAP_ENDPOINT = new CFG<>("automap.andpoint", "");
 
     public static final CFG<Boolean> ALWAYS_SHOW_DEWY_TIME = new CFG<>("addstg.always_show_dewy_time", false);
-    public static final CFG<Boolean> SHOW_TIME = new CFG<>("addstg.show_time", true);
-    public static final CFG<Boolean> SHOW_STATS = new CFG<>("addstg.show_stats", true);
+    public static final CFG<Boolean> SHOW_TIME = new CFG<>("addstg.show_time", false);
+    public static final CFG<Boolean> SHOW_STATS = new CFG<>("addstg.show_stats", false);
 
     public static final CFG<Boolean> QUESTHELPER_HIGHLIGHT_QUESTGIVERS = new CFG<>("questhelper.highlight_questgivers", true);
     public static final CFG<Boolean> QUESTHELPER_SHOW_TASKS_IN_TOOLTIP = new CFG<>("questhelper.show_tasks_in_tooltip", true);
