@@ -42,10 +42,10 @@ public class InventorySorter implements Defer.Callable<Void> {
     private boolean cancelled = false;
 
     private List<Object[]> sorteditems = new ArrayList<>();
-    private final List<Inventory> inentories;
+    private final List<Inventory> inventories;
 
     public InventorySorter(List<Inventory> inv) {
-	this.inentories = inv;
+	this.inventories = inv;
     }
 
     public static void sortInventory(List<Inventory>  inv, GameUI gui) {
@@ -54,7 +54,7 @@ public class InventorySorter implements Defer.Callable<Void> {
 
     @Override
     public Void call() throws InterruptedException {
-	for(Inventory inv : inentories) {
+	for(Inventory inv : inventories) {
 	    if (inv != null)
 		sortInv(inv);
 	}
@@ -130,12 +130,6 @@ public class InventorySorter implements Defer.Callable<Void> {
     private void run(Action1<String> callback) {
 	task = Defer.later(this);
 	task.callback(() -> callback.call(task.cancelled() ? "cancelled" : "complete"));
-    }
-
-    private void checkCancelled() throws InterruptedException {
-	if(cancelled) {
-	    throw new InterruptedException();
-	}
     }
 
     private void markCancelled() {
