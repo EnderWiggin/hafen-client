@@ -55,7 +55,7 @@ public class InventorySorter implements Defer.Callable<Void> {
     @Override
     public Void call() throws InterruptedException {
 	for(Inventory inv : inventories) {
-	    if (inv != null)
+	    if (!inv.disposed())
 		sortInv(inv);
 	}
 	synchronized (lock) {
@@ -82,7 +82,7 @@ public class InventorySorter implements Defer.Callable<Void> {
 	}
 	sorteditems = items.stream()
 	    .filter(witem -> witem.lsz.x * witem.lsz.y == 1)
-	    .sorted(Comparator.comparing(InventorySorter::nameforsorting)
+	    .sorted(Comparator.comparing(InventorySorter::nameForSorting)
 		.thenComparing(WItem::quality, Comparator.reverseOrder()))
 	    .map(witem -> new Object[] {witem, witem.c.sub(1, 1).div(Inventory.sqsz), new Coord(0, 0)})
 	    .collect(Collectors.toList());
@@ -155,13 +155,11 @@ public class InventorySorter implements Defer.Callable<Void> {
 	});
     }
 
-    public static String nameforsorting(WItem item) {
+    public static String nameForSorting(WItem item) {
 	try {
 	    return item.item.resname();
 	} catch (Loading e) {
-	    String name = item.getname();
-	    int a = name.indexOf("seed");
-	    return a > 0 ? name.substring(a + (name.contains("seeds") ? 5 : 4)) : name;
+	    return item.getname();
 	}
     }
 
@@ -175,7 +173,7 @@ public class InventorySorter implements Defer.Callable<Void> {
 		    invs.add(((ExtInventory) w).inv);
 	    }
 	}
-	if (invs.size() > 0)
+	if (!invs.isEmpty())
 	    start(new InventorySorter(invs), gui);
     }
 }
