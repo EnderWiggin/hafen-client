@@ -23,6 +23,9 @@ public class TimeWdg extends Widget {
     @Override
     public void tick(double dt) {
 	super.tick(dt);
+
+	if(!CFG.SHOW_TIME.get()) return;
+
 	lastupdate += dt;
 	if (lastupdate > updateinterval) {
 	    updateTime();

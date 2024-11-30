@@ -23,14 +23,14 @@ public class StatusWdg extends Widget {
     private static ThreadGroup tg = new ThreadGroup("StatusUpdaterThreadGroup");
     private static long lastUpdateTime = System.currentTimeMillis();
     private static boolean updatePingPending = false;
-    private static final HttpStatus httpStatus = new HttpStatus(HttpStatus.mond.get());
+    private final HttpStatus httpStatus = new HttpStatus(HttpStatus.mond.get());
 
     private final static Pattern pattern = Pattern.compile(Config.iswindows ? ".+?=(\\d+)[^ \\d\\s]" : ".+?time=(\\d+\\.?\\d*) ms");
 
     public void tick(double dt) {
 	super.tick(dt);
 
-	if(!CFG.SHOW_STATS.get() || System.currentTimeMillis() - lastUpdateTime < 1000) {return;}
+	if(!CFG.SHOW_STATS.get() || System.currentTimeMillis() - lastUpdateTime < 1000) return;
 
 	lastUpdateTime = System.currentTimeMillis();
 	players = Text.renderstroked(String.format("Players: %s", httpStatus.users), Color.WHITE, Color.BLACK).tex();
