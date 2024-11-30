@@ -1,5 +1,7 @@
 package haven;
 
+import me.ender.ui.DrinkMeter;
+
 import java.awt.*;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -26,6 +28,8 @@ public class StatusWdg extends Widget {
     private final static Pattern pattern = Pattern.compile(Config.iswindows ? ".+?=(\\d+)[^ \\d\\s]" : ".+?time=(\\d+\\.?\\d*) ms");
 
     public void tick(double dt) {
+	super.tick(dt);
+
 	if(!CFG.SHOW_STATS.get() || System.currentTimeMillis() - lastUpdateTime < 1000) {return;}
 
 	lastUpdateTime = System.currentTimeMillis();
