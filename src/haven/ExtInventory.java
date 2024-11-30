@@ -2,7 +2,6 @@ package haven;
 
 import auto.Actions;
 import auto.Targets;
-import auto.InventorySorter;
 import haven.render.Pipe;
 import haven.resutil.Curiosity;
 import haven.rx.Reactor;
@@ -45,11 +44,6 @@ public class ExtInventory extends Widget {
     private WindowX wnd;
     private final ICheckBox chb_show = new ICheckBox("gfx/hud/btn-extlist", "", "-d", "-h");
     private final ICheckBox chb_repeat = new ICheckBox("gfx/hud/btn-repeat", "", "-d", "-h");
-    private final IButton btn_sort = new IButton("gfx/hud/btn-sort", "", "-d", "-h") {
-	public void click() {
-	    InventorySorter.sortInventory(Collections.singletonList(inv), ui.gui);
-	}
-    };
     
     public ExtInventory(Coord sz) {
 	inv = new Inventory(sz);
@@ -60,8 +54,7 @@ public class ExtInventory extends Widget {
 	    .rclick(this::toggleInventory)
 	    .changed(this::setVisibility)
 	    .settip("LClick to toggle extra info\nRClick to hide inventory when info is visible", true);
-	btn_sort.settip("LClick to sort inventory", true);
-    
+
 	Composer composer = new Composer(extension).hmrgn(margin).vmrgn(margin);
 	composer.add(0);
 	grouping = new Dropbox<Grouping>(UI.scale(75), 5, UI.scale(16)) {
@@ -179,7 +172,6 @@ public class ExtInventory extends Widget {
 	    showInv = wnd.cfg.getValue(CFG_INV, true);
 	    if(!disabled) {
 		chb_show.a = vis;
-		wnd.addtwdg(btn_sort);
 		wnd.addtwdg(chb_show);
 		grouping.sel = Grouping.valueOf(wnd.cfg.getValue(CFG_GROUP, Grouping.NONE.name()));
 		needUpdate = true;
