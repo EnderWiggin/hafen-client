@@ -198,6 +198,36 @@ public class L10N {
 	return result != null ? result : def;
     }
     
+    public static String revertFlower(String text) {
+        return revertTranslation(text, Bundle.FLOWER);
+    }
+
+    private static String revertTranslation(String text, Bundle bundle) {
+        if (text == null || text.isEmpty() || L10N.isDefaultLanguage()) {
+            return text;
+        }
+        Map<?, String> map = null;
+        if (bundle.useMatch) {
+            map = match.get(bundle);
+        } else {
+            map = simple.get(bundle);
+        }
+        if(map == null || map.isEmpty()) {
+            return text;
+        }
+        for(Map.Entry<?, String> entry : map.entrySet()) {
+            if (entry.getValue().equals(text)){
+                if (bundle.useMatch) {
+                    String result = ((Pattern) entry.getKey()).toString();
+                    return result.substring(1, result.length()-1);
+                } else {
+                    return (String) entry.getKey();
+                }
+            }
+        }
+        return text;
+    }
+
     private static void reportMissing(Bundle bundle, String key, String def) {
 	synchronized (MISSING) {
 	    key = key.replaceAll("[()\\[\\]]", "\\\\$0");

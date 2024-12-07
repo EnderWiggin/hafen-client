@@ -35,7 +35,7 @@ public class FlowerList extends WidgetList<FlowerList.Item> {
 		String name = (String) args[0];
 		boolean val = (Boolean) args[1];
 		synchronized(AUTOCHOOSE) {
-		    AUTOCHOOSE.put(name, val);
+		    AUTOCHOOSE.put(L10N.revertFlower(name), val);
 		}
 		FlowerMenu.saveAutochoose();
 		break;
@@ -43,7 +43,7 @@ public class FlowerList extends WidgetList<FlowerList.Item> {
 	    case "delete": {
 		String name = ((Item) sender).name;
 		synchronized (AUTOCHOOSE) {
-		    AUTOCHOOSE.remove(name);
+		    AUTOCHOOSE.remove(L10N.revertFlower(name));
 		}
 		FlowerMenu.saveAutochoose();
 		removeitem((Item) sender, true);
@@ -53,7 +53,7 @@ public class FlowerList extends WidgetList<FlowerList.Item> {
 	    case "up": {
 		String name = ((Item) sender).name;
 		synchronized (AUTOCHOOSE) {
-		    AUTOCHOOSE.up(name);
+		    AUTOCHOOSE.up(L10N.revertFlower(name));
 		}
 		FlowerMenu.saveAutochoose();
 		update();
@@ -62,7 +62,7 @@ public class FlowerList extends WidgetList<FlowerList.Item> {
 	    case "down": {
 		String name = ((Item) sender).name;
 		synchronized (AUTOCHOOSE) {
-		    AUTOCHOOSE.down(name);
+		    AUTOCHOOSE.down(L10N.revertFlower(name));
 		}
 		FlowerMenu.saveAutochoose();
 		update();
@@ -76,11 +76,12 @@ public class FlowerList extends WidgetList<FlowerList.Item> {
 
     public void add(String name) {
 	if(name != null && !name.isEmpty() && !AUTOCHOOSE.has(name)) {
+            String originalName = L10N.revertFlower(name);
 	    synchronized (AUTOCHOOSE) {
-		AUTOCHOOSE.put(name, true);
+		AUTOCHOOSE.put(L10N.revertFlower(originalName), true);
 	    }
 	    FlowerMenu.saveAutochoose();
-	    additem(new Item(name));
+	    additem(new Item(originalName));
 	    update();
 	}
     }

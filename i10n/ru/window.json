@@ -102,6 +102,7 @@
 	"Hitching Post": "Приручательный столбик",
 	"Hog": "Боров",
 	"Hooray!": "Урааааа!",
+	"Icon settings": "Настройка значков",
 	"Inventory": "Инвентарь",
 	"Invitation": "Приглашение",
 	"Key name": "Имя ключа",
@@ -147,6 +148,7 @@
 	"Practice Target": "Мишень",
 	"Prospecting": "Поиск руды",
 	"Pumpkin Lantern": "Фонарь Джека",
+	"Quest Helper": "Помощник заданий",
 	"Quiver": "Колчан",
 	"Rabbit Hutch": "Кроличья клетка",
 	"Raft": "Паром",
@@ -232,6 +234,5 @@
 	"Wooden Plow": "Деревянный плуг",
 	"Wooden Sign": "Деревянный знак",
 	"Wooden sign": "Деревянный знак",
-	"Wrecking Ball": "Шаровой таран",
-	"Icon settings": "Настройка значков"
+	"Wrecking Ball": "Шаровой таран"
 }
