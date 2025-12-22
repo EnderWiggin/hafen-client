@@ -1,3 +1,6 @@
+$size[14]{$u{Update for 22.12.25:}
+  * merged loftar's changes
+ 
 $size[14]{$u{Update for 16.12.25:}
   * added support for extended inventory and sorting buton to equippable containers like creels
  
