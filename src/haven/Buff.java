@@ -49,9 +49,9 @@ public class Buff extends Widget implements ItemInfo.ResOwner, Bufflist.Managed 
     public static final Text.Foundry nfnd = new Text.Foundry(Text.dfont.deriveFont(Font.BOLD), 12);
     public static final Tex frame = Resource.loadtex("gfx/hud/buffs/frame");
     public static final Tex cframe = Resource.loadtex("gfx/hud/buffs/cframe");
-    public static final Coord imgoff = UI.scale(new Coord(3, 3));
-    public static final Coord ameteroff = UI.scale(new Coord(3, 37));
-    public static final Coord ametersz = UI.scale(new Coord(32, 3));
+    public static final Tex ameter = Resource.loadtex("gfx/hud/buffs/cframe-m");
+    public static final Coord imgoff = UI.scale(3, 3);
+    public static final int ameterx1 = UI.scale(3), ameterx2 = UI.scale(35); /* XXX: Detect? */
     public static final int textw = UI.scale(200);
     public Indir<Resource> res;
     protected int a = 255;
@@ -118,13 +118,11 @@ public class Buff extends Widget implements ItemInfo.ResOwner, Bufflist.Managed 
 
     public void draw(GOut g) {
 	g.chcolor(255, 255, 255, a);
-	Double ameter = ameteri.get();
-	if(ameter != null) {
+	Double ameterv = ameteri.get();
+	if(ameterv != null) {
 	    g.image(cframe, Coord.z);
-	    g.chcolor(0, 0, 0, a);
-	    g.frect(ameteroff, ametersz);
-	    g.chcolor(255, 255, 255, a);
-	    g.frect(ameteroff, new Coord((int)Math.floor(ameter * ametersz.x), ametersz.y));
+	    int w = (int)Math.floor((ameterx2 - ameterx1) * ameterv);
+	    g.image(ameter, Coord.z, Coord.of(ameterx1, 0), Coord.of(ameterx1 + w, ameter.sz().y));
 	} else {
 	    g.image(frame, Coord.z);
 	}

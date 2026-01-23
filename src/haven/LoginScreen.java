@@ -40,7 +40,7 @@ public class LoginScreen extends Widget {
     public static final Tex bg = Resource.loadtex("gfx/loginscr");
     public static final Position bgc = new Position(UI.scale(420, 300));
     public final Widget login;
-    public final String hostname;
+    public final String confname;
     private Text error, progress;
     private Button optbtn;
     private OptWnd opts;
@@ -49,12 +49,12 @@ public class LoginScreen extends Widget {
     AccountList accounts;
 
     private String getpref(String name, String def) {
-	return(Utils.getpref(name + "@" + hostname, def));
+	return(Utils.getpref(name + "@" + confname, def));
     }
-    
-    public LoginScreen(String hostname) {
+
+    public LoginScreen(String confname) {
 	super(bg.sz());
-	this.hostname = hostname;
+	this.confname = confname;
 	setfocustab(true);
 	add(new Img(bg), Coord.z);
 	optbtn = adda(new Button(UI.scale(100), "Options"), pos("cbl").add(10, -10), 0, 1);
@@ -122,7 +122,7 @@ public class LoginScreen extends Widget {
 
 	    private UserEntry(int w) {
 		super(w, "");
-		//history.addAll(Utils.getprefsl("saved-tokens@" + hostname, new String[] {}));
+//		history.addAll(Utils.getprefsl("saved-tokens@" + confname, new String[] {}));
 		synchronized (AccountList.accountmap) {
 		    history.addAll(AccountList.accountmap.keySet());
 		}
@@ -211,7 +211,7 @@ public class LoginScreen extends Widget {
 		Arrays.fill(this.token, (byte)0);
 		this.token = null;
 	    }
-	    byte[] token = Bootstrap.gettoken(user.text(), hostname);
+	    byte[] token = Bootstrap.gettoken(user.text(), confname);
 	    if(token == null) {
 		tkbox.hide();
 		pwbox.show();
@@ -224,7 +224,7 @@ public class LoginScreen extends Widget {
 
 	private void forget() {
 	    String nm = user.text();
-	    Bootstrap.settoken(nm, hostname, null);
+	    Bootstrap.settoken(nm, confname, null);
 	    savetoken.set(false);
 	    checktoken();
 	}
