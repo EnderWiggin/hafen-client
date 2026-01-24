@@ -1,3 +1,6 @@
+$size[14]{$u{Update for 24.01.26:}
+  * merged loftar's changes
+ 
 $size[14]{$u{Update for 03.01.26:}
   * merged loftar's changes
  
