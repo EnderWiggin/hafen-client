@@ -6,7 +6,7 @@ import java.util.*;
 import java.awt.image.BufferedImage;
 
 /* >tt: Smoke */
-@haven.FromResource(name = "ui/tt/smoked", version = 7)
+@haven.FromResource(name = "ui/tt/smoked", version = 8)
 public class Smoke extends ItemInfo.Tip {
     public final String name;
     public final Double val;
@@ -21,24 +21,22 @@ public class Smoke extends ItemInfo.Tip {
 	this(owner, name, null);
     }
 
-    public static ItemInfo mkinfo(Owner owner, Object... args) {
+    public static ItemInfo mkinfo(ItemInfo.Owner owner, Object... args) {
 	int a = 1;
 	String name;
 	if(args[a] instanceof String) {
 	    name = L10N.ingredient((String)args[a++]);
-	} else if(args[a] instanceof Integer) {
-	    Indir<Resource> res = owner.context(Resource.Resolver.class).getres((Integer)args[a++]);
+	} else {
+	    Indir<Resource> res = owner.context(Resource.Resolver.class).getresv(args[a++]);
 	    Message sdt = Message.nil;
 	    if((args.length > a) && (args[a] instanceof byte[]))
 		sdt = new MessageBuf((byte[])args[a++]);
 	    ItemSpec spec = new ItemSpec(owner, new ResData(res, sdt), null);
 	    name = spec.name();
-	} else {
-	    throw(new IllegalArgumentException());
 	}
 	Double val = null;
 	if(args.length > a)
-	    val = (args[a] == null)?null:((Number)args[a]).doubleValue();
+	    val = (args[a] == null) ? null : Utils.dv(args[a]);
 	return(new Smoke(owner, name, val));
     }
 
@@ -62,7 +60,7 @@ public class Smoke extends ItemInfo.Tip {
 		buf.append(L10N.tooltip(" and "));
 		buf.append(all.get(all.size() - 1).descr());
 	    }
-	    return(RichText.render(buf.toString(), UI.scale(250)).img);
+	    return(RichText.render(buf.toString(), 250).img);
 	}
     }
     public static final Layout.TipID<Line> id = Line::new;

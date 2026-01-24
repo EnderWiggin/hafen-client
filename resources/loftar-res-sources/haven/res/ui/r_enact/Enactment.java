@@ -6,15 +6,15 @@ import haven.CharWnd.LoadingTextBox;
 import java.util.*;
 import java.awt.Color;
 
-@haven.FromResource(name = "ui/r-enact", version = 65)
+@haven.FromResource(name = "ui/r-enact", version = 66)
 public class Enactment {
-    public final int id;
+    public final Object id;
     public final Indir<Resource> res;
     public int lvl, mlvl;
     public Cost cost, dcost, icost;
     String sortkey = "\uffff";
 
-    public Enactment(int id, Indir<Resource> res) {
+    public Enactment(Object id, Indir<Resource> res) {
 	this.id = id;
 	this.res = res;
     }

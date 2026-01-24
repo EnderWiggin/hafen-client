@@ -8,7 +8,7 @@ import java.awt.Graphics;
 import java.util.*;
 
 /* >tt: Slotted */
-@haven.FromResource(name = "ui/tt/slot", version = 18)
+@haven.FromResource(name = "ui/tt/slot", version = 19)
 public class Slotted extends ItemInfo.Tip {
     public static final Text.Line ch = Text.render("As gilding:");
     public final double pmin, pmax;
@@ -26,11 +26,12 @@ public class Slotted extends ItemInfo.Tip {
     public static ItemInfo mkinfo(Owner owner, Object... args) {
 	Resource.Resolver rr = owner.context(Resource.Resolver.class);
 	int a = 1;
-	double pmin = ((Number)args[a++]).doubleValue();
-	double pmax = ((Number)args[a++]).doubleValue();
+	double pmin = Utils.dv(args[a++]);
+	double pmax = Utils.dv(args[a++]);
 	List<Resource> attrs = new LinkedList<Resource>();
-	while(args[a] instanceof Integer)
-	    attrs.add(rr.getres((Integer)args[a++]).get());
+	/* XXX? Make attrs a sublist? */
+	while(!(args[a] instanceof Object[]))
+	    attrs.add(rr.getresv(args[a++]).get());
 	Object[] raw = (Object[])args[a++];
 	return(new Slotted(owner, pmin, pmax, attrs.toArray(new Resource[0]), buildinfo(owner, raw)));
     }

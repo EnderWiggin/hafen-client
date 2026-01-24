@@ -6,7 +6,7 @@ import haven.CharWnd.LoadingTextBox;
 import java.util.*;
 import java.awt.Color;
 
-@haven.FromResource(name = "ui/r-enact", version = 65)
+@haven.FromResource(name = "ui/r-enact", version = 66)
 public class Cost {
     public final double mp, ip, rp, lp;
 

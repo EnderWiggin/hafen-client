@@ -10,23 +10,24 @@ import java.awt.Color;
 import java.util.*;
 
 /* >tt: Fac */
-@haven.FromResource(name = "ui/tt/slots", version = 32)
+@haven.FromResource(name = "ui/tt/slots", version = 33)
 public class Fac implements ItemInfo.InfoFactory {
     public ItemInfo build(ItemInfo.Owner owner, ItemInfo.Raw rawi, Object... args) {
 	Resource.Resolver rr = owner.context(Resource.Resolver.class);
 	int a = 1;
-	double pmin = ((Number)args[a++]).doubleValue();
-	double pmax = ((Number)args[a++]).doubleValue();
+	double pmin = Utils.dv(args[a++]);
+	double pmax = Utils.dv(args[a++]);
 	List<Resource> attrs = new LinkedList<Resource>();
+	/* XXX? Make attrs a sublist? */
 	while(args[a] != null)
-	    attrs.add(rr.getres((Integer)args[a++]).get());
+	    attrs.add(rr.getresv(args[a++]).get());
 	a++;
-	int uses = (Integer)args[a++];
-	int used = (Integer)args[a++];
+	int uses = Utils.iv(args[a++]);
+	int used = Utils.iv(args[a++]);
 	int left = uses - used;
 	ISlots ret = new ISlots(owner, left, pmin, pmax, attrs.toArray(new Resource[0]));
 	while(a < args.length) {
-	    Indir<Resource> res = rr.getres((Integer)args[a++]);
+	    Indir<Resource> res = rr.getresv(args[a++]);
 	    Message sdt = Message.nil;
 	    if(args[a] instanceof byte[])
 		sdt = new MessageBuf((byte[])args[a++]);

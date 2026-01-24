@@ -6,7 +6,7 @@ import haven.CharWnd.LoadingTextBox;
 import java.util.*;
 import java.awt.Color;
 
-@haven.FromResource(name = "ui/r-enact", version = 65)
+@haven.FromResource(name = "ui/r-enact", version = 66)
 public class Enactments extends Widget {
     public static final Tex mpi = Resource.classres(Enactments.class).layer(Resource.imgc, 1).tex();
     public static final Tex ipi = Resource.classres(Enactments.class).layer(Resource.imgc, 0).tex();
@@ -218,9 +218,9 @@ public class Enactments extends Widget {
 	return(new Enactments());
     }
 
-    private static Enactment get(Collection<Enactment> from, int id) {
+    private static Enactment get(Collection<Enactment> from, Object id) {
 	for(Enactment act : from) {
-	    if(act.id == id)
+	    if(Utils.eq(act.id, id))
 		return(act);
 	}
 	return(null);
@@ -231,10 +231,10 @@ public class Enactments extends Widget {
 	    Collection<Enactment> buf = Utils.bv(args[0]) ? new ArrayList<Enactment>() : list.acts;
 	    int a = 1;
 	    while(a < args.length) {
-		int resid = Utils.iv(args[a++]);
+		Object resid = args[a++];
 		Enactment act = get(buf, resid);
 		if(act == null) {
-		    act = new Enactment(resid, ui.sess.getres(resid));
+		    act = new Enactment(resid, ui.sess.getresv(resid));
 		    buf.add(act);
 		}
 		act.lvl = Utils.iv(args[a++]);
