@@ -11,7 +11,7 @@ import static haven.MCache.tilesz;
 import static haven.render.sl.Cons.*;
 import static haven.render.sl.Type.*;
 
-@haven.FromResource(name = "ui/surv", version = 45)
+@haven.FromResource(name = "ui/surv", version = 46)
 public class Display implements RenderTree.Node, TickList.Ticking, TickList.TickNode {
     public static final Attribute v_elev = new Attribute(FLOAT);
     public static final Attribute v_flags = new Attribute(INT);

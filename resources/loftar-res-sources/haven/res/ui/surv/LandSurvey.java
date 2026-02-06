@@ -11,11 +11,12 @@ import static haven.MCache.tilesz;
 import static haven.render.sl.Cons.*;
 import static haven.render.sl.Type.*;
 
-@haven.FromResource(name = "ui/surv", version = 45)
+@haven.FromResource(name = "ui/surv", version = 46)
 public class LandSurvey extends Window {
     public final Area area;
     public final Data data;
     public final Label zdlbl, wlbl, dlbl;
+    public final CheckBox lock;
     public Area selection;
     private boolean inited = false;
     private MapView mv;
@@ -30,8 +31,10 @@ public class LandSurvey extends Window {
 	zdlbl = add(new Label("..."), prev.pos("bl").adds(0, 1));
 	wlbl = add(new Label("..."), zdlbl.pos("bl").adds(0, 1));
 	dlbl = add(new Label("..."), wlbl.pos("bl").adds(0, 1));
+	lock = add(new CheckBox("Enable editing"), dlbl.pos("bl").adds(0, 20));
+	lock.set(true); lock.changed(this::lock);
 	prev = add(new Button(UI.scale(125), "Ground level", false).action(this::initsurf),
-		   dlbl.pos("bl").adds(0, 20));
+		   lock.pos("bl").adds(0, 10));
 	add(new Button(UI.scale(125), "Ground plane", false).action(this::initplane),
 	    prev.pos("ur").adds(10, 0));
 	prev = add(new Button(UI.scale(125), "Dig", false).action(() -> wdgmsg("lvl")),
@@ -105,6 +108,10 @@ public class LandSurvey extends Window {
 	dlbl.settext(String.format("Units of soil to dig: %d", hn));
     }
 
+    private void lock(boolean enabled) {
+	wdgmsg("lock", enabled ? 0 : 1);
+    }
+
     private void send() {
 	wdgmsg("data", data.encode());
     }
@@ -121,12 +128,12 @@ public class LandSurvey extends Window {
     public class Idle implements EventHandler<Widget.MouseEvent> {
 	public boolean handle(MouseEvent ev) {
 	    if(ev instanceof MouseMoveEvent) {
-		Coord sel = dsp.mousetest(ev.c, false);
+		Coord sel = lock.a ? dsp.mousetest(ev.c, false) : null;
 		if(!Utils.eq(sel, dsp.selected)) {
 		    dsp.selected = sel;
 		    dsp.update = true;
 		}
-	    } else if(ev instanceof MouseDownEvent) {
+	    } else if((ev instanceof MouseDownEvent) && lock.a) {
 		if(((MouseDownEvent)ev).b == 1) {
 		    Coord sel = dsp.mousetest(ev.c, false);
 		    if(sel != null) {
@@ -313,6 +320,8 @@ public class LandSurvey extends Window {
 	if(name == "data") {
 	    data.decode(Utils.iv(args[0]), (byte[])args[1]);
 	    upd = true;
+	} else if(name == "lock") {
+	    lock.set(!Utils.bv(args[0]));
 	} else {
 	    super.uimsg(name, args);
 	}
