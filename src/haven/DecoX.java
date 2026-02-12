@@ -179,10 +179,10 @@ public class DecoX extends Window.DefaultDeco {
 	private static final int capo = UI.scale(2), capio = UI.scale(1);
 	private static final Coord mrgn = UI.scale(1, 1);
 	private static final double cay = 0.5;
-	public static final Text.Furnace cf = Text.Imager.of(new PUtils.TexFurn(new Text.Foundry(Text.serif.deriveFont(Font.BOLD, UI.scale(14))).aa(true), WindowX.ctex),
-	    in -> rasterimg(blurmask2(in.img.getRaster(), UI.rscale(0.75), UI.rscale(1.0), new Color(96, 96, 0))));
-	public static final Text.Furnace ncf = Text.Imager.of(new PUtils.TexFurn(new Text.Foundry(Text.serif.deriveFont(Font.BOLD, UI.scale(14))).aa(true), WindowX.ctex),
-	    in -> rasterimg(blurmask2(in.img.getRaster(), UI.rscale(0.75), UI.rscale(1.0), Color.BLACK)));
+	public static final Text.Forge cf =  new PUtils.BlurFurn(new PUtils.TexFurn(new Text.Foundry(Text.serif, 14).aa(true), WindowX.ctex),
+	    UI.rscale(0.75), UI.rscale(1.0), new Color(96, 96, 0));
+	public static final Text.Forge ncf = new PUtils.BlurFurn(new PUtils.TexFurn(new Text.Foundry(Text.serif, 14).aa(true), WindowX.ctex),
+	    UI.rscale(0.75), UI.rscale(1.0), Color.BLACK);
 	
 	public static final BufferedImage[] cbtni = new BufferedImage[]{
 	    Resource.loadsimg("gfx/hud/btn-close"),
