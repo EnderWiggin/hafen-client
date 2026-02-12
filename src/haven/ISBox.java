@@ -99,11 +99,12 @@ public class ISBox extends Widget implements DTarget {
     }
 
     public ISBox(Indir<Resource> res, int rem, int av, int bi) {
-        super(defsz);
+	super(defsz);
 	this.rem = rem;
 	this.av = av;
-        this.res = res;
-        setlabel(rem, av, bi);
+	this.res = res;
+	setlabel(rem, av, bi);
+	tooltip = new PaginaTip(res, true);
     }
 
     public void draw(GOut g) {
@@ -115,12 +116,6 @@ public class ISBox extends Widget implements DTarget {
         } catch(Loading e) {}
 	g.image(label.tex(), new Coord(UI.scale(40), first_Line - label.sz().y / 2));
 	super.draw(g);
-    }
-
-    public Object tooltip(Coord c, Widget prev) {
-	if(res.get().layer(Resource.tooltip) != null)
-	    return(res.get().layer(Resource.tooltip).t);
-	return(null);
     }
 
     public boolean mousedown(MouseDownEvent ev) {

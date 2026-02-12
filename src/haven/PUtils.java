@@ -82,6 +82,25 @@ public class PUtils {
 	return(tgt);
     }
 
+    public static Area alphabounds(Raster img, int thres) {
+	int w = img.getWidth(), h = img.getHeight();
+	int l = w, u = h, r = 0, b = 0;
+	for(int y = 0; y < h; y++) {
+	    for(int x = 0; x < w; x++) {
+		if(img.getSample(x, y, 3) > thres) {
+		    l = Math.min(l, x); u = Math.min(u, y);
+		    r = Math.max(r, x); b = Math.max(b, y);
+		}
+	    }
+	}
+	if((l > r) || (u > b))
+	    return(null);
+	return(Area.corni(Coord.of(l, u), Coord.of(r, b)));
+    }
+    public static Area alphabounds(BufferedImage img, int thres) {
+	return(alphabounds(img.getRaster(), thres));
+    }
+
     public static WritableRaster imggrow(WritableRaster img, int rad) {
 	int h = img.getHeight(), w = img.getWidth();
 	int[] buf = new int[w * h];
@@ -304,34 +323,50 @@ public class PUtils {
 	return(rasterimg(buf));
     }
 
-    public static class BlurFurn extends Text.Imager {
+    public static class BlurFurn extends Text.OffsetForge {
 	public final int grad, brad;
 	public final Color col;
 
-	public BlurFurn(Text.Furnace bk, int grad, int brad, Color col) {
+	public BlurFurn(Text.Forge bk, int grad, int brad, Color col) {
 	    super(bk);
 	    this.grad = grad;
 	    this.brad = brad;
 	    this.col = col;
 	}
 
-	public BufferedImage proc(Text text) {
+	@Deprecated
+	public BlurFurn(Text.Furnace bk, int grad, int brad, Color col) {
+	    this((Text.Forge)bk, grad, brad, col);
+	}
+
+	public BufferedImage proc(Text.Slug text) {
 	    return(rasterimg(blurmask2(text.img.getRaster(), grad, brad, col)));
 	}
+
+	public Coord tloff() {return(Coord.of(grad + brad));}
+	public Coord broff() {return(Coord.of(grad + brad));}
     }
 
-    public static class TexFurn extends Text.Imager {
+    public static class TexFurn extends Text.OffsetForge {
 	public final BufferedImage tex;
 
-	public TexFurn(Text.Furnace bk, BufferedImage tex) {
-	    super(bk);
+	public TexFurn(Text.Forge bk, BufferedImage tex) {
+	    super((Text.Forge)bk);
 	    this.tex = tex;
 	}
 
-	public BufferedImage proc(Text text) {
+	@Deprecated
+	public TexFurn(Text.Furnace bk, BufferedImage tex) {
+	    this((Text.Forge)bk, tex);
+	}
+
+	public BufferedImage proc(Text.Slug text) {
 	    tilemod(text.img.getRaster(), tex.getRaster(), Coord.z);
 	    return(text.img);
 	}
+
+	public Coord tloff() {return(Coord.z);}
+	public Coord broff() {return(Coord.z);}
     }
 
     public static void dumpband(Raster img, int band) {
