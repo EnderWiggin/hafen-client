@@ -242,6 +242,9 @@ public class Hitbox extends SlottedNode implements Rendered {
 	if(res.name.startsWith("gfx/kritter/reindeer")) {
 	    return Resource.remote().loadwait("gfx/kritter/reindeer/reindeer");
 	}
+	if(res.name.startsWith("gfx/terobjs/producesack")) {
+	    return Resource.remote().loadwait("gfx/terobjs/producesack");
+	}
 	return res;
     }
     
