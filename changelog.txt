@@ -1,3 +1,7 @@
+$size[14]{$u{Update for 20.02.26:}
+  * merged loftar's changes
+  * fixed hitbox for produce sacks
+ 
 $size[14]{$u{Update for 12.02.26:}
   * merged loftar's changes
  
