@@ -10,7 +10,7 @@ import java.awt.Color;
 import java.util.*;
 
 /* >tt: Fac */
-@haven.FromResource(name = "ui/tt/slots", version = 33)
+@haven.FromResource(name = "ui/tt/slots", version = 34)
 public class Fac implements ItemInfo.InfoFactory {
     public ItemInfo build(ItemInfo.Owner owner, ItemInfo.Raw rawi, Object... args) {
 	Resource.Resolver rr = owner.context(Resource.Resolver.class);

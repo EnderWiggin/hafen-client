@@ -10,7 +10,7 @@ import java.awt.Color;
 import java.util.*;
 
 /* >tt: Fac */
-@haven.FromResource(name = "ui/tt/slots", version = 33)
+@haven.FromResource(name = "ui/tt/slots", version = 34)
 public class ISlots extends ItemInfo.Tip implements GItem.NumberInfo {
     public static final Text ch = Text.render("Gilding:");
     public static final Text.Foundry progf = new Text.Foundry(Text.dfont.deriveFont(Font.ITALIC), 10, new Color(0, 169, 224));
@@ -36,22 +36,22 @@ public class ISlots extends ItemInfo.Tip implements GItem.NumberInfo {
 	if(attrs.length > 0) {
 	    BufferedImage head = RichText.render(String.format("Chance: $col[%s]{%d%%} to $col[%s]{%d%%}", chc, Math.round(100 * pmin), chc, Math.round(100 * pmax)), 0).img;
 	    int h = head.getHeight();
-	    int x = 10, y = l.cmp.sz.y;
+	    int x = UI.scale(10), y = l.cmp.sz.y;
 	    l.cmp.add(head, new Coord(x, y));
-	    x += head.getWidth() + 10;
+	    x += head.getWidth() + UI.scale(10);
 	    for(int i = 0; i < attrs.length; i++) {
 		BufferedImage icon = convolvedown(attrs[i].layer(Resource.imgc).img, new Coord(h, h), CharWnd.iconfilter);
 		l.cmp.add(icon, new Coord(x, y));
-		x += icon.getWidth() + 2;
+		x += icon.getWidth() + UI.scale(2);
 	    }
 	} else {
 	    BufferedImage head = RichText.render(String.format("Chance: $col[%s]{%d%%}", chc, (int)Math.round(100 * pmin)), 0).img;
-	    l.cmp.add(head, new Coord(10, l.cmp.sz.y));
+	    l.cmp.add(head, new Coord(UI.scale(10), l.cmp.sz.y));
 	}
 	for(SItem si : s)
 	    si.layout(l);
 	if(left > 0)
-	    l.cmp.add(progf.render((left > 1)?String.format("Gildable \u00d7%d", left):"Gildable").img, new Coord(10, l.cmp.sz.y));
+	    l.cmp.add(progf.render((left > 1) ? String.format("Gildable \u00d7%d", left) : "Gildable").img, new Coord(UI.scale(10), l.cmp.sz.y));
     }
 
     public static final Object[] defn = {Loading.waitfor(Resource.classres(ISlots.class).pool.load("ui/tt/defn", 7))};
@@ -77,14 +77,15 @@ public class ISlots extends ItemInfo.Tip implements GItem.NumberInfo {
 	}
 
 	public void layout(Layout l) {
-	    BufferedImage icon = PUtils.convolvedown(img(), new Coord(16, 16), CharWnd.iconfilter);
+	    int h = ch.sz().y;
+	    BufferedImage icon = PUtils.convolvedown(img(), Coord.of(h), CharWnd.iconfilter);
 	    BufferedImage lbl = Text.render(name).img;
 	    BufferedImage sub = longtip(info);
-	    int x = 10, y = l.cmp.sz.y;
+	    int x = UI.scale(10), y = l.cmp.sz.y;
 	    l.cmp.add(icon, new Coord(x, y));
-	    l.cmp.add(lbl, new Coord(x + 16 + 3, y + ((16 - lbl.getHeight()) / 2)));
+	    l.cmp.add(lbl, new Coord(x + h + UI.scale(3), y + ((h - lbl.getHeight()) / 2)));
 	    if(sub != null)
-		l.cmp.add(sub, new Coord(x + 16, y + 16));
+		l.cmp.add(sub, new Coord(x + h, y + h));
 	}
     }
 
