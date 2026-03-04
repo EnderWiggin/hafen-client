@@ -52,8 +52,8 @@ public class MCache implements MapSource {
     Map<Coord, Request> req = new HashMap<Coord, Request>();
     Map<Coord, Grid> grids = new HashMap<Coord, Grid>();
     Session sess;
-    final Set<Overlay> ols = new HashSet<Overlay>();
-    public int olseq = 0, chseq = 0;
+    final Set<LocalOverlay> ols = new HashSet<>();
+    public volatile int olseq = 0, chseq = 0;
     public long lastupdate = 0;
     Map<Integer, Defrag> fragbufs = new TreeMap<Integer, Defrag>();
 
@@ -232,45 +232,71 @@ public class MCache implements MapSource {
 	}
     }
 
-    public class Overlay {
-	private Area a;
-	private OverlayInfo id;
+    public static interface LocalOverlay {
+	public OverlayInfo id();
+	public void fill(Area a, boolean[] buf);
+	public default boolean filter(Area a) {return(false);}
+	public default void tick() {}
+    }
+
+    public void add(LocalOverlay ol) {
+	ols.add(ol);
+	olseq++;
+    }
+
+    public void remove(LocalOverlay ol) {
+	ols.remove(ol);
+	olseq++;
+    }
+
+    public class RectOverlay implements LocalOverlay {
+	public final OverlayInfo id;
+	public Area a;
 	private Function<Coord, Boolean> mask;
 
-	public Overlay(Area a, OverlayInfo id) {
-	    this.a = a;
+	public RectOverlay(OverlayInfo id, Area a) {
 	    this.id = id;
-	    synchronized (ols) {
-		ols.add(this);
-		olseq++;
-	    }
+	    this.a = a;
 	}
 
-	public void destroy() {
-	    synchronized (ols) {
-		ols.remove(this);
-		olseq++;
-	    }
+	public OverlayInfo id() {return(id);}
+
+	public boolean filter(Area b) {
+	    return(b.overlap(a) == null);
 	}
 
-	public void update(OverlayInfo id, Area a) {
-	    if(!id.equals(this.id)) {
-		olseq++;
-		this.id = id;
+	public void fill(Area b, boolean[] buf) {
+	    Area ol = a.overlap(b);
+	    if(ol != null) {
+		for(Coord lc : ol)
+		    buf[b.ri(lc)] = true;
 	    }
-	    update(a);
 	}
 
 	public void update(Area a) {
 	    if(!a.equals(this.a)) {
-		olseq++;
 		this.a = a;
+		olseq++;
 	    }
 	}
-	
+
 	public void mask(Function<Coord, Boolean> mask) {this.mask = mask;}
-	
+
 	public boolean mask(Coord c) {return mask == null || Boolean.TRUE.equals(mask.apply(c));}
+    }
+
+    @Deprecated
+    public class Overlay extends RectOverlay {
+	public Overlay(Area a, OverlayInfo id) {
+	    super(id, a);
+	    ols.add(this);
+	    olseq++;
+	}
+
+	public void destroy() {
+	    ols.remove(this);
+	    olseq++;
+	}
     }
 
     private void cktileid(int id) {
@@ -838,17 +864,6 @@ public class MCache implements MapSource {
 
     public MCache(Session sess) {
 	this.sess = sess;
-	CFG.NO_TILE_TRANSITION.observe(this::resetMap);
-	CFG.FLAT_TERRAIN.observe(this::resetMap);
-	CFG.DISPLAY_RIDGE_BOX.observe(this::resetMap);
-	CFG.COLOR_RIDGE_BOX.observe(this::resetMap);
-	CFG.COLORIZE_DEEP_WATER.observe(this::resetMap);
-    }
-    
-    private void resetMap(CFG<?> cfg) {
-	synchronized (MCache.this) {
-	    trimall();
-	}
     }
 
     public void ctick(double dt) {
@@ -858,6 +873,8 @@ public class MCache implements MapSource {
 	}
 	for(Grid g : copy)
 	    g.tick(dt);
+	for(LocalOverlay lol : new ArrayList<>(ols))
+	    lol.tick();
     }
 
     public void gtick(Render g) {
@@ -1013,11 +1030,9 @@ public class MCache implements MapSource {
 		    ret.add(id);
 	    }
 	}
-	synchronized (ols) {
-	    for (Overlay lol : ols) {
-		if((lol.a.overlap(a) != null) && !ret.contains(lol.id))
-		    ret.add(lol.id);
-	    }
+	for(LocalOverlay lol : ols) {
+	    if(!lol.filter(a) && !ret.contains(lol.id()))
+		ret.add(lol.id());
 	}
 	return(ret);
     }
@@ -1037,16 +1052,10 @@ public class MCache implements MapSource {
 		    buf[a.ri(tc)] = gbuf[(tc.x - gt.ul.x) + ((tc.y - gt.ul.y) * cmaps.x)];
 	    }
 	}
-	synchronized (ols) {
-	    for (Overlay lol : ols) {
-		if(lol.id != id)
-		    continue;
-		Area la = lol.a.overlap(a);
-		if(la != null) {
-		    for (Coord lc : la)
-			if(lol.mask(lc)) {buf[a.ri(lc)] = true;}
-		}
-	    }
+	for(LocalOverlay lol : ols) {
+	    if(lol.id() != id)
+		continue;
+	    lol.fill(a, buf);
 	}
     }
     
