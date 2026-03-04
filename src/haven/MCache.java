@@ -252,7 +252,6 @@ public class MCache implements MapSource {
     public class RectOverlay implements LocalOverlay {
 	public final OverlayInfo id;
 	public Area a;
-	private Function<Coord, Boolean> mask;
 
 	public RectOverlay(OverlayInfo id, Area a) {
 	    this.id = id;
@@ -280,7 +279,47 @@ public class MCache implements MapSource {
 	    }
 	}
 
-	public void mask(Function<Coord, Boolean> mask) {this.mask = mask;}
+    }
+
+    public class MaskedRectOverlay implements LocalOverlay {
+	public OverlayInfo id;
+	public Area a;
+	private final Function<Coord, Boolean> mask;
+
+	public MaskedRectOverlay(OverlayInfo id, Area a, Function<Coord, Boolean> mask) {
+	    this.id = id;
+	    this.a = a;
+	    this.mask = mask;
+	}
+	
+	public OverlayInfo id() {return(id);}
+
+	public boolean filter(Area b) {
+	    return(b.overlap(a) == null);
+	}
+
+	public void fill(Area b, boolean[] buf) {
+	    Area ol = a.overlap(b);
+	    if(ol == null) {return;}
+	    for (Coord lc : ol) {
+		if(mask(lc)) {buf[b.ri(lc)] = true;}
+	    }
+	}
+
+	public void update(Area a) {
+	    if(!a.equals(this.a)) {
+		this.a = a;
+		olseq++;
+	    }
+	}
+
+	public void update(OverlayInfo id, Area a) {
+	    if(!id.equals(this.id)) {
+		this.id = id;
+		olseq++;
+	    }
+	    update(a);
+	}
 
 	public boolean mask(Coord c) {return mask == null || Boolean.TRUE.equals(mask.apply(c));}
     }

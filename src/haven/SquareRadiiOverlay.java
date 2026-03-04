@@ -9,7 +9,7 @@ public class SquareRadiiOverlay {
     private final MCache map;
     private final MCache.OverlayInfo safe;
     private final MCache.OverlayInfo danger;
-    private MCache.Overlay ol;
+    private MCache.MaskedRectOverlay ol;
     
     private final Gob gob;
     private final float radius;
@@ -49,13 +49,13 @@ public class SquareRadiiOverlay {
     
     public void add() {
 	if(ol != null) {return;}
-	ol = map.new Overlay(area, olid());
-	ol.mask(mask);
+	ol = map.new MaskedRectOverlay(olid(), area, mask);
+	map.add(ol);
     }
     
     public void rem() {
 	if(ol == null) {return;}
-	ol.destroy();
+	map.remove(ol);
 	ol = null;
     }
     
