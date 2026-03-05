@@ -8,7 +8,7 @@ import java.awt.Graphics;
 import java.util.*;
 
 /* >tt: Slotted */
-@haven.FromResource(name = "ui/tt/slot", version = 19)
+@haven.FromResource(name = "ui/tt/slot", version = 20)
 public class Slotted extends ItemInfo.Tip {
     public static final Text.Line ch = Text.render("As gilding:");
     public final double pmin, pmax;
@@ -42,22 +42,22 @@ public class Slotted extends ItemInfo.Tip {
 	if(attrs.length > 0) {
 	    BufferedImage head = RichText.render(String.format("Chance: $col[%s]{%d%%} to $col[%s]{%d%%}", chc, Math.round(100 * pmin), chc, Math.round(100 * pmax)), 0).img;
 	    int h = head.getHeight();
-	    int x = 10, y = l.cmp.sz.y;
+	    int x = UI.scale(10), y = l.cmp.sz.y;
 	    l.cmp.add(head, new Coord(x, y));
-	    x += head.getWidth() + 10;
+	    x += head.getWidth() + UI.scale(10);
 	    for(int i = 0; i < attrs.length; i++) {
 		BufferedImage icon = convolvedown(attrs[i].layer(Resource.imgc).img, new Coord(h, h), CharWnd.iconfilter);
 		l.cmp.add(icon, new Coord(x, y));
-		x += icon.getWidth() + 2;
+		x += icon.getWidth() + UI.scale(2);
 	    }
 	} else {
 	    BufferedImage head = RichText.render(String.format("Chance: $col[%s]{%d%%}", chc, (int)Math.round(100 * pmin)), 0).img;
-	    l.cmp.add(head, new Coord(10, l.cmp.sz.y));
+	    l.cmp.add(head, new Coord(UI.scale(10), l.cmp.sz.y));
 	}
 
 	BufferedImage stip = longtip(sub);
 	if(stip != null)
-	    l.cmp.add(stip, new Coord(10, l.cmp.sz.y));
+	    l.cmp.add(stip, new Coord(UI.scale(10), l.cmp.sz.y));
     }
 
     public int order() {
