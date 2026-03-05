@@ -240,13 +240,17 @@ public class MCache implements MapSource {
     }
 
     public void add(LocalOverlay ol) {
-	ols.add(ol);
-	olseq++;
+	synchronized (ols) {
+	    ols.add(ol);
+	    olseq++;
+	}
     }
 
     public void remove(LocalOverlay ol) {
-	ols.remove(ol);
-	olseq++;
+	synchronized (ols) {
+	    ols.remove(ol);
+	    olseq++;
+	}
     }
 
     public class RectOverlay implements LocalOverlay {
@@ -1069,9 +1073,11 @@ public class MCache implements MapSource {
 		    ret.add(id);
 	    }
 	}
-	for(LocalOverlay lol : ols) {
-	    if(!lol.filter(a) && !ret.contains(lol.id()))
-		ret.add(lol.id());
+	synchronized (ols) {
+	    for (LocalOverlay lol : ols) {
+		if(!lol.filter(a) && !ret.contains(lol.id()))
+		    ret.add(lol.id());
+	    }
 	}
 	return(ret);
     }
@@ -1091,10 +1097,12 @@ public class MCache implements MapSource {
 		    buf[a.ri(tc)] = gbuf[(tc.x - gt.ul.x) + ((tc.y - gt.ul.y) * cmaps.x)];
 	    }
 	}
-	for(LocalOverlay lol : ols) {
-	    if(lol.id() != id)
-		continue;
-	    lol.fill(a, buf);
+	synchronized (ols) {
+	    for(LocalOverlay lol : ols) {
+		if(lol.id() != id)
+		    continue;
+		lol.fill(a, buf);
+	    }
 	}
     }
     

@@ -114,7 +114,7 @@ public class Global implements LocalOverlay {
 	     * GAttrib.dispose were called properly */
 	    for(Radius rad : current) {
 		if(rad.gob.removed) {
-		    rad.removed = true;
+		    rad.remove();
 		    update = true;
 		}
 	    }

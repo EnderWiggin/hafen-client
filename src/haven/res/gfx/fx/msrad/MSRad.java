@@ -6,6 +6,7 @@ package haven.res.gfx.fx.msrad;
 
 import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 import haven.*;
 import haven.render.*;
@@ -15,7 +16,7 @@ import me.ender.ClientUtils;
 /* >spr: MSRad */
 @haven.FromResource(name = "gfx/fx/msrad", version = 16)
 public class MSRad extends Sprite {
-    private static final double TICK_RATE = 0.1;
+    public static final double TICK_RATE = 0.1;
     public static final float LOW_HP = 0.25f;
     public static boolean show = false;
     public static Collection<MSRad> current = new WeakList<>();
@@ -26,6 +27,20 @@ public class MSRad extends Sprite {
     
     public static final MCache.OverlayInfo safeol = new CFGOverlayId(CFG.COLOR_MINE_SUPPORT_OVERLAY, OL_TAG);
     public static final MCache.OverlayInfo dangerol = new CFGOverlayId(CFG.COLOR_MINE_SUPPORT_DAMAGED_OVERLAY, OL_TAG);
+
+    public static final MCache.OverlayInfo buildol = new MCache.OverlayInfo() {
+	private final Color col = new Color(190, 27, 255);
+	private final List<String> tags = Collections.singletonList("show");
+	private final Material mat = new Material(BaseColor.fromColorAndAlpha(col, 0.25f), States.maskdepth);
+	private final Material omat = new Material(BaseColor.fromColorAndAlpha(col, 0.75f), States.maskdepth);
+
+	public Collection<String> tags() {return tags;}
+
+	public Material mat() {return (mat);}
+
+	@Override
+	public Material omat() {return omat;}
+    };
     
     private double timer = TICK_RATE;
     
@@ -108,7 +123,7 @@ public class MSRad extends Sprite {
     
     private boolean useRadii() {
 	String resid = owner.context(Gob.class).resid();
-	if(resid == null || !CFG.SHOW_MINE_SUPPORT_AS_OVERLAY.get()) {return true;}
+	if(resid == null) {return true;}
 	switch (resid) {
 	    case "gfx/terobjs/minesupport":
 	    case "gfx/terobjs/column":

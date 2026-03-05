@@ -686,7 +686,6 @@ public class MapView extends PView implements DTarget, Console.Directory, Widget
 	disposables.add(CFG.DISPLAY_GOB_HITBOX.observe(this::updatePlobDrawable));
 	disposables.add(CFG.DISPLAY_GOB_HITBOX_TOP.observe(this::updatePlobDrawable));
 	disposables.add(CFG.SHOW_GOB_RADIUS.observe(this::updateSupportOverlay));
-	disposables.add(CFG.SHOW_MINE_SUPPORT_AS_OVERLAY.observe(this::updateSupportOverlay));
 	disposables.add(CFG.COLOR_MINE_SUPPORT_OVERLAY.observe(this::updateSupportOverlayColor));
 	disposables.add(CFG.COLOR_TILE_GRID.observe(this::updateGridMat));
 	disposables.add(CFG.DISPLAY_FLAVOR.observe(terrain::updateFlavor));
@@ -715,7 +714,7 @@ public class MapView extends PView implements DTarget, Console.Directory, Widget
     }
     
     private void updateSupportOverlay(CFG<Boolean> cfg) {
-	boolean show = CFG.SHOW_GOB_RADIUS.get() && CFG.SHOW_MINE_SUPPORT_AS_OVERLAY.get();
+	boolean show = CFG.SHOW_GOB_RADIUS.get();
 	if(show && !visol(MSRad.OL_TAG)) {
 	    enol(MSRad.OL_TAG);
 	} else if(!show && visol(MSRad.OL_TAG)) {

@@ -5,10 +5,8 @@ package haven.res.gfx.fx.mscover;
 
 import haven.*;
 import haven.render.*;
-import java.util.*;
-import haven.res.ui.pag.toggle.*;
-import haven.MenuGrid.Pagina;
-import static haven.MCache.*;
+
+import haven.res.gfx.fx.msrad.MSRad;
 
 /* >objdelta: Radius */
 @FromResource(name = "gfx/fx/mscover", version = 1)
@@ -20,6 +18,8 @@ public class Radius extends GAttrib {
     public Coord2d cc;
     public int cfl = 0, chseq = 1, useq = 0;
     public boolean removed = false;
+    private double timer = MSRad.TICK_RATE;
+    private final SquareRadiiOverlay overlay;
 
     public Radius(Gob owner, double r, boolean real) {
 	super(owner);
@@ -27,6 +27,10 @@ public class Radius extends GAttrib {
 	this.real = real;
 	this.gl = Global.get(gob.glob);
 	gl.add(this);
+	overlay = real
+	    ? new SquareRadiiOverlay(owner, (float) r, MSRad.safeol, MSRad.dangerol)
+	    : new SquareRadiiOverlay(owner, (float) r, MSRad.buildol);
+	overlay.add();
     }
 
     public int fl() {
@@ -38,10 +42,22 @@ public class Radius extends GAttrib {
 	super.dispose();
 	removed = true;
     }
+    
+    public void remove() {
+	removed = true;
+	overlay.rem();
+    }
 
     public void ctick(double dt) {
-	if(!Utils.eq(gob.rc, cc) || (fl() != cfl))
+	timer -= dt;
+	if(timer <= 0) {
+	    timer = MSRad.TICK_RATE;
+	    overlay.checkHP();
+	}
+	if(!Utils.eq(gob.rc, cc) || (fl() != cfl)) {
 	    gl.update = true;
+	    overlay.update();
+	}
     }
 
     public static void parse(Gob gob, Message dat) {
