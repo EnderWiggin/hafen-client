@@ -16,6 +16,7 @@ import java.util.List;
 
 public class CFG<T> {
     public static final CFG<String> VERSION = new CFG<>("version", "");
+    public static final CFG<Integer> VERSION_NUM = new CFG<>("version_num", 0);
     public static final CFG<Boolean> VIDEO_FULL_SCREEN = new CFG<>("video.full_screen", false);
 //    public static final CFG<Boolean> DISPLAY_KINNAMES = new CFG<>("display.kinnames", true);
     public static final CFG<Boolean> DISPLAY_KINSFX = new CFG<>("display.kinsfx", true);
@@ -207,6 +208,25 @@ public class CFG<T> {
 	    new CFG<>("display.buffs." + toggle.action, true),
 	    new CFG<>("general.start_toggle." + toggle.action, false)
 	));
+	processVersions();
+    }
+
+    private static final int LATEST = 1;
+    private static void processVersions() {
+	int version = VERSION_NUM.get();
+	
+	if(version < LATEST) {
+	    
+	    //Reset mine support colors
+	    if(version < 1) {
+		COLOR_MINE_SUPPORT_OVERLAY.reset(false);
+		COLOR_MINE_SUPPORT_SINGLE_OVERLAY.reset(false);
+		COLOR_MINE_SUPPORT_DAMAGED_OVERLAY.reset(false);
+		COLOR_MINE_SUPPORT_VIRTUAL_OVERLAY.reset(false);
+	    }
+	    
+	    VERSION_NUM.set(LATEST);
+	}
     }
 
     public interface Observer<T> {
@@ -228,13 +248,22 @@ public class CFG<T> {
     }
 
     public void set(T value) {
-	CFG.set(this, value);
+	CFG.set(this, value, true);
 	observe();
     }
 
     public void set(T value, boolean observe) {
 	set(value);
 	if(observe) {observe();}
+    }
+
+    private void set(T value, boolean observe, boolean store) {
+	CFG.set(this, value, store);
+	if(observe) {observe();}
+    }
+
+    private void reset(boolean store) {
+	set(def, true, store);
     }
 
     public Disposable observe(Observer<T> observer) {
@@ -289,7 +318,7 @@ public class CFG<T> {
     }
 
     @SuppressWarnings("unchecked")
-    public static synchronized <E> void set(CFG<E> name, E value) {
+    private static synchronized <E> void set(CFG<E> name, E value, boolean store) {
 	cache.put(name.path, value);
 	if(name.path == null) {return;}
 	String[] parts = name.path.split("\\.");
@@ -311,7 +340,7 @@ public class CFG<T> {
 	    Map<Object, Object> map = (Map<Object, Object>) cur;
 	    map.put(parts[parts.length - 1], value);
 	}
-	store();
+	if(store) {store();}
     }
 
     private static synchronized void store() {
