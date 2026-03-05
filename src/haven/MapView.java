@@ -689,6 +689,7 @@ public class MapView extends PView implements DTarget, Console.Directory, Widget
 	disposables.add(CFG.DISPLAY_GOB_HITBOX_TOP.observe(this::updatePlobDrawable));
 	disposables.add(CFG.SHOW_GOB_RADIUS.observe(this::updateSupportOverlay));
 	disposables.add(CFG.COLOR_MINE_SUPPORT_OVERLAY.observe(this::updateSupportOverlayColor));
+	disposables.add(CFG.COLOR_MINE_SUPPORT_SINGLE_OVERLAY.observe(this::updateSupportOverlayColor));
 	disposables.add(CFG.COLOR_MINE_SUPPORT_DAMAGED_OVERLAY.observe(this::updateSupportOverlayColor));
 	disposables.add(CFG.COLOR_MINE_SUPPORT_VIRTUAL_OVERLAY.observe(this::updateSupportOverlayColor));
 	disposables.add(CFG.COLOR_TILE_GRID.observe(this::updateGridMat));

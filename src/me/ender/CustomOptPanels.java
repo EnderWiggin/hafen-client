@@ -22,7 +22,10 @@ public class CustomOptPanels {
 	
 	x = 0;
 	y = START;
-	panel.add(new CFGColorBtn(CFG.COLOR_MINE_SUPPORT_OVERLAY, "Mine support overlay", false), x, y);
+	panel.add(new CFGColorBtn(CFG.COLOR_MINE_SUPPORT_OVERLAY, "Mine support overlay", true), x, y);
+	
+	y += STEP;
+	panel.add(new CFGColorBtn(CFG.COLOR_MINE_SUPPORT_SINGLE_OVERLAY, "Mine support (single) overlay", true), x, y);
 
 	y += STEP;
 	panel.add(new CFGColorBtn(CFG.COLOR_MINE_SUPPORT_VIRTUAL_OVERLAY, "Mine support build preview", true), x, y);

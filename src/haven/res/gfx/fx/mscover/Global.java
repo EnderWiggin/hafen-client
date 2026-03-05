@@ -18,10 +18,10 @@ import static haven.MCache.*;
 @haven.FromResource(name = "gfx/fx/mscover", version = 1)
 public class Global implements LocalOverlay {
     public static final String OL_TAG = "mscover";
-    public static final OverlayInfo ol_1 = new CFGOverlayId(CFG.COLOR_MINE_SUPPORT_OVERLAY, OL_TAG, 0.10f, -1f);
-    public static final OverlayInfo ol_m = new CFGOverlayId(CFG.COLOR_MINE_SUPPORT_OVERLAY, OL_TAG, 0.25f, -1f);
-    public static final OverlayInfo ol_v = new CFGOverlayId(CFG.COLOR_MINE_SUPPORT_VIRTUAL_OVERLAY, OL_TAG, 0.25f, -1f);
-    public static final OverlayInfo ol_d = new CFGOverlayId(CFG.COLOR_MINE_SUPPORT_DAMAGED_OVERLAY, OL_TAG, 0.25f, -1f);
+    public static final OverlayInfo ol_1 = new CFGOverlayId(CFG.COLOR_MINE_SUPPORT_SINGLE_OVERLAY, OL_TAG);
+    public static final OverlayInfo ol_m = new CFGOverlayId(CFG.COLOR_MINE_SUPPORT_OVERLAY, OL_TAG);
+    public static final OverlayInfo ol_v = new CFGOverlayId(CFG.COLOR_MINE_SUPPORT_VIRTUAL_OVERLAY, OL_TAG);
+    public static final OverlayInfo ol_d = new CFGOverlayId(CFG.COLOR_MINE_SUPPORT_DAMAGED_OVERLAY, OL_TAG);
     public static final int GRAN = 25;
     public final Glob glob;
     public final Collection<Radius> current = new HashSet<>();
