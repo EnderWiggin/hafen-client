@@ -1,3 +1,10 @@
+$size[14]{$u{Update for 05.03.26:}
+  * merged loftar's changes
+  * removed "Show mine support radius as overlay" option in favor of loftar's implementation
+  * added option to set hp threshold for mine support to be considered dangerous
+  * added color option for mine support preview
+  * mine support area will be shown when either "Show gob radius" or loftar's mine support toggle is on 
+ 
 $size[14]{$u{Update for 04.03.26:}
   * merged loftar's changes
  
