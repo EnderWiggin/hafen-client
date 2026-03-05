@@ -1,9 +1,4 @@
 {
-  "gfx/terobjs/ladder"    : {
-    "radius": 100,
-    "color": "80808080",
-    "color2": "FF80C0C0"
-  },
   "gfx/terobjs/beehive"    : {
     "radius": 150,
     "color" : "64F2FF84"
