@@ -68,7 +68,6 @@ public class MiniMap extends Widget {
     private Resource biome = null;
     private Tex biometex;
     public boolean big = false;
-    public int scale = 1;
 
     public MiniMap(Coord sz, MapFile file) {
 	super(sz);
@@ -600,6 +599,14 @@ public class MiniMap extends Widget {
 	    return(c.mul(1 << f));
     }
 
+    private Coord rscalec(Coord c) {
+	int f = dlvl - dmag;
+	if(f < 0)
+	    return(c.mul(1 << -f));
+	else
+	    return(c.div(1 << f));
+    }
+
     public Coord st2c(Coord tc) {
 	return(tc.add(sessloc.tc).sub(dloc.tc).div(scalef()).add(sz.div(2)));
     }
@@ -673,7 +680,7 @@ public class MiniMap extends Widget {
 	    for(DisplayMarker mark : dgrid.markers(true, ui)) {
 		if(filter(mark))
 		    continue;
-		mark.draw(g, mark.m.tc.sub(dloc.tc).div(scalef()).add(hsz), scale, ui, file, big);
+		mark.draw(g, mark.m.tc.sub(dloc.tc).div(scalef()).add(hsz), 1 << dmag, ui, file, big);
 	    }
 	}
     }
@@ -783,7 +790,7 @@ public class MiniMap extends Widget {
 	drawmap(g);
 	drawmarkers(g);
 	boolean playerSegment = (sessloc != null) && ((curloc == null) || (sessloc.seg == curloc.seg));
-	if(zoomlevel <= 2 && CFG.MMAP_GRID.get()) {drawgrid(g);}
+	if(dlvl <= 2 && CFG.MMAP_GRID.get()) {drawgrid(g);}
 	if(playerSegment && zoomlevel <= 1 && CFG.MMAP_VIEW.get()) {drawview(g);}
 	if(playerSegment && CFG.MMAP_SHOW_PATH.get()) {drawMovement(g);}
 	if(big && CFG.MMAP_POINTER.get()) {drawPointers(g);}
@@ -845,15 +852,6 @@ public class MiniMap extends Widget {
 	    return(null);
 	Coord hsz = sz.div(2);
 	Coord gc = dloc.tc.add(scalec(sc.sub(hsz))).div(cmaps.mul(1 << dlvl));
-	if(!dgext.contains(gc))
-	    return(null);
-	return(display[dgext.ri(gc)]);
-    }
-
-    public DisplayGrid gridattile(Coord tc) {
-	if((dloc == null) || (dgext == null))
-	    return(null);
-	Coord gc = tc.div(cmaps.mul(1 << dlvl));
 	if(!dgext.contains(gc))
 	    return(null);
 	return(display[dgext.ri(gc)]);
@@ -1145,14 +1143,14 @@ public class MiniMap extends Widget {
     void drawgrid(GOut g) {
 	int zmult = 1 << zoomlevel;
 	Coord offset = sz.div(2).sub(dloc.tc.div(scalef()));
-	Coord zmaps = cmaps.div( (float)zmult).mul(scale);
+	Coord zmaps = rscalec(cmaps);
     
-	double width = UI.scale(1f);
+	double width = 1f;
 	Color col = g.getcolor();
 	g.chcolor(Color.RED);
 	for (int x = dgext.ul.x * zmult; x < dgext.br.x * zmult; x++) {
-	    Coord a = UI.scale(zmaps.mul(x, dgext.ul.y * zmult)).add(offset);
-	    Coord b = UI.scale(zmaps.mul(x, dgext.br.y * zmult)).add(offset);
+	    Coord a = zmaps.mul(x, dgext.ul.y * zmult).add(offset);
+	    Coord b = zmaps.mul(x, dgext.br.y * zmult).add(offset);
 	    if(a.x >= 0 && a.x <= sz.x) {
 		a.y = Utils.clip(a.y, 0, sz.y);
 		b.y = Utils.clip(b.y, 0, sz.y);
@@ -1160,8 +1158,8 @@ public class MiniMap extends Widget {
 	    }
 	}
 	for (int y = dgext.ul.y * zmult; y < dgext.br.y * zmult; y++) {
-	    Coord a = UI.scale(zmaps.mul(dgext.ul.x * zmult, y)).add(offset);
-	    Coord b = UI.scale(zmaps.mul(dgext.br.x * zmult, y)).add(offset);
+	    Coord a = zmaps.mul(dgext.ul.x * zmult, y).add(offset);
+	    Coord b = zmaps.mul(dgext.br.x * zmult, y).add(offset);
 	    if(a.y >= 0 && a.y <= sz.y) {
 		a.x = Utils.clip(a.x, 0, sz.x);
 		b.x = Utils.clip(b.x, 0, sz.x);
@@ -1171,17 +1169,16 @@ public class MiniMap extends Widget {
 	g.chcolor(col);
     }
     
-    public static final Coord VIEW_SZ = UI.scale(MCache.sgridsz.mul(9).div(tilesz.floor()));// view radius is 9x9 "server" grids
+    public static final Coord VIEW_SZ = MCache.sgridsz.mul(9).div(tilesz.floor());// view radius is 9x9 "server" grids
     public static final Color VIEW_BG_COLOR = new Color(255, 255, 255, 60);
     public static final Color VIEW_BORDER_COLOR = new Color(0, 0, 0, 128);
     
     void drawview(GOut g) {
-	int zmult = 1 << zoomlevel;
 	Coord2d sgridsz = new Coord2d(MCache.sgridsz);
 	Gob player = player();
 	if(player != null) {
 	    Coord rc = p2c(player.rc.floor(sgridsz).sub(4, 4).mul(sgridsz));
-	    Coord viewsz = VIEW_SZ.div(zmult).mul(scale);
+	    Coord viewsz = rscalec(VIEW_SZ);
 	    g.chcolor(VIEW_BG_COLOR);
 	    g.frect(rc, viewsz);
 	    g.chcolor(VIEW_BORDER_COLOR);
