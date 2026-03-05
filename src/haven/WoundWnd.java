@@ -68,7 +68,7 @@ public class WoundWnd extends Widget {
 	    this.doc = doc;
 	}
 	public WoundPagina(Owner owner, Resource.Pagina pag) {
-	    this(owner, resdoc(pag.getres(), pag.text));
+	    this(owner, resdoc(pag.getres(), pag.text + WoundTreatment.treatment(pag.getres())));
 	}
 
 	public void layout(Layout l) {
@@ -110,7 +110,7 @@ public class WoundWnd extends Widget {
 		List<ItemInfo> info = ItemInfo.buildinfo(this, rawinfo);
 		Resource.Pagina pag = res.get().layer(Resource.pagina);
 		if(pag != null)
-		    info.add(new WoundPagina(this, pag, WoundTreatment.treatment(res.get())));
+		    info.add(new WoundPagina(this, pag));
 		this.info = info;
 	    }
 	    return(info);

@@ -37,9 +37,6 @@ import java.util.stream.Collectors;
 import haven.MapFile.Segment;
 import haven.MapFile.DataGrid;
 import haven.MapFile.GridInfo;
-import haven.MapFile.Marker;
-import haven.MapFile.PMarker;
-import haven.MapFile.SMarker;
 import haven.MapFile.TileInfo;
 import me.ender.ClientUtils;
 import me.ender.QuestCondition;
@@ -68,7 +65,7 @@ public class MiniMap extends Widget {
     protected Segment dseg;
     protected int dlvl, dmag;
     protected Location dloc;
-    private String biome;
+    private Resource biome = null;
     private Tex biometex;
     public boolean big = false;
     public int scale = 1;
@@ -853,6 +850,15 @@ public class MiniMap extends Widget {
 	return(display[dgext.ri(gc)]);
     }
 
+    public DisplayGrid gridattile(Coord tc) {
+	if((dloc == null) || (dgext == null))
+	    return(null);
+	Coord gc = tc.div(cmaps.mul(1 << dlvl));
+	if(!dgext.contains(gc))
+	    return(null);
+	return(display[dgext.ri(gc)]);
+    }
+
     public DisplayMarker findmarker(Marker rm) {
 	for(DisplayGrid dgrid : display) {
 	    if(dgrid == null)
@@ -1071,7 +1077,6 @@ public class MiniMap extends Widget {
 		oname = mark.tip.text;
 	    }
 	    
-	    DisplayIcon icon = iconat(c);
 	    if(icon != null) {
 		return icon.tooltip();
 	    }
@@ -1232,16 +1237,13 @@ public class MiniMap extends Widget {
     
     private void setBiome(Location loc) {
 	try {
-	    String newbiome = biome;
+	    Resource newbiome = biome;
 	    if(loc == null) {
 		Gob player = player();
 		if(player != null) {
 		    MCache mCache = ui.sess.glob.map;
 		    int tile = mCache.gettile(player.rc.div(tilesz).floor());
-		    Resource res = mCache.tilesetr(tile);
-		    if(res != null) {
-			newbiome = res.name;
-		    }
+		    newbiome = mCache.tilesetr(tile);
 		}
 	    } else {
 		MapFile map = loc.seg.file();
@@ -1250,15 +1252,14 @@ public class MiniMap extends Widget {
 			MapFile.Grid grid = loc.seg.grid(loc.tc.div(cmaps)).get();
 			if(grid != null) {
 			    int tile = grid.gettile(loc.tc.mod(cmaps));
-			    newbiome = grid.tilesets[tile].res.name;
+			    newbiome = grid.tilesets[tile].res.get();
 			}
 		    } finally {
 			map.lock.readLock().unlock();
 		    }
 		}
 	    }
-	    if(newbiome == null) {newbiome = "???";}
-	    if(!newbiome.equals(biome)) {
+	    if(!Objects.equals(newbiome, biome)) {
 		biome = newbiome;
 		biometex = Text.renderstroked(L10N.biome(ClientUtils.prettyResName(biome))).tex();
 	    }
