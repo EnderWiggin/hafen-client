@@ -44,6 +44,8 @@ import haven.render.*;
 import haven.MCache.OverlayInfo;
 import haven.render.sl.Uniform;
 import haven.render.sl.Type;
+import haven.res.gfx.fx.mscover.Global;
+import haven.res.gfx.fx.mscover.ShowCover;
 import haven.res.gfx.fx.msrad.MSRad;
 import haven.rx.Reactor;
 import me.ender.ChatCommands;
@@ -687,10 +689,12 @@ public class MapView extends PView implements DTarget, Console.Directory, Widget
 	disposables.add(CFG.DISPLAY_GOB_HITBOX_TOP.observe(this::updatePlobDrawable));
 	disposables.add(CFG.SHOW_GOB_RADIUS.observe(this::updateSupportOverlay));
 	disposables.add(CFG.COLOR_MINE_SUPPORT_OVERLAY.observe(this::updateSupportOverlayColor));
+	disposables.add(CFG.COLOR_MINE_SUPPORT_DAMAGED_OVERLAY.observe(this::updateSupportOverlayColor));
+	disposables.add(CFG.COLOR_MINE_SUPPORT_VIRTUAL_OVERLAY.observe(this::updateSupportOverlayColor));
 	disposables.add(CFG.COLOR_TILE_GRID.observe(this::updateGridMat));
 	disposables.add(CFG.DISPLAY_FLAVOR.observe(terrain::updateFlavor));
 	disposables.add(CFG.SHOW_MINESWEEPER_OVERLAY.observe(terrain::updateMinesweeper));
-	updateSupportOverlay(null);
+	updateSupportOverlay();
 	updateGridMat(null);
     }
     
@@ -707,18 +711,31 @@ public class MapView extends PView implements DTarget, Console.Directory, Widget
 	    showgrid(true);
 	}
     }
-    
+
     private void updateSupportOverlayColor(CFG<Color> cfg) {
-	Overlay o = ols.remove(MSRad.safeol);
+	Overlay o = ols.remove(Global.ol_1);
+	if(o != null) {o.remove();}
+
+	o = ols.remove(Global.ol_m);
+	if(o != null) {o.remove();}
+
+	o = ols.remove(Global.ol_v);
+	if(o != null) {o.remove();}
+
+	o = ols.remove(Global.ol_d);
 	if(o != null) {o.remove();}
     }
-    
+
     private void updateSupportOverlay(CFG<Boolean> cfg) {
-	boolean show = CFG.SHOW_GOB_RADIUS.get();
-	if(show && !visol(MSRad.OL_TAG)) {
-	    enol(MSRad.OL_TAG);
-	} else if(!show && visol(MSRad.OL_TAG)) {
-	    disol(MSRad.OL_TAG);
+	updateSupportOverlay();
+    }
+    
+    public void updateSupportOverlay() {
+	boolean show = CFG.SHOW_GOB_RADIUS.get() || ShowCover.show;
+	if(show && !visol(Global.OL_TAG)) {
+	    enol(Global.OL_TAG);
+	} else if(!show && visol(Global.OL_TAG)) {
+	    disol(Global.OL_TAG);
 	}
     }
     

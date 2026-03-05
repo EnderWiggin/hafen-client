@@ -23,9 +23,15 @@ public class CustomOptPanels {
 	x = 0;
 	y = START;
 	panel.add(new CFGColorBtn(CFG.COLOR_MINE_SUPPORT_OVERLAY, "Mine support overlay", false), x, y);
+
+	y += STEP;
+	panel.add(new CFGColorBtn(CFG.COLOR_MINE_SUPPORT_VIRTUAL_OVERLAY, "Mine support build preview", true), x, y);
 	
 	y += STEP;
 	panel.add(new CFGColorBtn(CFG.COLOR_MINE_SUPPORT_DAMAGED_OVERLAY, "Damaged mine support overlay", true), x, y);
+
+	y+=STEP;
+	y = addSlider(CFG.MINE_SUPPORT_DANGER_THRESHOLD, 0, 100, "Mine support danger threshold %d%% HP:", "Mine support with less than this HP threshold will be considered dangerous.", panel, x, y, STEP);
 	
 	y += STEP;
 	panel.add(new CFGColorBtn(CFG.COLOR_TILE_GRID, "Tile grid", true), x, y);

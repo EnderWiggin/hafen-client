@@ -13,7 +13,7 @@ import static haven.MCache.*;
 /* >objdelta: Radius */
 @FromResource(name = "gfx/fx/mscover", version = 1)
 public class Info implements OverlayInfo {
-    public static final Collection<String> tags = Collections.singleton("mscover");
+    public static final Collection<String> tags = Collections.singleton(Global.OL_TAG);
     public final Material mat;
 
     public Info(Material mat) {

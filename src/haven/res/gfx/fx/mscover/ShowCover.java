@@ -39,13 +39,9 @@ public class ShowCover extends MenuGrid.PagButton {
 	    pag.scm.getparent(GameUI.class).error("Please update your client to restore mine-support coverage display.");
 	    return;
 	}
-	if(show) {
-	    map.disol("mscover");
-	    show = false;
-	} else {
-	    map.enol("mscover");
-	    show = true;
-	}
+
+	show = !show;
+	map.updateSupportOverlay();
 	pag.scm.ui.msg("Mine-support display is now turned " + (show ? "on" : "off") + ".", null,
 		       Audio.resclip(show ? Toggle.sfxon : Toggle.sfxoff));
     }

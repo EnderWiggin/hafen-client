@@ -269,26 +269,6 @@ public class OCache implements Iterable<Gob> {
 	return(objs.get(id));
     }
 
-    private final List<SquareRadiiOverlay> msols = new LinkedList<>();
-    public boolean dirtyMSOls = true;
-
-    /**Returns list of mine support overlays*/
-    public List<SquareRadiiOverlay> msols() {
-	if(!dirtyMSOls) {return msols;}
-	synchronized (msols) {
-	    dirtyMSOls = false;
-	    msols.clear();
-	    synchronized (this) {
-		for (Gob gob : objs.values()) {
-		    MSRad spr = gob.findsprol(MSRad.class);
-		    if(spr == null) {continue;}
-		    msols.add(spr.overlay);
-		}
-	    }
-	}
-	return msols;
-    }
-
     private java.util.concurrent.atomic.AtomicLong nextvirt = new java.util.concurrent.atomic.AtomicLong(-1);
     public class Virtual extends Gob {
 	public Virtual(Coord2d c, double a) {

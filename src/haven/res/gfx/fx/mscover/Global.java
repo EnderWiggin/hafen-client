@@ -5,18 +5,23 @@ package haven.res.gfx.fx.mscover;
 
 import haven.*;
 import haven.render.*;
+
+import java.awt.*;
 import java.util.*;
 import haven.res.ui.pag.toggle.*;
 import haven.MenuGrid.Pagina;
+import me.ender.CFGOverlayId;
+
 import static haven.MCache.*;
 
 /* >objdelta: Radius */
-@FromResource(name = "gfx/fx/mscover", version = 1)
+@haven.FromResource(name = "gfx/fx/mscover", version = 1)
 public class Global implements LocalOverlay {
-    public static final OverlayInfo ol_1 = new Info(new Material(new BaseColor( 64, 255, 128, 16), States.maskdepth));
-    public static final OverlayInfo ol_m = new Info(new Material(new BaseColor( 64, 255, 128, 32), States.maskdepth));
-    public static final OverlayInfo ol_v = new Info(new Material(new BaseColor(255, 255,   0, 32), States.maskdepth));
-    public static final OverlayInfo ol_d = new Info(new Material(new BaseColor(255,  64,  64, 32), States.maskdepth));
+    public static final String OL_TAG = "mscover";
+    public static final OverlayInfo ol_1 = new CFGOverlayId(CFG.COLOR_MINE_SUPPORT_OVERLAY, OL_TAG, 0.10f, -1f);
+    public static final OverlayInfo ol_m = new CFGOverlayId(CFG.COLOR_MINE_SUPPORT_OVERLAY, OL_TAG, 0.25f, -1f);
+    public static final OverlayInfo ol_v = new CFGOverlayId(CFG.COLOR_MINE_SUPPORT_VIRTUAL_OVERLAY, OL_TAG, 0.25f, -1f);
+    public static final OverlayInfo ol_d = new CFGOverlayId(CFG.COLOR_MINE_SUPPORT_DAMAGED_OVERLAY, OL_TAG, 0.25f, -1f);
     public static final int GRAN = 25;
     public final Glob glob;
     public final Collection<Radius> current = new HashSet<>();
@@ -24,9 +29,11 @@ public class Global implements LocalOverlay {
     public Data dat = null;
     public boolean update = false;
     private boolean hasvirt = false;
+    public float healthThreshold = CFG.MINE_SUPPORT_DANGER_THRESHOLD.get() / 100.0f;
 
     public Global(Glob glob) {
 	this.glob = glob;
+	CFG.MINE_SUPPORT_DANGER_THRESHOLD.observe(cfg -> healthThreshold = cfg.get() / 100.0f);
     }
 
     public abstract class Overlay implements LocalOverlay {
@@ -114,7 +121,7 @@ public class Global implements LocalOverlay {
 	     * GAttrib.dispose were called properly */
 	    for(Radius rad : current) {
 		if(rad.gob.removed) {
-		    rad.remove();
+		    rad.removed = true;
 		    update = true;
 		}
 	    }
@@ -128,7 +135,7 @@ public class Global implements LocalOverlay {
 		    if(cc == Coord2d.z)
 			continue;
 		    Area oa = Area.corn(cc.sub(rad.r, rad.r).floor(tilesz),
-					cc.add(rad.r, rad.r).ceil(tilesz));
+			cc.add(rad.r, rad.r).ceil(tilesz));
 		    aa = (aa == null) ? oa : aa.include(oa);
 		}
 		if(aa == null) {

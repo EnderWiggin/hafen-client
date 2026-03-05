@@ -5,11 +5,13 @@ package haven.res.gfx.fx.mscover;
 
 import haven.*;
 import haven.render.*;
-
-import haven.res.gfx.fx.msrad.MSRad;
+import java.util.*;
+import haven.res.ui.pag.toggle.*;
+import haven.MenuGrid.Pagina;
+import static haven.MCache.*;
 
 /* >objdelta: Radius */
-@FromResource(name = "gfx/fx/mscover", version = 1)
+@haven.FromResource(name = "gfx/fx/mscover", version = 1)
 public class Radius extends GAttrib {
     public static final double ε = 0.01 * 11;
     public final Global gl;
@@ -18,8 +20,6 @@ public class Radius extends GAttrib {
     public Coord2d cc;
     public int cfl = 0, chseq = 1, useq = 0;
     public boolean removed = false;
-    private double timer = MSRad.TICK_RATE;
-    private final SquareRadiiOverlay overlay;
 
     public Radius(Gob owner, double r, boolean real) {
 	super(owner);
@@ -27,37 +27,21 @@ public class Radius extends GAttrib {
 	this.real = real;
 	this.gl = Global.get(gob.glob);
 	gl.add(this);
-	overlay = real
-	    ? new SquareRadiiOverlay(owner, (float) r, MSRad.safeol, MSRad.dangerol)
-	    : new SquareRadiiOverlay(owner, (float) r, MSRad.buildol);
-	overlay.add();
     }
 
     public int fl() {
 	GobHealth h = gob.getattr(GobHealth.class);
-	return((real ? 0 : 1) | (((h != null) && (h.hp < 0.9)) ? 2 : 0));
+	return ((real ? 0 : 1) | (((h != null) && (h.hp < gl.healthThreshold)) ? 2 : 0));
     }
 
     public void dispose() {
 	super.dispose();
 	removed = true;
     }
-    
-    public void remove() {
-	removed = true;
-	overlay.rem();
-    }
 
     public void ctick(double dt) {
-	timer -= dt;
-	if(timer <= 0) {
-	    timer = MSRad.TICK_RATE;
-	    overlay.checkHP();
-	}
-	if(!Utils.eq(gob.rc, cc) || (fl() != cfl)) {
+	if(!Utils.eq(gob.rc, cc) || (fl() != cfl))
 	    gl.update = true;
-	    overlay.update();
-	}
     }
 
     public static void parse(Gob gob, Message dat) {
