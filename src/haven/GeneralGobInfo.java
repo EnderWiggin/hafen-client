@@ -174,9 +174,14 @@ public class GeneralGobInfo extends GobInfo {
     
     private BufferedImage quality() {
 	if(GobInfoOpts.disabled(InfoPart.QUALITY)) {return null;}
+	Text text;
 	if(q != 0) {
-	    String text = String.format("$img[gfx/hud/gob/quality,c]%s", RichText.color(String.valueOf(q), Q_COL));
-	    return Utils.outline2(RichText.stdf.render(text).img, Color.BLACK);
+	    try {
+		text = RichText.stdf.render(String.format("$img[gfx/hud/gob/quality,c]%s", RichText.color(String.valueOf(q), Q_COL)));
+	    } catch (Loading ignore) {
+		text = Text.renderf(Color.WHITE, String.valueOf(q));
+	    }
+	    return Utils.outline2(text.img, Color.BLACK);
 	}
 	return null;
     }

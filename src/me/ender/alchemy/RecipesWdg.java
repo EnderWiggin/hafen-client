@@ -2,6 +2,7 @@ package me.ender.alchemy;
 
 import haven.*;
 
+import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -69,12 +70,16 @@ class RecipesWdg extends AlchemyWdg {
 	    super.draw(g, strict);
 	}
 
-	private RichText text(Elixir elixir) {
+	private Text text(Elixir elixir) {
 	    String name = elixir.name();
 	    RichText text = names.getOrDefault(name, null);
 	    if(text != null) {return text;}
 
-	    text = RichText.render(String.format("$img[%s,h=16,c] %s", elixir.recipe.res, name), CONTENT_W);
+	    try {
+		text= RichText.render(String.format("$img[%s,h=16,c] %s", elixir.recipe.res, name), CONTENT_W);
+	    } catch (Loading e) {
+		return Text.renderf(Color.WHITE, name);
+	    }
 	    names.put(name, text);
 	    return text;
 	}
