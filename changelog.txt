@@ -1,3 +1,10 @@
+$size[14]{$u{Update for 05.03.26 (part 2):}
+  * fixed minimap grid
+  * fixed view box on minimap
+  * fixed some loading crashes
+  * allow customizing the overlay color of the single mine support
+  * allow customizing alpha of the mine support overlays
+ 
 $size[14]{$u{Update for 05.03.26:}
   * merged loftar's changes
   * removed "Show mine support radius as overlay" option in favor of loftar's implementation
