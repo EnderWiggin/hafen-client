@@ -1,3 +1,6 @@
+$size[14]{$u{Update for 06.03.26:}
+  * fixed beehive and troughs not showing their radius
+ 
 $size[14]{$u{Update for 05.03.26 (part 2):}
   * fixed minimap grid
   * fixed view box on minimap
