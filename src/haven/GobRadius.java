@@ -3,6 +3,7 @@ package haven;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import haven.res.gfx.fx.msrad.MSRad;
 import me.ender.ClientUtils;
 
 import java.awt.*;
@@ -20,6 +21,8 @@ public class GobRadius {
     
     static {
 	gobRadiusCfg = parseJson(Config.loadFile(GOB_RADIUS_JSON));
+	showDefaultRadii(CFG.SHOW_GOB_RADIUS.get());
+	CFG.SHOW_GOB_RADIUS.observe(GobRadius::showDefaultRadii);
     }
     
     private static Map<String, GobRadius> parseJson(String json) {
@@ -43,6 +46,14 @@ public class GobRadius {
 
     public static GobRadius get(String resname) {
 	return gobRadiusCfg.get(resname);
+    }
+
+    public static void showDefaultRadii(CFG<Boolean> show) {
+	showDefaultRadii(show.get());
+    }
+
+    public static void showDefaultRadii(boolean show) {
+	MSRad.show(show);
     }
     
     private static Gson getGson() {
