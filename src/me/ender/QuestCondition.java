@@ -1,7 +1,7 @@
 package me.ender;
 
 import haven.*;
-import me.ender.minimap.SMarker;
+import haven.MapFile.SMarker;
 
 import java.awt.*;
 import java.util.Objects;

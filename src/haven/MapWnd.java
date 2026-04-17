@@ -34,6 +34,8 @@ import java.nio.channels.*;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.image.*;
+
+import haven.MapFile.*;
 import haven.MiniMap.*;
 import haven.MiniMap.Location;
 import haven.BuddyWnd.GroupSelector;
@@ -1277,8 +1279,9 @@ public class MapWnd extends WindowX implements Console.Directory {
     public Coord2d findMarkerPosition(String name) {
 	Location sessloc = view.sessloc;
 	if(sessloc == null || name == null) {return null;}
-	for (Map.Entry<Long, SMarker> e : file.smarkers.entrySet()) {
-	    SMarker m = e.getValue();
+	for (Marker e : file.markers) {
+	    if(!(e instanceof SMarker)) {continue;}
+	    SMarker m = (SMarker) e;
 	    if(m.seg == sessloc.seg.id && m.nm.contains(name)) {
 		return m.tc.sub(sessloc.tc).mul(tilesz);
 	    }
@@ -1287,8 +1290,9 @@ public class MapWnd extends WindowX implements Console.Directory {
     }
     
     public SMarker findMarker(String name) {
-	for (Map.Entry<Long, SMarker> e : file.smarkers.entrySet()) {
-	    SMarker m = e.getValue();
+	for (Marker e : file.markers) {
+	    if(!(e instanceof SMarker)) {continue;}
+	    SMarker m = (SMarker) e;
 	    if(Objects.equals(m.nm, name)) {
 		return m;
 	    }

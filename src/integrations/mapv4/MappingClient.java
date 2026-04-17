@@ -2,7 +2,7 @@ package integrations.mapv4;
 
 import haven.*;
 import haven.MCache.LoadingMap;
-import me.ender.minimap.*;
+import haven.MapFile.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 

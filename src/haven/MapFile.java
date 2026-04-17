@@ -36,6 +36,7 @@ import java.awt.image.WritableRaster;
 import haven.render.*;
 import haven.Defer.Future;
 import me.ender.IDPool;
+import me.ender.QuestCondition;
 import me.ender.minimap.*;
 
 import static haven.MCache.cmaps;
@@ -271,39 +272,107 @@ public class MapFile {
 	}
     }
 
-    public abstract static class MarkerOld {
+    public abstract static class Marker {
 	public long seg;
 	public Coord tc;
 	public String nm;
 
-	public MarkerOld(long seg, Coord tc, String nm) {
+	public Marker(long seg, Coord tc, String nm) {
 	    this.seg = seg;
 	    this.tc = tc;
 	    this.nm = nm;
 	}
+
+	@Override
+	public boolean equals(Object o) {
+	    if(this == o) return true;
+	    if(o == null || getClass() != o.getClass()) return false;
+	    Marker marker = (Marker) o;
+	    return seg == marker.seg && tc.equals(marker.tc) && nm.equals(marker.nm);
+	}
+
+	@Override
+	public int hashCode() {
+	    return Objects.hash(seg, tc, nm);
+	}
+
+	private static final Map<String, Tex> ntex_cache = new HashMap<>();
+	private static Tex ntex(String nm) {
+	    return ntex_cache.computeIfAbsent(nm, s -> Text.renderstroked(nm, Color.WHITE, Color.BLACK).tex());
+	}
+
+	public void tryDrawName(GOut g, Coord cc) {
+	    if(nm != null && CFG.MMAP_SHOW_MARKER_NAMES.get()) {
+		g.aimage(ntex(nm), cc.addy(UI.scale(5)), 0.5, 0);
+	    }
+	}
+
+	public void drawBackground(GOut g, Coord cc, GobIcon.Icon icon) {
+	    tryDrawQuestState(g, cc, icon);
+	}
+
+	private void tryDrawQuestState(GOut g, Coord cc, GobIcon.Icon icon) {
+	    if(!CFG.QUESTHELPER_HIGHLIGHT_QUESTGIVERS.get() || !(this instanceof SMarker)) {return;}
+	    SMarker sm = (SMarker) this;
+	    if(sm.questConditions.isEmpty()) {return;}
+	    try {
+		QuestCondition item = sm.questConditions.get(sm.questConditions.size() - 1);
+		Coord ssz = Utils.imgsz(icon.image());
+		g.chcolor(item.questGiverMarkerColor());
+		g.fellipse(cc, ssz.div(2).sub(1, 1));
+		g.chcolor();
+	    } catch (Exception ignore) {}
+	}
     }
 
-    public static class PMarkerOld extends MarkerOld {
+    public static class PMarker extends Marker {
 	public Color color;
 	public boolean onmap;
 
-	public PMarkerOld(long seg, Coord tc, String nm, Color color, boolean onmap) {
+	public PMarker(long seg, Coord tc, String nm, Color color, boolean onmap) {
 	    super(seg, tc, nm);
 	    this.color = color;
 	    this.onmap = onmap;
 	}
+
+	@Override
+	public boolean equals(Object o) {
+	    if(this == o) return true;
+	    if(o == null || getClass() != o.getClass()) return false;
+	    if(!super.equals(o)) return false;
+	    PMarker pMarker = (PMarker) o;
+	    return color.equals(pMarker.color);
+	}
     }
 
-    public static class SMarkerOld extends MarkerOld {
+    public static class SMarker extends Marker {
 	public UID oid;
 	public Resource.Saved res;
 	public byte[] data;
 
-	public SMarkerOld(long seg, Coord tc, String nm, UID oid, Resource.Saved res, byte[] data) {
+	public final List<QuestCondition> questConditions = new ArrayList<>();
+	public final Iterator<QuestCondition> questIterator;
+
+	public SMarker(long seg, Coord tc, String nm, UID oid, Resource.Saved res, byte[] data) {
 	    super(seg, tc, nm);
 	    this.oid = oid;
 	    this.res = res;
 	    this.data = data;
+	    questIterator = Utils.circularIterator(questConditions);
+	}
+
+	@Override
+	public boolean equals(Object o) {
+	    if(this == o) return true;
+	    if(o == null || getClass() != o.getClass()) return false;
+	    if(!super.equals(o)) return false;
+	    SMarker sMarker = (SMarker) o;
+	    return Objects.equals(oid, sMarker.oid) && res.equals(sMarker.res);
+	}
+
+	@Override
+	public int hashCode() {
+	    return Objects.hash(super.hashCode(), oid, res);
 	}
     }
 

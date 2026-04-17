@@ -3,6 +3,7 @@ package me.ender.minimap;
 import haven.*;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 import java.util.Map;
 import java.util.Objects;
@@ -11,7 +12,7 @@ import java.util.WeakHashMap;
 import static haven.MapWnd.MarkerType.*;
 
 // Simple custom icons that are a combo of PMarker (color) and SMarker (Custom res)
-public class CustomMarker extends Marker {
+public class CustomMarker extends MapFile.Marker {
     private static final Map<String, Image> cache = new WeakHashMap<>();
     
     public Color color;
@@ -40,33 +41,38 @@ public class CustomMarker extends Marker {
 	CustomMarker that = (CustomMarker) o;
 	return color.equals(that.color) && res.equals(that.res);
     }
+
     
-    @Override
-    public void draw(GOut g, Coord c, Text tip, final float scale, final MapFile file) {
-	final Image img = image(res, color);
-	if(img != null && img.tex != null) {
-	    final Coord ul = c.sub(img.cc);
-	    g.image(img.tex, ul);
-	    if(tip != null && CFG.MMAP_SHOW_MARKER_NAMES.get()) {
-		g.aimage(tip.tex(), c.addy(UI.scale(5)), 0.5, 0);
-	    }
-	}
+    
+    public GobIcon.Icon icon(OwnerContext owner) {
+	return new CustomIcon(owner, res.get(), nm, color);
     }
     
-    @Override
-    public Area area() {
-	final Image img = image(res, Color.WHITE);
-	if(img == null) {return null;}
-	Coord sz = img.tex.sz();
-	return Area.sized(sz.div(2).inv(), sz);
-    }
-    
+//    @Override
+//    public Area area() {
+//	final Image img = image(res, Color.WHITE);
+//	if(img == null) {return null;}
+//	Coord sz = img.tex.sz();
+//	return Area.sized(sz.div(2).inv(), sz);
+//    }
+
     public static Image image(Resource.Spec spec, Color col) {
 	String cacheId = String.format("%s:c[%d]", spec.name, col.getRGB());
 	Image image = cache.get(cacheId);
 	if(image == null) {
 	    try {
-		image = new Image(spec.loadsaved(), col);
+		image = image(spec.get(), col);
+	    } catch (Loading ignored) {}
+	}
+	return image;
+    }
+
+    public static Image image(Resource res, Color col) {
+	String cacheId = String.format("%s:c[%d]", res.name, col.getRGB());
+	Image image = cache.get(cacheId);
+	if(image == null) {
+	    try {
+		image = new Image(res, col);
 		cache.put(cacheId, image);
 	    } catch (Loading ignored) {}
 	}
@@ -84,10 +90,50 @@ public class CustomMarker extends Marker {
 	    && a.res.name.equals(b.res.name);
     }
     
+    public static class CustomIcon extends GobIcon.Icon {
+	private final String name;
+	private final Color color;
+
+	private CustomIcon(OwnerContext owner, Resource res, String name, Color color) {
+	    super(owner, res);
+	    this.name = name;
+	    this.color = color;
+	}
+
+	@Override
+	public String name() {
+	    return name;
+	}
+
+	@Override
+	public BufferedImage image() {
+	    return CustomMarker.image(res, color).img;
+	}
+
+	@Override
+	public void draw(GOut g, Coord cc) {
+	    final Image img = CustomMarker.image(res, color);
+	    final Coord ul = cc.sub(img.cc);
+	    g.image(img.tex, ul);
+	}
+
+	@Override
+	public boolean checkhit(Coord c) {
+	    Image img = CustomMarker.image(res, color);
+	    Coord oc = c.add(img.cc);
+	    if(!oc.isect(Coord.z, PUtils.imgsz(img.img)))
+		return(false);
+	    if(img.img.getRaster().getNumBands() < 4)
+		return(true);
+	    return(img.img.getRaster().getSample(oc.x, oc.y, 3) >= 128);
+	}
+    }
+    
     public static class Image {
 	public final Tex tex;
 	public final Coord cc;
-	
+	public final BufferedImage img;
+
 	public Image(Resource res, Color col) {
 	    Resource.Image bg = res.layer(Resource.imgc, 0);
 	    Resource.Image fg = res.layer(Resource.imgc, 1);
@@ -109,8 +155,9 @@ public class CustomMarker extends Marker {
 	    if(fg != null) {
 		PUtils.alphablit(buf, PUtils.coercergba(fg.img).getRaster(), fg.o);
 	    }
-	    
-	    this.tex = new TexI(PUtils.uiscale(PUtils.rasterimg(buf), new Coord(iconsz, iconsz)));
+
+	    this.img = PUtils.uiscale(PUtils.rasterimg(buf), new Coord(iconsz, iconsz));
+	    this.tex = new TexI(img);
 	    this.cc = tex.sz().div(2);
 	}
     }

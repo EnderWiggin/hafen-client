@@ -26,6 +26,7 @@
 
 package haven;
 
+import haven.MapFile.*;
 import haven.render.*;
 import java.util.*;
 import java.util.List;
@@ -35,10 +36,6 @@ import java.awt.image.*;
 import java.awt.Color;
 import java.util.stream.Collectors;
 
-import haven.MapFile.Segment;
-import haven.MapFile.DataGrid;
-import haven.MapFile.GridInfo;
-import haven.MapFile.TileInfo;
 import me.ender.ClientUtils;
 import me.ender.QuestCondition;
 import me.ender.gob.KinInfo;
@@ -436,7 +433,9 @@ public class MiniMap extends Widget {
 	public GobIcon.Icon icon() {
 	    if(icon == null) {
 		if(m instanceof PMarker) {
-		    icon = new Flag(this, ((PMarker)m).color, m.nm);
+		    icon = new Flag(this, ((PMarker) m).color, m.nm);
+		} else if(m instanceof CustomMarker) {
+		    icon = ((CustomMarker) m).icon(this);
 		} else {
 		    SMarker sm = (SMarker)m;
 		    Resource res = sm.res.get();
@@ -448,7 +447,10 @@ public class MiniMap extends Widget {
 
 	public void draw(GOut g, Coord c) {
 	    try {
-		icon().draw(g, c);
+		GobIcon.Icon icn = icon();
+		m.drawBackground(g, c, icn);
+		icn.draw(g, c);
+		m.tryDrawName(g, c);
 	    } catch(Loading l) {}
 	}
 
@@ -461,6 +463,7 @@ public class MiniMap extends Widget {
 	    if(info == null) {
 		Object[] raw = icon().info(this);
 		info = ItemInfo.buildinfo(this, raw);
+		addQuestTips();
 	    }
 	    return(info);
 	}
@@ -473,19 +476,11 @@ public class MiniMap extends Widget {
 	    return(tooltip);
 	}
 
-	//OLD CODE - rework to new approach
-	private void checkTip(final String nm) {
-	    if (CFG.QUESTHELPER_SHOW_TASKS_IN_TOOLTIP.get() && m instanceof SMarker) {
-		StringBuilder sb = new StringBuilder(nm);
-		if (!((SMarker) m).questConditions.isEmpty())
-		    sb.append("\n");
-		for (QuestCondition questCondition : ((SMarker)m).questConditions) {
-		    sb.append("\n");
-		    sb.append(questCondition.name());
-		}
-		tip = RichText.render(sb.toString(), 300);
-	    } else if (tip == null || !tip.text.equals(nm))
-		tip = Text.renderstroked(nm, Color.WHITE, Color.BLACK);
+	private void addQuestTips() {
+	    if(!CFG.QUESTHELPER_SHOW_TASKS_IN_TOOLTIP.get() || !(m instanceof SMarker)) {return;}
+	    for (QuestCondition questCondition : ((SMarker) m).questConditions) {
+		info.add(new ItemInfo.AdHoc(this, questCondition.name()));
+	    }
 	}
     }
 
@@ -610,7 +605,7 @@ public class MiniMap extends Widget {
 
 	private Collection<DisplayMarker> markers = Collections.emptyList();
 	private int markerseq = -1;
-	public Collection<DisplayMarker> markers(boolean remark, final UI ui) {
+	public Collection<DisplayMarker> markers(boolean remark) {
 	    if(remark && (markerseq != file.markerseq)) {
 		if(file.lock.readLock().tryLock()) {
 		    try {
@@ -709,10 +704,10 @@ public class MiniMap extends Widget {
 	    DisplayGrid dgrid = display[dgext.ri(c)];
 	    if(dgrid == null)
 		continue;
-	    for(DisplayMarker mark : dgrid.markers(true, ui)) {
+	    for(DisplayMarker mark : dgrid.markers(true)) {
 		if(filter(mark))
 		    continue;
-		mark.draw(g, l2dscale(mark.m.tc).sub(l2dscale(dloc.tc)).add(hsz), dmag, ui, file, big);
+		mark.draw(g, l2dscale(mark.m.tc).sub(l2dscale(dloc.tc)).add(hsz));
 	    }
 	}
     }
@@ -894,7 +889,7 @@ public class MiniMap extends Widget {
 	for(DisplayGrid dgrid : display) {
 	    if(dgrid == null)
 		continue;
-	    for(DisplayMarker mark : dgrid.markers(false, ui)) {
+	    for(DisplayMarker mark : dgrid.markers(false)) {
 		if(mark.m == rm)
 		    return(mark);
 	    }

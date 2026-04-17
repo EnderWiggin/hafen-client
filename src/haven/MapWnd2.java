@@ -1,6 +1,7 @@
 package haven;
 
 
+import haven.MapFile.*;
 import me.ender.minimap.*;
 
 import java.awt.*;
@@ -202,16 +203,6 @@ public class MapWnd2 extends MapWnd {
 		return gob.is(GobTag.VEHICLE) && gob.rc.dist(player.rc) < 25;
 	    }
 	    return false;
-	}
-
-	@Override
-	public void draw(GOut g, Coord c, Text tip, float scale, MapFile file) {
-
-	}
-
-	@Override
-	public Area area() {
-	    return null;
 	}
 
 	@Override

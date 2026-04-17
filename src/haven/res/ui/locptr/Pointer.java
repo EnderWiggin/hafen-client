@@ -2,11 +2,9 @@
 package haven.res.ui.locptr;
 
 import haven.*;
+import haven.MapFile.*;
 import haven.render.*;
 import me.ender.ClientUtils;
-import me.ender.minimap.Marker;
-import me.ender.minimap.PMarker;
-import me.ender.minimap.SMarker;
 
 import java.awt.Color;
 import java.util.Objects;
@@ -51,9 +49,9 @@ public class Pointer extends Widget implements MiniMap.IPointer, DTarget {
 	this.marker = marker;
 	tip = marker.nm;
 	if(marker instanceof PMarker) {
-	    col = new BaseColor(((PMarker) marker).color);
+	    col = new BaseColor(((MapFile.PMarker) marker).color);
 	} else if(marker instanceof SMarker) {
-	    Resource.Saved spec = ((SMarker) marker).res;
+	    Resource.Saved spec = ((MapFile.SMarker) marker).res;
 	    icon = new Resource.Spec(spec.pool, spec.name, -1);
 	    col = colors[0];
 	} else if(marker instanceof MapWnd2.GobMarker) {
