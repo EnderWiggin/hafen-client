@@ -85,6 +85,7 @@ public class GobIcon extends GAttrib {
 	public abstract BufferedImage image();
 	public abstract void draw(GOut g, Coord cc);
 	public abstract boolean checkhit(Coord c);
+	public Object[] info(ItemInfo.Owner owner) {return(new Object[] {new Object[] {new ItemInfo.Name.Default()}});}
 	public Object[] id() {return(nilid);}
 	public int z() {return(0);}
 	public Markable markable() {return(Markable.UNMARKABLE);}
@@ -109,7 +110,7 @@ public class GobIcon extends GAttrib {
 	    Resource.Image rimg = res.layer(Resource.imgc);
 	    BufferedImage img = rimg.scaled();
 	    Tex tex = rimg.tex();
-	    if ((tex.sz().x > size) || (tex.sz().y > size)) {
+	    if(((tex.sz().x > size) || (tex.sz().y > size)) && !Utils.bv(rimg.info.getOrDefault("mm/noscale", 0))) {
 		BufferedImage buf = rimg.img;
 		buf = PUtils.rasterimg(PUtils.blurmask2(buf.getRaster(), 1, 1, Color.BLACK));
 		Coord tsz;
