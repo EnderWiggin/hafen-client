@@ -18,6 +18,7 @@
   ],
   "paginae/wound/bladekiss": [
     "gfx/invobjs/gauze",
+    "gfx/invobjs/silksuture",
     "gfx/invobjs/toadbutter"
   ],
   "paginae/wound/blunttrauma": [
@@ -42,11 +43,14 @@
     "gfx/invobjs/opium"
   ],
   "paginae/wound/crabcaressed": [
-    "gfx/invobjs/antpaste"
+    "gfx/invobjs/antpaste",
+    "gfx/invobjs/silksuture"
   ],
   "paginae/wound/cruelincision": [
     "gfx/invobjs/gauze",
+    "gfx/invobjs/jar-woundglue",
     "gfx/invobjs/rootfill",
+    "gfx/invobjs/silksuture",
     "gfx/invobjs/stitchpatch"
   ],
   "paginae/wound/deepcut": [
@@ -55,10 +59,16 @@
     "gfx/invobjs/herbs/waybroad",
     "gfx/invobjs/honeybroadaid",
     "gfx/invobjs/rootfill",
+    "gfx/invobjs/silksuture",
     "gfx/invobjs/stingingpoultice"
   ],
+  "paginae/wound/deepworm": [
+    "gfx/invobjs/jar-tansy"
+  ],
   "paginae/wound/fellslash": [
-    "gfx/invobjs/gauze"
+    "gfx/invobjs/gauze",
+    "gfx/invobjs/jar-woundglue",
+    "gfx/invobjs/silksuture"
   ],
   "paginae/wound/infectedsore": [
     "gfx/invobjs/antpaste",
@@ -76,8 +86,13 @@
     "gfx/invobjs/herbs/yarrow"
   ],
   "paginae/wound/nastylaceration": [
+    "gfx/invobjs/jar-woundglue",
     "gfx/invobjs/stitchpatch",
+    "gfx/invobjs/silksuture",
     "gfx/invobjs/toadbutter"
+  ],
+  "paginae/wound/nervdmg": [
+    "gfx/invobjs/ancientroot"
   ],
   "paginae/wound/nicksnknacks": [
     "gfx/invobjs/herbs/yarrow",
@@ -120,6 +135,9 @@
     "gfx/invobjs/coldcut",
     "gfx/invobjs/leech",
     "gfx/invobjs/stingingpoultice"
+  ],
+  "paginae/wound/toadwart": [
+    "gfx/invobjs/ancientroot"
   ],
   "paginae/wound/unfaced": [
     "gfx/invobjs/kelpcream",
