@@ -1,3 +1,7 @@
+$size[14]{$u{Update for 17.04.26:}
+   * merged loftar's changes
+   * updated wound treatments
+ 
 $size[14]{$u{Update for 03.04.26:}
    * merged loftar's changes
  
