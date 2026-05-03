@@ -2074,7 +2074,7 @@ public class MapFile {
 	}
 
 	void importcmark(Message data) {
-	    Marker mark = loadcmarker(data);
+	    Marker mark = loadcmarker(MapFile.this, data);
 	    ImportedSegment seg = segs.get(mark.seg);
 	    if((seg == null) || (seg.noff == null))
 		return;

@@ -66,7 +66,7 @@ public class AutoMarkers {
 	    if(ver == 1) {
 		file.markerids = new IDPool(data);
 		for (int i = 0, no = data.int32(); i < no; i++) {
-		    Marker mark = loadcmarker(data);
+		    Marker mark = loadcmarker(file, data);
 		    file.markers.add(mark);
 		}
 	    } else {
@@ -94,7 +94,7 @@ public class AutoMarkers {
 	}
     }
     
-    public static Marker loadcmarker(Message fp) {
+    public static Marker loadcmarker(MapFile file, Message fp) {
 	int ver = fp.uint8();
 	long seg = fp.int64();
 	Coord tc = fp.coord();
@@ -105,7 +105,7 @@ public class AutoMarkers {
 	    if(fp.uint8() == 1) {
 		Color c = fp.color();
 		Resource.Spec r = new Resource.Spec(Resource.remote(), fp.string(), fp.int16());
-		return new CustomMarker(seg, tc, nm, c, r);
+		return new CustomMarker(file, seg, tc, nm, c, r);
 	    } else {
 		throw (new Message.FormatError("Unknown custom marker version: " + ver));
 	    }

@@ -18,9 +18,9 @@ public class CustomMarker extends MapFile.Marker {
     public Color color;
     public final Resource.Spec res;
     
-    public CustomMarker(final long seq, final Coord tc, final String nm,
+    public CustomMarker(MapFile file,  long seq, final Coord tc, final String nm,
 			final Color color, final Resource.Spec res) {
-	super(seq, tc, nm);
+	super(file, seq, tc, nm);
 	this.color = color;
 	this.res = res;
     }

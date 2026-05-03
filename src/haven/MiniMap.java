@@ -206,6 +206,8 @@ public class MiniMap extends Widget {
 	private GobIcon.Icon create() {
 	    if(m instanceof PMarker) {
 		return(new Flag(this, ((PMarker)m).color, m.nm));
+	    } else if(m instanceof CustomMarker) {
+		return  ((CustomMarker) m).icon(this);
 	    } else {
 		SMarker sm = (SMarker)m;
 		Resource res = sm.res.get();
@@ -267,8 +269,16 @@ public class MiniMap extends Widget {
 	    if(info == null) {
 		Object[] raw = icon().info(this);
 		info = ItemInfo.buildinfo(this, raw);
+		addQuestTips();
 	    }
 	    return(info);
+	}
+
+	private void addQuestTips() {
+	    if(!CFG.QUESTHELPER_SHOW_TASKS_IN_TOOLTIP.get() || !(m instanceof SMarker)) {return;}
+	    for (QuestCondition questCondition : ((SMarker) m).questConditions) {
+		info.add(new ItemInfo.AdHoc(this, questCondition.name()));
+	    }
 	}
     }
 
@@ -605,13 +615,6 @@ public class MiniMap extends Widget {
 		tseq = minf.iseq;
 	    }
 	    return(tooltip);
-	}
-
-	private void addQuestTips() {
-	    if(!CFG.QUESTHELPER_SHOW_TASKS_IN_TOOLTIP.get() || !(m instanceof SMarker)) {return;}
-	    for (QuestCondition questCondition : ((SMarker) m).questConditions) {
-		info.add(new ItemInfo.AdHoc(this, questCondition.name()));
-	    }
 	}
     }
 
