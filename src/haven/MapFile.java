@@ -50,7 +50,7 @@ public class MapFile {
     public final String filename;
     public final Collection<Long> knownsegs = new HashSet<>();
     public final Collection<Marker> markers = new ArrayList<>();
-    public int markerseq = 0;
+    public volatile int markerseq = 0;
     public IDPool markerids = new IDPool(0, Long.MAX_VALUE);
     public final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
     private final Random rnd = new Random();
@@ -107,7 +107,7 @@ public class MapFile {
 		for(int i = 0, no = data.int32(); i < no; i++)
 		    file.knownsegs.add(data.int64());
 		for(int i = 0, no = data.int32(); i < no; i++) {
-		    Marker mark = loadmarker(data);
+		    Marker mark = file.loadmarker(data);
 		    file.markers.add(mark);
 		}
 	    } else {
@@ -203,6 +203,17 @@ public class MapFile {
 	    });
     }
 
+    private static <A> Defer.Callable<A> locked(Defer.Callable<A> f, Lock lock) {
+	return(() -> {
+		lock.lock();
+		try {
+		    return(f.call());
+		} finally {
+		    lock.unlock();
+		}
+	    });
+    }
+
     private static <A, R> Function<A, R> locked(Function<A, R> f, Lock lock) {
 	return(v -> {
 		lock.lock();
@@ -273,14 +284,26 @@ public class MapFile {
     }
 
     public abstract static class Marker {
+	public final MapFile file;
 	public long seg;
 	public Coord tc;
 	public String nm;
+	public volatile int seq = 0;
 
-	public Marker(long seg, Coord tc, String nm) {
+	public Marker(MapFile file, long seg, Coord tc, String nm) {
+	    this.file = file;
 	    this.seg = seg;
 	    this.tc = tc;
 	    this.nm = nm;
+	}
+
+	public void update(boolean save) {
+	    if(save) {
+		file.update(this);
+	    } else {
+		seq++;
+		file.markerseq++;
+	    }
 	}
 
 	@Override
@@ -329,8 +352,8 @@ public class MapFile {
 	public Color color;
 	public boolean onmap;
 
-	public PMarker(long seg, Coord tc, String nm, Color color, boolean onmap) {
-	    super(seg, tc, nm);
+	public PMarker(MapFile file, long seg, Coord tc, String nm, Color color, boolean onmap) {
+	    super(file, seg, tc, nm);
 	    this.color = color;
 	    this.onmap = onmap;
 	}
@@ -343,6 +366,10 @@ public class MapFile {
 	    PMarker pMarker = (PMarker) o;
 	    return color.equals(pMarker.color);
 	}
+
+	public String toString() {
+	    return(String.format("#<pmarker \"%s\" %s %d>", nm, color, seq));
+	}
     }
 
     public static class SMarker extends Marker {
@@ -353,8 +380,8 @@ public class MapFile {
 	public final List<QuestCondition> questConditions = new ArrayList<>();
 	public final Iterator<QuestCondition> questIterator;
 
-	public SMarker(long seg, Coord tc, String nm, UID oid, Resource.Saved res, byte[] data) {
-	    super(seg, tc, nm);
+	public SMarker(MapFile file, long seg, Coord tc, String nm, UID oid, Resource.Saved res, byte[] data) {
+	    super(file, seg, tc, nm);
 	    this.oid = oid;
 	    this.res = res;
 	    this.data = data;
@@ -374,9 +401,13 @@ public class MapFile {
 	public int hashCode() {
 	    return Objects.hash(super.hashCode(), oid, res);
 	}
+
+	public String toString() {
+	    return(String.format("#<smarker \"%s\" %s %s %s>", nm, oid, res.name, seq));
+	}
     }
 
-    private static Marker loadmarker(Message fp) {
+    private Marker loadmarker(Message fp) {
 	int ver = fp.uint8();
 	if((ver >= 1) && (ver <= 3)) {
 	    long seg = fp.int64();
@@ -387,14 +418,14 @@ public class MapFile {
 	    case 'p':
 		Color color = fp.color();
 		boolean onmap = (ver >= 2) ? fp.uint8() != 0 : false;
-		return(new PMarker(seg, tc, nm, color, onmap));
+		return(new PMarker(this, seg, tc, nm, color, onmap));
 	    case 's':
 		UID oid = UID.of(fp.int64());
 		Resource.Saved res = new Resource.Saved(Resource.remote(), fp.string(), fp.uint16());
 		byte[] data = new byte[0];
 		if(ver >= 3)
 		    data = fp.bytes(fp.uint8());
-		return(new SMarker(seg, tc, nm, oid, res, data));
+		return(new SMarker(this, seg, tc, nm, oid, res, data));
 	    default:
 		throw(new Message.FormatError("Unknown marker type: " + (int)type));
 	    }
@@ -406,12 +437,12 @@ public class MapFile {
 	    if(enc.containsKey("col")) {
 		Color color = COLOR.of(enc.get("col"));
 		boolean onmap = BOOL.of(enc.getOrDefault("md", 0));
-		return(new PMarker(seg, tc, nm, color, onmap));
+		return(new PMarker(this, seg, tc, nm, color, onmap));
 	    } else if(enc.containsKey("res")) {
 		UID oid = UNIQID.of(enc.get("oid"));
 		Resource.Named res = (Resource.Named)enc.get("res");
 		byte[] data = BYTES.of(enc.getOrDefault("dat", new byte[0]));
-		return(new SMarker(seg, tc, nm, oid, new Resource.Saved(Resource.remote(), res.name, res.ver), data));
+		return(new SMarker(this, seg, tc, nm, oid, new Resource.Saved(Resource.remote(), res.name, res.ver), data));
 	    } else {
 		throw(new Message.FormatError("Unknown marker type: " + enc));
 	    }
@@ -449,6 +480,7 @@ public class MapFile {
 	    if(markers.add(mark)) {
 		defersave();
 		markerseq++;
+		mark.seq++;
 	    }
 	} finally {
 	    lock.writeLock().unlock();
@@ -461,6 +493,7 @@ public class MapFile {
 	    if(markers.remove(mark)) {
 		defersave();
 		markerseq++;
+		mark.seq++;
 	    }
 	} finally {
 	    lock.writeLock().unlock();
@@ -473,6 +506,7 @@ public class MapFile {
 	    if(markers.contains(mark)) {
 		defersave();
 		markerseq++;
+		mark.seq++;
 	    }
 	} finally {
 	    lock.readLock().unlock();
@@ -1260,7 +1294,7 @@ public class MapFile {
 	}
 
 	private Future<Grid> loadgrid(long id) {
-	    return(Defer.later(() -> Grid.load(MapFile.this, id)));
+	    return(Defer.later(locked(() -> Grid.load(MapFile.this, id), lock.readLock())));
 	}
 
 	private Cached grid0(long id) {
@@ -1289,7 +1323,7 @@ public class MapFile {
 	}
 
 	private Future<ZoomGrid> loadzgrid(ZoomCoord zc) {
-	    return(Defer.later(() -> ZoomGrid.fetch(MapFile.this, Segment.this, zc.lvl, zc.c)));
+	    return(Defer.later(locked(() -> ZoomGrid.fetch(MapFile.this, Segment.this, zc.lvl, zc.c), lock.readLock())));
 	}
 
 	private class ByZCoord implements Indir<ZoomGrid> {
@@ -1579,6 +1613,7 @@ public class MapFile {
 	    if(mark.seg == src.id) {
 		mark.seg = dst.id;
 		mark.tc = mark.tc.sub(soff.mul(cmaps));
+		mark.seq++;
 		mf = true;
 	    }
 	}
