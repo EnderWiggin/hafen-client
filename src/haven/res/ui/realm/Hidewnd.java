@@ -9,7 +9,7 @@ import haven.res.ui.polity.*;
 import static haven.BuddyWnd.width;
 
 /* >wdg: Realm */
-@FromResource(name = "ui/realm", version = 31)
+@FromResource(name = "ui/realm", version = 34)
 public class Hidewnd extends Window {
     Hidewnd(Coord sz, String cap, boolean lg) {
 	super(sz, cap, lg);
