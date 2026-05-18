@@ -399,6 +399,8 @@ public abstract class GLEnvironment implements Environment {
 		} else {
 		    gcmd.gl.abort();
 		}
+	    } else {
+		gcmd.dispose();
 	    }
 	}
 	if(inv)

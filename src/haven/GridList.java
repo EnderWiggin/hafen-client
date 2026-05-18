@@ -150,7 +150,7 @@ public abstract class GridList<T> extends Widget {
     }
 
     public boolean mousewheel(MouseWheelEvent ev) {
-	sb.ch(ev.a * 20);
+	sb.ch(ev.s * 20);
 	return(true);
     }
 

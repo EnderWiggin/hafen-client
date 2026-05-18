@@ -239,6 +239,26 @@ public class Text implements Disposable {
 	    return(ellipsize(text, w, "\u2026"));
 	}
 
+	public static Font fontpxsz(Font font, int pxsz) {
+	    int h = 12, l = 1;
+	    while(new Foundry(font.deriveFont((float)h)).height() < pxsz) {
+		l = h;
+		h *= 2;
+	    }
+	    while(h > l + 1) {
+		int m = (l + h) / 2;
+		int th = new Foundry(font.deriveFont((float)m)).height();
+		if(th < pxsz) {
+		    l = m;
+		} else if(th > pxsz) {
+		    h = m;
+		} else {
+		    return(font.deriveFont((float)m));
+		}
+	    }
+	    return(font.deriveFont((float)l));
+	}
+
 	public Line renderstroked(String text, Color c, Color s){
 	    Line line = render(text, c);
 	    BufferedImage img = Utils.outline2(line.img, s, true);

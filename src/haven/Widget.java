@@ -1096,14 +1096,17 @@ public class Widget {
 
     public static class MouseWheelEvent extends MouseActionEvent {
 	public final int a;
+	public final double s;
 
-	public MouseWheelEvent(Coord c, int a) {
+	public MouseWheelEvent(Coord c, int a, double s) {
 	    super(c);
 	    this.a = a;
+	    this.s = s;
 	}
 	public MouseWheelEvent(MouseWheelEvent from, Coord c) {
 	    super(from, c);
 	    this.a = from.a;
+	    this.s = from.s;
 	}
 
 	public MouseWheelEvent derive(Coord c) {return(new MouseWheelEvent(this, c));}

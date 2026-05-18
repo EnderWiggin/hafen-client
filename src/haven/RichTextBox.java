@@ -115,7 +115,7 @@ public class RichTextBox extends Widget {
     }
 
     public boolean mousewheel(MouseWheelEvent ev) {
-	sb.ch(ev.a * UI.scale(20));
+	sb.ch(ev.s * UI.scale(20));
 	return(true);
     }
 

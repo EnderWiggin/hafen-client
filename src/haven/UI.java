@@ -949,10 +949,10 @@ public class UI {
 	uictx.setmousepos(c);
     }
 	
-    public void mousewheel(MouseEvent ev, Coord c, int amount) {
+    public void mousewheel(MouseEvent ev, Coord c, int ia, double sa) {
 	setmods(ev);
 	mc = c;
-	dispatch(root, new Widget.MouseWheelEvent(c, amount));
+	dispatch(root, new Widget.MouseWheelEvent(c, ia, sa));
     }
 
     public static enum Cursor {

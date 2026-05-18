@@ -36,7 +36,8 @@ public abstract class SListBox<I, W extends Widget> extends SListWidget<I, W> im
     private Map<I, W> curw = new IdentityHashMap<>();
     private I[] curi;
     private int n = -1, h, curo = 0, itemw = 0;
-    private int maxy = 0, cury = 0;
+    private int maxy = 0;
+    private double cury = 0.0;
     private boolean reset = false;
 
     public SListBox(Coord sz, int itemh, int marg) {
@@ -54,7 +55,7 @@ public abstract class SListBox<I, W extends Widget> extends SListWidget<I, W> im
     protected boolean autoscroll() {return(true);}
     public int scrollmin() {return(0);}
     public int scrollmax() {return(maxy);}
-    public int scrollval() {return(cury);}
+    public int scrollval() {return((int)cury);}
     public void scrollval(int val) {cury = val;}
 
     @SuppressWarnings("unchecked")
@@ -73,7 +74,7 @@ public abstract class SListBox<I, W extends Widget> extends SListWidget<I, W> im
 	    reset = true;
 	    this.itemw = itemw;
 	}
-	int sy = cury, off = sy / (itemh + marg);
+	int sy = (int)cury, off = sy / (itemh + marg);
 	if(reset) {
 	    for(W cw : curw.values())
 		cw.destroy();
@@ -179,7 +180,7 @@ public abstract class SListBox<I, W extends Widget> extends SListWidget<I, W> im
 	drawbg(g);
 	if(curi != null) {
 	    List<? extends I> items = items();
-	    int sy = cury;
+	    int sy = (int)cury;
 	    for(int i = 0; (i < curi.length) && (i + curo < items.size()); i++) {
 		if(curi[i] != null)
 		    drawslot(g, curi[i], i + curo, Area.sized(Coord.of(0, ((i + curo) * (itemh + marg)) - sy), Coord.of(itemw, itemh)));
@@ -189,17 +190,17 @@ public abstract class SListBox<I, W extends Widget> extends SListWidget<I, W> im
     }
 
     public int slotat(Coord c) {
-	return((c.y + cury) / (itemh + marg));
+	return((c.y + (int)cury) / (itemh + marg));
     }
 
     public boolean mousewheel(MouseWheelEvent ev) {
 	if(ev.propagate(this) || super.mousewheel(ev))
 	    return(true);
-	int step = sz.y / 8;
+	double step = sz.y / 8.0;
 	if(maxy > 0)
-	    step = Math.min(step, maxy / 8);
+	    step = Math.min(step, maxy / 8.0);
 	step = Math.max(step, itemh);
-	cury = Math.max(Math.min(cury + (step * ev.a), maxy), 0);
+	cury = Math.max(Math.min(cury + (step * ev.s), maxy), 0);
 	return(true);
     }
 
@@ -235,7 +236,7 @@ public abstract class SListBox<I, W extends Widget> extends SListWidget<I, W> im
 	int y = idx * (itemh + marg);
 	if(y < cury)
 	    cury = y;
-	else if(y + itemh >= cury + sz.y)
+	else if(y + itemh >= (int)cury + sz.y)
 	    cury = Math.max((y + itemh) - sz.y, 0);
     }
 

@@ -968,6 +968,7 @@ public class GLDrawList implements DrawList {
 		gl.bglCallList(cur.compiled);
 	    settingbuf.put(gl);
 	    g.state.assume(last.bk.state());
+	    g.state.apply(null, VaoState.slot, ((VaoSetting)last.settings[idx_vao]).st);
 	}
     }
 

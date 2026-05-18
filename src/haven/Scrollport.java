@@ -89,7 +89,7 @@ public class Scrollport extends Widget {
     }
 
     public boolean mousewheel(MouseWheelEvent ev) {
-	bar.ch(ev.a * UI.scale(15));
+	bar.ch(ev.s * UI.scale(15));
 	return(true);
     }
 

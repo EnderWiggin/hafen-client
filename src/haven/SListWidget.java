@@ -40,6 +40,10 @@ public abstract class SListWidget<I, W extends Widget> extends Widget {
     protected abstract List<? extends I> items();
     protected abstract W makeitem(I item, int idx, Coord sz);
 
+    public static interface ItemFactory<I, W extends Widget> {
+	public W makeitem(I item, int idx, Coord sz);
+    }
+
     public void change(I item) {
 	this.sel = item;
     }

@@ -744,7 +744,7 @@ public class DynresWindow extends WindowX {
 	    @SuppressWarnings("deprecation") public Resource getres() {throw(new UnsupportedOperationException());}
 
 	    public boolean mousewheel(MouseWheelEvent ev) {
-		tfield += ev.a * 10;
+		tfield += ev.s * 10;
 		return(true);
 	    }
 
