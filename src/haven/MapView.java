@@ -173,7 +173,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	public void rotate(Coord r) {
 	    tangl = tangl + (25 * r.x / 100.0f);
 	    tangl = tangl % ((float)Math.PI * 2.0f);
-	    wheel(Coord.z, 5 * r.y);
+	    wheel(new MouseWheelEvent(Coord.z, 5 * r.y, 5 * r.y));
 	}
  
 	@Override
@@ -2720,7 +2720,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	    });
     }
     
-    public void zoomCamera(int amount) { camera.wheel(Coord.z, amount); }
+    public void zoomCamera(int amount) { camera.wheel(new MouseWheelEvent(Coord.z, amount, amount)); }
     
     public void rotateCamera(Coord r) {
 	camera.rotate(r.mul(
