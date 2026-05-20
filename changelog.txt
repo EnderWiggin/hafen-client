@@ -1,3 +1,12 @@
+$size[14]{$u{Update for 20.05.26:}
+  * fixed attribute search not detecting bonuses from gildings in world 16
+  * improved list inventory SHIFT-Click transfer:
+    - ignore invisible inventories
+    - sort inventories by z-order
+    - works on all list inventories, not just main one
+  * fixed crash in wound treatments if treatment resource is not found
+  * fixed resource for tansy extract in wound treatments
+ 
 $size[14]{$u{Update for 18.05.26:}
   * merged loftar's changes
  
