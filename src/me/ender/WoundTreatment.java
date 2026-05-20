@@ -33,8 +33,12 @@ public class WoundTreatment {
 	if(treatment != null && treatment.length > 0) {
 	    buf.append("\n\n$b{$font[serif,16]{Treatment}}\n\n");
 	    for (String t : treatment) {
-		String name = Resource.remote().load(t).get().layer(Resource.tooltip).t;
-		buf.append("$img[").append(t).append(",c,h=16]").append(name).append("\n");
+		try {
+		    String name = Resource.remote().load(t).get().layer(Resource.tooltip).t;
+		    buf.append("$img[").append(t).append(",c,h=16]").append(name).append("\n");
+		} catch (Exception ignore) {
+		    buf.append(t).append("\n");
+		}
 	    }
 	}
 	return buf.toString();
