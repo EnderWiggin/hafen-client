@@ -110,8 +110,7 @@ public class UI {
 	WindowX wnd = wdg.getparent(WindowX.class);
 	if(wnd == null) {return;}
 	String name = wnd.caption().toLowerCase();
-	if(name.contains("inventory")
-	    || name.contains("character sheet")
+	if(name.contains("character sheet")
 	    || name.contains("belt")
 	    || name.contains("equipment")
 	    || name.contains("study")) {

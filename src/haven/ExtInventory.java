@@ -736,13 +736,21 @@ public class ExtInventory extends Widget {
 	}
     }
     
-    //TODO: should we sort inventories based on z-order of windows?
     private Object[] getTransferTargets() {
-	//use default transfer logic if transferring not from main inventory
-	if(inv != ui.gui.maininv) {
-	    return null;
-	}
-	List<Widget> inventories = ui.EXT_INVENTORIES;
+	List<Widget> widgets = ui.gui.children();
+	List<Widget> inventories = ui.EXT_INVENTORIES.stream()
+	    .filter(Widget::tvisible)
+	    .filter(w -> w != this)
+	    .sorted((w1, w2) -> {
+		Window p1 = w1.getparent(Window.class);
+		Window p2 = w2.getparent(Window.class);
+		return Integer.compare(
+		    p1 != null ? -widgets.indexOf(p1) : 0,
+		    p2 != null ? -widgets.indexOf(p2) : 0
+		);
+	    })
+	    .collect(Collectors.toList());
+
 	if(inventories.isEmpty()) {
 	    return null;
 	}
