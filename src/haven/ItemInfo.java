@@ -570,10 +570,16 @@ public abstract class ItemInfo {
     public static Map<Resource, Integer> getBonuses(List<ItemInfo> infos, Map<String, Glob.CAttr> attrs) {
 	List<ISlots> slotInfos = ItemInfo.findall(ISlots.class, infos);
 	List<Slotted> gilding = ItemInfo.findall(Slotted.class, infos);
+	List<haven.res.ui.tt.slots.ISlots> oldSlotInfos = ItemInfo.findall(haven.res.ui.tt.slots.ISlots.class, infos);
 	Map<Resource, Integer> bonuses = new HashMap<>();
 	try {
 	    for (ISlots islots : slotInfos) {
 		for (ISlots.SItem slot : islots.s) {
+		    parseAttrMods(bonuses, ItemInfo.findall(AttrMod.class, slot.info));
+		}
+	    }
+	    for (haven.res.ui.tt.slots.ISlots islots : oldSlotInfos) {
+		for (haven.res.ui.tt.slots.ISlots.SItem slot : islots.s) {
 		    parseAttrMods(bonuses, ItemInfo.findall(AttrMod.class, slot.info));
 		}
 	    }
