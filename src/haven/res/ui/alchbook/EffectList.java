@@ -65,6 +65,7 @@ public class EffectList extends TableBox<KnownEffects> implements FilterDisplay.
 	    KnownEffects ik = i.next();
 	    try {
 		ik.fin(OwnerContext.uictx.curry(ui));
+		ik.input.type.name(); //FIXME: temporary fix for input resource not being loaded
 	    } catch(Loading l) {
 		continue;
 	    }
