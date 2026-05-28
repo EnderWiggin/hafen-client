@@ -9,7 +9,7 @@ import haven.res.ui.alchbook.*;
 import java.awt.image.BufferedImage;
 
 /* >tt: BuffAttr */
-@haven.FromResource(name = "ui/tt/alch/ingr-buff", version = 3)
+@haven.FromResource(name = "ui/tt/alch/ingr-buff", version = 5)
 public class BuffAttr extends Effect implements EffectInfo {
     public final Resource res;
 
