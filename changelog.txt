@@ -1,3 +1,6 @@
+$size[14]{$u{Update for 28.05.26:}
+  * merged loftar's changes
+ 
 $size[14]{$u{Update for 20.05.26:}
   * fixed attribute search not detecting bonuses from gildings in world 16
   * improved list inventory SHIFT-Click transfer:
