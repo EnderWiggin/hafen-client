@@ -9,7 +9,7 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import static haven.PType.*;
 
-@haven.FromResource(name = "ui/alchbook", version = 3)
+@haven.FromResource(name = "ui/alchbook", version = 4)
 public class Recipe {
     public static final Comparator<ItemSpec> iconorder = Comparator.comparing(ItemSpec::name);
     public static final Comparator<Input> inputorder = new Comparator<Input>() {

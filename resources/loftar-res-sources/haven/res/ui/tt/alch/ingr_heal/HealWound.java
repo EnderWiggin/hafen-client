@@ -9,7 +9,7 @@ import haven.res.ui.alchbook.*;
 import java.awt.image.BufferedImage;
 
 /* >tt: HealWound */
-@haven.FromResource(name = "ui/tt/alch/ingr-heal", version = 5)
+@haven.FromResource(name = "ui/tt/alch/ingr-heal", version = 6)
 public class HealWound extends Effect implements EffectInfo {
     public final Resource res, repl;
 

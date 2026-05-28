@@ -9,7 +9,7 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import static haven.PType.*;
 
-@FromResource(name = "ui/alchbook", version = 3)
+@FromResource(name = "ui/alchbook", version = 4)
 public class Effects extends Widget {
     public Effects(List<EffectInfo> effects, Consumer<EffectInfo> action) {
 	Coord pos = Coord.z;

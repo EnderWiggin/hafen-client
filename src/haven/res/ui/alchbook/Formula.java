@@ -9,7 +9,7 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import static haven.PType.*;
 
-@FromResource(name = "ui/alchbook", version = 3)
+@FromResource(name = "ui/alchbook", version = 4)
 public class Formula extends Widget {
     public static final Text.Foundry fnd = new Text.Foundry(Text.Foundry.fontpxsz(Text.sans, Book.HEIGHT), Color.WHITE).aa(true);
     public static final Text plus = fnd.render("+");

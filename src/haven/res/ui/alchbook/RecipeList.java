@@ -9,7 +9,7 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import static haven.PType.*;
 
-@FromResource(name = "ui/alchbook", version = 3)
+@FromResource(name = "ui/alchbook", version = 4)
 public class RecipeList extends TableBox<Recipe> implements FilterDisplay.Filtered<Recipe> {
     public static final int HEIGHT = Book.HEIGHT;
     public static final List<ColSpec<? super Recipe>> cols =
@@ -78,16 +78,19 @@ public class RecipeList extends TableBox<Recipe> implements FilterDisplay.Filter
 	    dirty = true;
 	}
 	if(dirty) {
-	    selection = new ArrayList<>();
-	    select: for(Recipe rcp : recipes.values()) {
-		for(Filter<Recipe> flt : filters) {
-		    if(!flt.test(rcp))
-			continue select;
+	    try {
+		List<Recipe> ns = new ArrayList<>();
+		select: for(Recipe rcp : recipes.values()) {
+		    for(Filter<Recipe> flt : filters) {
+			if(!flt.test(rcp))
+			    continue select;
+		    }
+		    ns.add(rcp);
 		}
-		selection.add(rcp);
-	    }
-	    Collections.sort(selection, order);
-	    dirty = false;
+		Collections.sort(ns, order);
+		selection = ns;
+		dirty = false;
+	    } catch(Loading l) {}
 	}
 	super.tick(dt);
     }

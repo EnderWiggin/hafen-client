@@ -9,7 +9,7 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import static haven.PType.*;
 
-@FromResource(name = "ui/alchbook", version = 3)
+@FromResource(name = "ui/alchbook", version = 4)
 public class KnownEffects {
     public static final Comparator<KnownEffects> ikinputorder = Comparator.comparing(ik -> ik.input.type, Recipe.iconorder);
     public static final Comparator<KnownEffects> kieffectorder = Comparator.comparing((KnownEffects ik) -> ik.effs, Recipe.effectorder).thenComparing(ikinputorder);

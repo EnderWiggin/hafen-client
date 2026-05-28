@@ -9,7 +9,7 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import static haven.PType.*;
 
-@FromResource(name = "ui/alchbook", version = 3)
+@FromResource(name = "ui/alchbook", version = 4)
 public class EffectList extends TableBox<KnownEffects> implements FilterDisplay.Filtered<KnownEffects> {
     public static final int HEIGHT = Book.HEIGHT;
     public static final List<ColSpec<? super KnownEffects>> cols =
@@ -65,7 +65,6 @@ public class EffectList extends TableBox<KnownEffects> implements FilterDisplay.
 	    KnownEffects ik = i.next();
 	    try {
 		ik.fin(OwnerContext.uictx.curry(ui));
-		ik.input.type.name(); //FIXME: temporary fix for input resource not being loaded
 	    } catch(Loading l) {
 		continue;
 	    }
@@ -74,16 +73,19 @@ public class EffectList extends TableBox<KnownEffects> implements FilterDisplay.
 	    dirty = true;
 	}
 	if(dirty) {
-	    selection = new ArrayList<>();
-	    select: for(KnownEffects ik : knowledge.values()) {
-		for(Filter<KnownEffects> flt : filters) {
-		    if(!flt.test(ik))
-			continue select;
+	    try {
+		List<KnownEffects> ns = new ArrayList<>();
+		select: for(KnownEffects ik : knowledge.values()) {
+		    for(Filter<KnownEffects> flt : filters) {
+			if(!flt.test(ik))
+			    continue select;
+		    }
+		    ns.add(ik);
 		}
-		selection.add(ik);
-	    }
-	    Collections.sort(selection, order);
-	    dirty = false;
+		Collections.sort(ns, order);
+		selection = ns;
+		dirty = false;
+	    } catch(Loading l) {}
 	}
 	super.tick(dt);
     }

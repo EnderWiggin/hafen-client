@@ -9,7 +9,7 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import static haven.PType.*;
 
-@haven.FromResource(name = "ui/alchbook", version = 3)
+@haven.FromResource(name = "ui/alchbook", version = 4)
 public class Book extends Widget {
     public static final int HEIGHT = UI.scale(24);
     public final RecipeList rl;

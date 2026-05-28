@@ -9,7 +9,7 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import static haven.PType.*;
 
-@FromResource(name = "ui/alchbook", version = 3)
+@FromResource(name = "ui/alchbook", version = 4)
 public class TabButton extends IButton {
     public TabButton(int up, int down) {
 	super(Resource.classres(TabButton.class).flayer(Resource.imgc, up).scaled(),
