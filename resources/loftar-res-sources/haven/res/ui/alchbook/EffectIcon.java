@@ -9,7 +9,7 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import static haven.PType.*;
 
-@FromResource(name = "ui/alchbook", version = 3)
+@haven.FromResource(name = "ui/alchbook", version = 3)
 public class EffectIcon extends Widget {
     public final EffectInfo eff;
     public final Consumer<EffectInfo> action;

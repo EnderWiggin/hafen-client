@@ -10,11 +10,6 @@ import java.awt.image.BufferedImage;
 import static haven.PType.*;
 
 @FromResource(name = "ui/alchbook", version = 3)
-public class Effects extends Widget {
-    public Effects(List<EffectInfo> effects, Consumer<EffectInfo> action) {
-	Coord pos = Coord.z;
-	for(EffectInfo eff : effects)
-	    pos = add(new EffectIcon(eff, action), pos).pos("ur").adds(2, 0);
-	pack();
-    }
+public interface Filter <T> extends Predicate<T> {
+    public Tex icon();
 }

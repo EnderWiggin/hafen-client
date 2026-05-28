@@ -9,7 +9,7 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import static haven.PType.*;
 
-@FromResource(name = "ui/alchbook", version = 3)
+@haven.FromResource(name = "ui/alchbook", version = 3)
 public class Input {
     public final ItemSpec type;
     public final List<Input> sub = new ArrayList<>();
