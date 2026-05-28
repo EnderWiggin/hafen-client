@@ -384,7 +384,6 @@ public class Config {
 	out.println("  -h                 Display this help");
 	out.println("  -d                 Display debug text");
 	out.println("  -P                 Enable profiling");
-	out.println("  -G                 Enable GPU profiling");
 	out.println("  -f                 Fullscreen mode");
 	out.println("  -U URL             Use specified external resource URL");
 	out.println("  -r DIR             Use specified resource directory (or HAVEN_RESDIR)");
@@ -396,7 +395,7 @@ public class Config {
     }
 
     public static void cmdline(String[] args) {
-	PosixArgs opt = PosixArgs.getopt(args, "hdPGfU:r:S:u:C:p:R:");
+	PosixArgs opt = PosixArgs.getopt(args, "hdPfU:r:S:u:C:p:R:");
 	if(opt == null) {
 	    usage(System.err);
 	    System.exit(1);
@@ -412,9 +411,6 @@ public class Config {
 		break;
 	    case 'P':
 		UIPanel.profile.set(true);
-		break;
-	    case 'G':
-		UIPanel.profilegpu.set(true);
 		break;
 	    case 'f':
 		MainFrame.initfullscreen.set(true);

@@ -135,6 +135,11 @@ public class MainFrame extends java.awt.Frame implements Console.Directory {
 
     private Map<String, Console.Command> cmdmap = new TreeMap<String, Console.Command>();
     {
+	cmdmap.put("q", new Console.Command() {
+		public void run(Console cons, String[] args) {
+		    mt.interrupt();
+		}
+	    });
 	cmdmap.put("sz", new Console.Command() {
 		public void run(Console cons, String[] args) {
 		    if(args.length == 3) {

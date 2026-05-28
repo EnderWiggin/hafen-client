@@ -400,6 +400,11 @@ public class MiniMap extends Widget {
 	    }
 	}
 	icons = findicons(icons);
+	if(tvisible()) {
+	    Location loc = this.curloc;
+	    if(loc != null)
+		redisplay(loc);
+	}
 	if(CFG.MMAP_SHOW_BIOMES.get()) {
 	    Coord mc = rootxlate(ui.mc);
 	    if(mc.isect(Coord.z, sz)) {
@@ -595,6 +600,13 @@ public class MiniMap extends Widget {
 
 	public GobIcon.Icon icon() {
 	    return(mm.markers.get(m).icon());
+	}
+
+	public void dispupdate() {
+	    if(mm.dloc == null)
+		this.sc = null;
+	    else
+		this.sc = mm.l2dscale(m.tc).sub(mm.l2dscale(mm.dloc.tc)).add(mm.sz.div(2));
 	}
 
 	public void draw(GOut g, Coord c) {
@@ -806,6 +818,13 @@ public class MiniMap extends Widget {
 		file.lock.readLock().unlock();
 	    }
 	}
+	for(Coord c : dgext) {
+	    DisplayGrid dgrid = display[dgext.ri(c)];
+	    if(dgrid == null)
+		continue;
+	    for(DisplayMarker mark : dgrid.markers(true))
+		mark.dispupdate();
+	}
 	for(DisplayIcon icon : icons)
 	    icon.dispupdate();
     }
@@ -838,9 +857,8 @@ public class MiniMap extends Widget {
 	    if(dgrid == null)
 		continue;
 	    for(DisplayMarker mark : dgrid.markers(true)) {
-		if(filter(mark))
+		if((mark.sc == null) || filter(mark))
 		    continue;
-		mark.sc = l2dscale(mark.m.tc).sub(l2dscale(dloc.tc)).add(hsz);
 		mark.draw(g, mark.sc);
 	    }
 	}
@@ -963,10 +981,8 @@ public class MiniMap extends Widget {
     }
 
     public void draw(GOut g) {
-	Location loc = this.curloc;
-	if(loc == null)
+	if(dloc == null)
 	    return;
-	redisplay(loc);
 	remparty();
 	drawparts(g);
     }

@@ -206,9 +206,12 @@ public class GSettings extends State implements Serializable {
 	    }
 	};
 
-    public EnumSetting<JOGLPanel.SyncMode> syncmode = new EnumSetting<JOGLPanel.SyncMode>("syncmode", JOGLPanel.SyncMode.class) {
-	    public JOGLPanel.SyncMode defval() {
-		return(JOGLPanel.SyncMode.FRAME);
+    public static enum SyncMode {
+	FRAME, TICK, SEQ, FINISH
+    }
+    public EnumSetting<SyncMode> syncmode = new EnumSetting<SyncMode>("syncmode", SyncMode.class) {
+	    public SyncMode defval() {
+		return(SyncMode.FRAME);
 	    }
 	};
 
@@ -325,7 +328,6 @@ public class GSettings extends State implements Serializable {
 	return(update(s, val));
     }
     public static GSettings load(boolean failsafe) {
-	convertold();
 	GSettings gs = defaults();
 	try {
 	    for(Field f : settings) {
@@ -345,69 +347,6 @@ public class GSettings extends State implements Serializable {
 	    throw(new AssertionError(e));
 	}
 	return(gs);
-    }
-
-    /* XXX: Remove oldload at some point in the future. */
-    @SuppressWarnings("unchecked")
-    private <T> Setting<T> iExistOnlyToIntroduceATypeVariableSinceJavaSucks(Setting<T> s, Object val) {
-	return(update(s, (T)val));
-    }
-
-    private static GSettings oldload(Object data, boolean failsafe) {
-	GSettings gs = defaults();
-	Map<?, ?> dat = (Map)data;
-	try {
-	    for(Field f : settings) {
-		Setting<?> s = (Setting<?>)f.get(gs);
-		if(dat.containsKey(s.nm)) {
-		    try {
-			f.set(gs, gs.iExistOnlyToIntroduceATypeVariableSinceJavaSucks(s, dat.get(s.nm)));
-		    } catch(SettingException | ClassCastException e) {
-			if(!failsafe)
-			    throw(e);
-		    }
-		}
-	    }
-	} catch(IllegalAccessException e) {
-	    throw(new AssertionError(e));
-	}
-	return(gs);
-    }
-
-    private static GSettings oldload(boolean failsafe) {
-	byte[] data = Utils.getprefb("gconf", null);
-	if(data == null) {
-	    return(null);
-	} else {
-	    Object dat;
-	    try {
-		dat = Utils.deserialize(data);
-	    } catch(Exception e) {
-		dat = null;
-	    }
-	    if(dat == null)
-		return(null);
-	    return(oldload(dat, failsafe));
-	}
-    }
-
-    private static void convertold() {
-	if(Utils.getprefb("gconf-cvt", false))
-	    return;
-	GSettings old = oldload(true);
-	if(old != null) {
-	    try {
-		for(Field f : settings) {
-		    Setting<?> s = (Setting<?>)f.get(old);
-		    if(Utils.eq(s.val, s.defval()))
-			s.set = false;
-		}
-	    } catch(IllegalAccessException e) {
-		throw(new AssertionError(e));
-	    }
-	    old.save();
-	}
-	Utils.setprefb("gconf-cvt", true);
     }
 
     public haven.render.sl.ShaderMacro shader() {return(null);}

@@ -181,13 +181,6 @@ public class JOGLPanel extends GLCanvas implements GLPanel, Console.Directory {
 	}
     }
 
-    /* XXX: Should be in GLPanel, but since GSettings use
-     * serialization to save itself, it can't be moved (without
-     * breaking existing settings). */
-    public static enum SyncMode {
-	FRAME, TICK, SEQ, FINISH
-    }
-
     public GLEnvironment env() {return(env);}
     public Area shape() {return(shape);}
     public Pipe basestate() {return(wnd);}

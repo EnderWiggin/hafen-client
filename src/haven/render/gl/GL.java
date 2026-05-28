@@ -268,7 +268,6 @@ public interface GL {
     public void glDepthMask(boolean mask);
     public void glDisable(int cap);
     public void glDisablei(int cap, int index);
-    public void glDisableClientState(int cap);
     public void glDisableVertexAttribArray(int location);
     public void glDrawBuffer(int buf);
     public void glDrawBuffers(int n, int[] bufs);
@@ -279,7 +278,6 @@ public interface GL {
     public void glDrawRangeElements(int mode, int start, int end, int count, int type, long indices);
     public void glEnable(int cap);
     public void glEnablei(int cap, int index);
-    public void glEnableClientState(int cap);
     public void glEnableVertexAttribArray(int location);
     public long glFenceSync(int condition, int flags);
     public void glFinish();

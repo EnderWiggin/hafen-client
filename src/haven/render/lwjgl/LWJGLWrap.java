@@ -109,7 +109,6 @@ public class LWJGLWrap implements GL {
     public void glDepthMask(boolean mask) {GL30.glDepthMask(mask);}
     public void glDisable(int cap) {GL30.glDisable(cap);}
     public void glDisablei(int cap, int index) {GL30.glDisablei(cap, index);}
-    public void glDisableClientState(int cap) {GL30.glDisableClientState(cap);}
     public void glDisableVertexAttribArray(int location) {GL30.glDisableVertexAttribArray(location);}
     public void glDrawBuffer(int buf) {GL30.glDrawBuffer(buf);}
     public void glDrawBuffers(int n, int[] bufs) {GL30.glDrawBuffers(ckbuf(bufs, n));}
@@ -120,7 +119,6 @@ public class LWJGLWrap implements GL {
     public void glDrawRangeElements(int mode, int start, int end, int count, int type, long indices) {GL30.glDrawRangeElements(mode, start, end, count, type, indices);}
     public void glEnable(int cap) {GL30.glEnable(cap);}
     public void glEnablei(int cap, int index) {GL30.glEnablei(cap, index);}
-    public void glEnableClientState(int cap) {GL30.glEnableClientState(cap);}
     public void glEnableVertexAttribArray(int location) {GL30.glEnableVertexAttribArray(location);}
     public long glFenceSync(int condition, int flags) {return(GL32.glFenceSync(condition, flags));}
     public void glFinish() {GL30.glFinish();}

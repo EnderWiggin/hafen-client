@@ -71,8 +71,6 @@ public class RootWidget extends ConsoleHost implements UI.Notice.Handler, Widget
 		   if((gi != null) && (gi.map != null))
 		   add(new Profwnd(gi.map.prof, "Map profile"), UI.scale(100, 250));
 		*/
-	    }
-	    if(UIPanel.profilegpu.get()) {
 		add(new Profwnd(ggprof, "GPU profile"), UI.scale(500, 250));
 	    }
 	    return(true);
@@ -139,7 +137,7 @@ public class RootWidget extends ConsoleHost implements UI.Notice.Handler, Widget
 			clip = new Audio.Resampler(clip).sp(spd);
 		    if(vol != 1.0)
 			clip = new Audio.VolAdjust(clip, vol);
-		    Audio.play(clip);
+		    ui.sfx(clip);
 		}, null);
 	} else if(msg == "bgm") {
 	    int a = 0;

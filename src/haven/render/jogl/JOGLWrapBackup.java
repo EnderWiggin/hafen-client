@@ -84,7 +84,6 @@ public class JOGLWrapBackup implements GL, WrappedJOGL {
     public void glDepthMask(boolean mask) {back.glDepthMask(mask);}
     public void glDisable(int cap) {back.glDisable(cap);}
     public void glDisablei(int cap, int index) {back.getGL2GL3().glDisablei(cap, index);}
-    public void glDisableClientState(int cap) {back.getGL2GL3().glDisableClientState(cap);}
     public void glDisableVertexAttribArray(int location) {back.getGL2GL3().glDisableVertexAttribArray(location);}
     public void glDrawBuffer(int buf) {back.getGL2GL3().glDrawBuffer(buf);}
     public void glDrawBuffers(int n, int[] bufs) {back.getGL2GL3().glDrawBuffers(n, bufs, 0);}
@@ -95,7 +94,6 @@ public class JOGLWrapBackup implements GL, WrappedJOGL {
     public void glDrawRangeElements(int mode, int start, int end, int count, int type, long indices) {back.getGL2GL3().glDrawRangeElements(mode, start, end, count, type, indices);}
     public void glEnable(int cap) {back.glEnable(cap);}
     public void glEnablei(int cap, int index) {back.getGL2GL3().glEnablei(cap, index);}
-    public void glEnableClientState(int cap) {back.getGL2GL3().glEnableClientState(cap);}
     public void glEnableVertexAttribArray(int location) {back.getGL2GL3().glEnableVertexAttribArray(location);}
     public long glFenceSync(int condition, int flags) {return(back.getGL3().glFenceSync(condition, flags));}
     public void glFinish() {back.glFinish();}

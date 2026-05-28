@@ -31,7 +31,7 @@ import haven.render.*;
 import haven.render.gl.*;
 import java.awt.Cursor;
 import java.awt.Toolkit;
-import haven.JOGLPanel.SyncMode;
+import haven.GSettings.SyncMode;
 
 public interface GLPanel extends UIPanel, UI.Context {
     public GLEnvironment env();
@@ -45,7 +45,8 @@ public interface GLPanel extends UIPanel, UI.Context {
 	public final CPUProfile uprof = new CPUProfile(300), rprof = new CPUProfile(300);
 	public final GPUProfile gprof = new GPUProfile(300);
 	protected boolean bgmode = false;
-	protected int fps, framelag;
+	protected int fps;
+	protected double framelag;
 	protected volatile int frameno;
 	protected double uidle = 0.0, ridle = 0.0;
 	protected long lastrcycle = 0, ridletime = 0;
@@ -74,17 +75,17 @@ public interface GLPanel extends UIPanel, UI.Context {
 	}
 
 	private class BufferSwap implements BGL.Request {
-	    final int frameno;
+	    final double ttime;
 
-	    BufferSwap(int frameno) {
-		this.frameno = frameno;
+	    BufferSwap(double ttime) {
+		this.ttime = ttime;
 	    }
 
 	    public void run(GL gl) {
 		long start = System.nanoTime();
 		p.glswap(gl);
 		ridletime += System.nanoTime() - start;
-		framelag = Loop.this.frameno - frameno;
+		framelag = Utils.rtime() - ttime;
 	    }
 	}
 
@@ -266,7 +267,7 @@ public interface GLPanel extends UIPanel, UI.Context {
 	@SuppressWarnings("deprecation")
 	private void drawstats(UI ui, GOut g, GLRender buf) {
 	    int y = g.sz().y - UI.scale(190), dy = FastText.h;
-	    FastText.aprintf(g, new Coord(10, y -= dy), 0, 1, "FPS: %d (%d%%, %d%% idle, latency %d)", fps, (int)(uidle * 100.0), (int)(ridle * 100.0), framelag);
+	    FastText.aprintf(g, new Coord(10, y -= dy), 0, 1, "FPS: %d (%d%%, %d%% idle, latency %.2f ms)", fps, (int)(uidle * 100.0), (int)(ridle * 100.0), framelag * 1000);
 	    Runtime rt = Runtime.getRuntime();
 	    long free = rt.freeMemory(), total = rt.totalMemory();
 	    if(free < prevfree)
@@ -342,7 +343,7 @@ public interface GLPanel extends UIPanel, UI.Context {
 		    GSettings prefs = ui.gprefs;
 		    SyncMode syncmode = prefs.syncmode.val;
 		    CPUProfile.Current curf = profile.get() ?  CPUProfile.set(uprof.new Frame()) : null;
-		    GPUProfile.Frame curgf = profilegpu.get() ? gprof.new Frame(buf) : null;
+		    GPUProfile.Frame curgf = profile.get() ? gprof.new Frame(buf) : null;
 		    rprofc = profile.get() ? new ProfileCycle(rprof, rprofc, buf) : null;
 		    BufferBGL.Profile frameprof = false ? new BufferBGL.Profile() : null;
 		    if(frameprof != null) buf.submit(frameprof.start);
@@ -363,11 +364,10 @@ public interface GLPanel extends UIPanel, UI.Context {
 			}
 		    }
 
-		    int cfno = frameno++;
+		    double ttime = Utils.rtime();
 		    synchronized(ui) {
 			CPUProfile.phase(curf, "dsp");
 			ed.dispatch(ui);
-			ui.mousehover(ui.mc);
 
 			CPUProfile.phase(curf, "stick");
 			if(ui.sess != null) {
@@ -377,6 +377,7 @@ public interface GLPanel extends UIPanel, UI.Context {
 			CPUProfile.phase(curf, "tick");
 			ui.tick();
 			ui.gtick(buf);
+			ui.mousehover(ui.mc);
 			Area shape = p.shape();
 			if((ui.root.sz.x != (shape.br.x - shape.ul.x)) || (ui.root.sz.y != (shape.br.y - shape.ul.y)))
 			    ui.root.resize(new Coord(shape.br.x - shape.ul.x, shape.br.y - shape.ul.y));
@@ -399,7 +400,7 @@ public interface GLPanel extends UIPanel, UI.Context {
 		    CPUProfile.phase(curf, "aux");
 		    if(curgf != null) curgf.part(buf, "swap");
 		    buf.submit(new ProfilePart(rprofc, "swap"));
-		    buf.submit(new BufferSwap(cfno));
+		    buf.submit(new BufferSwap(ttime));
 		    if(curgf != null) curgf.fin(buf);
 		    if(syncmode == SyncMode.FINISH) {
 			buf.submit(new ProfilePart(rprofc, "finish"));
@@ -526,17 +527,7 @@ public interface GLPanel extends UIPanel, UI.Context {
 		});
 	    Console.setscmd("profile", new Console.Command() {
 		    public void run(Console cons, String[] args) {
-			if(args[1].equals("none") || args[1].equals("off")) {
-			    profile.set(false);
-			    profilegpu.set(false);
-			} else if(args[1].equals("cpu")) {
-			    profile.set(true);
-			} else if(args[1].equals("gpu")) {
-			    profilegpu.set(true);
-			} else if(args[1].equals("all")) {
-			    profile.set(true);
-			    profilegpu.set(true);
-			}
+			profile.set(Utils.parsebool(args[1]));
 		    }
 		});
 	}

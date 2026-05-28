@@ -140,23 +140,15 @@ public class WItem extends Widget implements DTarget {
     }
 
     private List<ItemInfo> info() {return(item.info());}
-    public final AttrCache<Pipe.Op> rstate = new AttrCache<>(this::info, info -> {
-	    ArrayList<GItem.RStateInfo> ols = new ArrayList<>();
+    public final AttrCache<Pipe.Op> rstate = new AttrCache<>(this::info, GItem.RStateInfo.combine);
+    public final AttrCache<GItem.InfoOverlay<?>[]> itemols = new AttrCache<>(this::info, info -> {
+	    ArrayList<GItem.InfoOverlay<?>> buf = new ArrayList<>();
 	    for(ItemInfo inf : info) {
-		if(inf instanceof GItem.RStateInfo)
-		    ols.add((GItem.RStateInfo)inf);
+		if(inf instanceof GItem.OverlayInfo)
+		    buf.add(GItem.InfoOverlay.create((GItem.OverlayInfo<?>)inf));
 	    }
-	    if(ols.size() == 0)
-		return(() -> null);
-	    if(ols.size() == 1) {
-		Pipe.Op op = ols.get(0).rstate();
-		return(() -> op);
-	    }
-	    Pipe.Op[] ops = new Pipe.Op[ols.size()];
-	    for(int i = 0; i < ops.length; i++)
-		ops[i] = ols.get(0).rstate();
-	    Pipe.Op cmp = Pipe.Op.compose(ops);
-	    return(() -> cmp);
+	    GItem.InfoOverlay<?>[] ret = buf.toArray(new GItem.InfoOverlay<?>[0]);
+	    return(() -> ret);
 	});
     
     public final AttrCache<Color> olcol = new AttrCache<>(this::info, info -> {
@@ -171,16 +163,7 @@ public class WItem extends Widget implements DTarget {
 	return (() -> color);
     });
     
-    public final AttrCache<GItem.InfoOverlay<?>[]> itemols = new AttrCache<>(this::info, info -> {
-	    ArrayList<GItem.InfoOverlay<?>> buf = new ArrayList<>();
-	    for(ItemInfo inf : info) {
-		if(inf instanceof GItem.OverlayInfo)
-		    buf.add(GItem.InfoOverlay.create((GItem.OverlayInfo<?>)inf));
-	    }
-	    GItem.InfoOverlay<?>[] ret = buf.toArray(new GItem.InfoOverlay<?>[0]);
-	    return(() -> ret);
-	});
-
+    
     public final AttrCache<Level> fullness = new AttrCache<>(this::info, info -> () -> ItemInfo.find(Level.class, info));
     
     public final AttrCache<Double> itemmeter = new AttrCache<Double>(this::info, AttrCache.map1(GItem.MeterInfo.class, minf -> minf::meter));

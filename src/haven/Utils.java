@@ -1851,6 +1851,28 @@ public class Utils {
 	return(map.remove(key));
     }
 
+    public static <E> Set<E> union(Set<? extends E> a, Set<? extends E> b) {
+	Set<E> ret = new HashSet<>(a);
+	ret.addAll(b);
+	return(ret);
+    }
+
+    public static <E> Set<E> isect(Set<? extends E> a, Set<?> b) {
+	Set<E> ret = new HashSet<>(a);
+	ret.retainAll(b);
+	return(ret);
+    }
+
+    public static <E> Set<E> setdiff(Set<? extends E> a, Set<?> b) {
+	Set<E> ret = new HashSet<>(a);
+	ret.removeAll(b);
+	return(ret);
+    }
+
+    public static <E> Set<E> symdiff(Set<? extends E> a, Set<? extends E> b) {
+	return(setdiff(union(a, b), isect(a, b)));
+    }
+
     public static <T> List<T> reversed(List<T> ls) {
 	return(new AbstractList<T>() {
 		public int size() {

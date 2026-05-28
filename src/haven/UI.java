@@ -163,11 +163,6 @@ public class UI {
 
     private class WidgetConsole extends Console {
 	{
-	    setcmd("q", new Command() {
-		    public void run(Console cons, String[] args) {
-			HackThread.tg().interrupt();
-		    }
-		});
 	    setcmd("lo", new Command() {
 		    public void run(Console cons, String[] args) {
 			sess.close();
