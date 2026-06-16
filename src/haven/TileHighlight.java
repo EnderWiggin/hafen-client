@@ -159,7 +159,7 @@ public class TileHighlight {
 	    filter = adda(new Label(FILTER_DEFAULT), list.pos("ur").y(0), 1, 0);
 	    pack();
 	    setfocus(list);
-	    list.setItems(tiles.get(category));
+	    list.setItems(tiles.getOrDefault(category, Collections.emptyList()));
 	}
 	
 	private void updateFilter(String text) {
