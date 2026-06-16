@@ -26,7 +26,9 @@
 
 package haven;
 
+import java.util.*;
 import java.net.*;
+import static haven.PType.*;
 
 public class SessWidget extends AWidget {
     private final Defer.Future<Result> conn;
@@ -35,12 +37,11 @@ public class SessWidget extends AWidget {
     @RName("sess")
     public static class $_ implements Factory {
 	public Widget create(UI ui, Object[] args) {
-	    String host = (String)args[0];
-	    int port = Utils.iv(args[1]);
-	    byte[] cookie = (args[2] instanceof byte[]) ? (byte[])args[2] : Utils.hex.dec((String)args[2]);
+	    String host = STR.of(args[0]);
+	    int port = INT.of(args[1]);
+	    byte[] cookie = BYTES.is(args[2]) ? BYTES.of(args[2]) : Utils.hex.dec(STR.of(args[2]));
 	    Object[] sargs = Utils.splice(args, 3);
-	    Session.User acct = ui.sess.user.copy().alias(null);
-	    return(new SessWidget(host, port, acct, (ui.sess.conn instanceof Connection) && ((Connection)ui.sess.conn).encrypted(), cookie, sargs));
+	    return(new SessWidget(host, port, ui.sess, cookie, sargs));
 	}
     }
 
@@ -54,22 +55,31 @@ public class SessWidget extends AWidget {
 	}
     }
 
-    public SessWidget(final String addr, final int port, Session.User acct, boolean encrypt, final byte[] cookie, final Object... args) {
-	conn = Defer.later(new Defer.Callable<Result>() {
-		public Result call() throws InterruptedException {
-		    InetAddress host;
-		    try {
-			host = InetAddress.getByName(addr);
-		    } catch(UnknownHostException e) {
-			return(new Result(null, new Connection.SessionConnError()));
-		    }
-		    try {
-			return(new Result(Session.connect(new InetSocketAddress(host, port), acct, encrypt, cookie, args), null));
-		    } catch(Connection.SessionError err) {
-			return(new Result(null, err));
-		    }
+    public SessWidget(String host, int port, Session cursess, byte[] cookie, Object... args) {
+	Session.User acct = cursess.user.copy().alias(null);
+	boolean encrypt = (cursess.conn instanceof Connection) && ((Connection)cursess.conn).encrypted();
+	SocketAddress curaddr = (cursess.conn instanceof Connection) ? ((Connection)cursess.conn).server : null;
+	conn = Defer.later(() -> {
+	    List<InetSocketAddress> addrs = new ArrayList<>();
+	    try {
+		for(InetAddress addr : InetAddress.getAllByName(host))
+		    addrs.add(new InetSocketAddress(addr, port));
+	    } catch(UnknownHostException e) {
+		return(new Result(null, new Connection.SessionConnError()));
+	    }
+	    Bootstrap.preferhost(addrs, curaddr);
+	    Connection.SessionError error = null;
+	    for(int i = 0; i < addrs.size(); i++) {
+		try {
+		    return(new Result(Session.connect(addrs.get(i), acct, encrypt, cookie, args), null));
+		} catch(Connection.SessionConnError err) {
+		    error = err;
+		} catch(Connection.SessionError err) {
+		    return(new Result(null, err));
 		}
-	    });
+	    }
+	    return(new Result(null, error));
+	});
     }
 
     public void tick(double dt) {

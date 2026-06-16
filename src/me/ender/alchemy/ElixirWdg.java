@@ -2,6 +2,7 @@ package me.ender.alchemy;
 
 import haven.*;
 
+import java.io.IOException;
 import java.util.List;
 
 public class ElixirWdg extends Widget {
@@ -39,8 +40,10 @@ public class ElixirWdg extends Widget {
     }
 
     private void open() {
-	if(WebBrowser.self != null && elixir != null) {
-	    WebBrowser.self.show(Utils.url(elixir.toAlchemyUrl()));
+	if(elixir != null) {
+	    try {
+		ui.wnd.toolkit().browse(Utils.uri(elixir.toAlchemyUrl()));
+	    } catch (IOException ignored) {}
 	}
     }
 

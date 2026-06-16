@@ -32,6 +32,7 @@ import java.io.*;
 import java.nio.file.*;
 import java.awt.image.*;
 import com.jogamp.opengl.*;
+import java.awt.event.KeyEvent;
 
 public class Debug {
     public static final int FRAME_DEBUG_KEY = java.awt.event.KeyEvent.VK_PAUSE;
@@ -51,6 +52,13 @@ public class Debug {
 	synchronized(framestats) {
 	    framestats.clear();
 	}
+    }
+
+    public static void keyevent(KeyEvent ke) {
+	if((ke.getID() == KeyEvent.KEY_PRESSED)  && (ke.getKeyCode() == FRAME_DEBUG_KEY))
+	    fdk = true;
+	if((ke.getID() == KeyEvent.KEY_RELEASED) && (ke.getKeyCode() == FRAME_DEBUG_KEY))
+	    fdk = false;
     }
 
     public static void dumpimage(BufferedImage img, Path path) {

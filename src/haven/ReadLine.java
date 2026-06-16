@@ -26,9 +26,10 @@
 
 package haven;
 
+import haven.iosys.tk.*;
 import java.util.*;
+import java.util.function.*;
 import java.awt.event.*;
-import java.awt.datatransfer.*;
 import static haven.KeyMatch.*;
 
 public interface ReadLine {
@@ -81,10 +82,9 @@ public interface ReadLine {
     }
 
     public static interface Owner {
+	public UI ui();
 	public default void changed(ReadLine buf) {}
 	public default void done(ReadLine buf) {}
-
-	public static final Owner nil = new Owner() {};
     }
 
     public static abstract class Base implements ReadLine {
@@ -96,7 +96,7 @@ public interface ReadLine {
 	public double mtime;
 
 	public Base(Owner owner, String init) {
-	    this.owner = (owner == null) ? Owner.nil : owner;
+	    this.owner = owner;
 	    line(init);
 	    point(length);
 	}
@@ -201,35 +201,38 @@ public interface ReadLine {
 	}
 
 	public void clipset(Clipboard c) {
-	    if(c != null) {
-		String text = line(Math.min(mark, point), Math.abs(point - mark));
-		java.awt.datatransfer.StringSelection xf = new java.awt.datatransfer.StringSelection(text);
-		try {
-		    c.setContents(xf, xf);
-		} catch(IllegalStateException e) {
-		}
-	    }
+	    String text = line(Math.min(mark, point), Math.abs(point - mark));
+	    c.put(new Clipboard.Contents(new Clipboard.Item<CharSequence>(Clipboard.Format.TEXT, text)));
 	}
 
-	public String cliptext() {
-	    Clipboard c;
-	    if((c = java.awt.Toolkit.getDefaultToolkit().getSystemSelection()) != null) {
-		try {
-		    return((String)c.getData(DataFlavor.stringFlavor));
-		} catch(IllegalStateException e) {
-		} catch(java.io.IOException e) {
-		} catch(UnsupportedFlavorException e) {
+	public static Promise<CharSequence> cliptext(Clipboard c) {
+	    return(c.get().then(cnt -> cnt.or(Clipboard.Format.TEXT, null).get()));
+	}
+
+	public Promise<CharSequence> cliptext() {
+	    return(cliptext(owner.ui().wnd.clipboard(Clipboard.Std.PRIMARY))
+		   .then(val -> {
+		       if(val != null)
+			   return(new Promise<CharSequence>().resolve(val));
+		       return(cliptext(owner.ui().wnd.clipboard(Clipboard.Std.CLIPBOARD)));
+		   }));
+	}
+
+	private void paste(CharSequence text) {
+	    if(text == null)
+		return;
+	    synchronized(owner.ui()) {
+		rmsel();
+		int l = 0;
+		for(; l < text.length(); l++) {
+		    if(text.charAt(l) < 32)
+			break;
 		}
+		char[] dst = ensure(point, l);
+		for(int i = 0; i < l; i++)
+		    dst[point++] = text.charAt(i);
+		owner.changed(this);
 	    }
-	    if((c = java.awt.Toolkit.getDefaultToolkit().getSystemClipboard()) != null) {
-		try {
-		    return((String)c.getData(DataFlavor.stringFlavor));
-		} catch(IllegalStateException e) {
-		} catch(java.io.IOException e) {
-		} catch(UnsupportedFlavorException e) {
-		}
-	    }
-	    return("");
 	}
 
 	public int mark() {return(mark);}
@@ -250,7 +253,7 @@ public interface ReadLine {
 
 	private void cksel() {
 	    if(mark >= 0) {
-		clipset(java.awt.Toolkit.getDefaultToolkit().getSystemSelection());
+		clipset(owner.ui().wnd.clipboard(Clipboard.Std.PRIMARY));
 	    }
 	}
 
@@ -313,19 +316,10 @@ public interface ReadLine {
 		mark = s ? (mark < 0) ? point : mark : -1;
 		point = length;
 	    } else if((c == 'v') && (mod == C)) {
-		rmsel();
-		String cl = cliptext();
-		for(int i = 0; i < cl.length(); i++) {
-		    if(cl.charAt(i) < 32) {
-			cl = cl.substring(0, i);
-			break;
-		    }
-		}
-		cl.getChars(0, cl.length(), ensure(point, cl.length()), point);
-		point += cl.length();
+		cliptext().map(this::paste).report(owner.ui(), "Clipboard error");
 	    } else if((c == 'c') && (mod == C)) {
 		if(mark >= 0)
-		    clipset(java.awt.Toolkit.getDefaultToolkit().getSystemClipboard());
+		    clipset(owner.ui().wnd.clipboard(Clipboard.Std.CLIPBOARD));
 		else
 		    return(false);
 	    } else {
@@ -372,12 +366,12 @@ public interface ReadLine {
 	private String lastsel = "", lastclip = "";
 	private void killclipboard() {
 	    String cl;
-	    if(!(cl = cliptext(java.awt.Toolkit.getDefaultToolkit().getSystemSelection())).equals(lastsel)) {
+	    if(!(cl = cliptext(owner.ui().wnd.clipboard(Clipboard.Std.PRIMARY))).equals(lastsel)) {
 		lastsel = cl;
 		kill(cl);
 		return;
 	    }
-	    if(!(cl = cliptext(java.awt.Toolkit.getDefaultToolkit().getSystemClipboard())).equals(lastclip)) {
+	    if(!(cl = cliptext(owner.ui().wnd.clipboard(Clipboard.Std.CLIPBOARD))).equals(lastclip)) {
 		lastclip = cl;
 		kill(cl);
 		return;
@@ -390,13 +384,12 @@ public interface ReadLine {
 	}
 
 	private String cliptext(Clipboard c) {
-	    if(c == null)
-		return("");
 	    try {
-		return((String)c.getData(DataFlavor.stringFlavor));
-	    } catch(IllegalStateException e) {
-	    } catch(java.io.IOException e) {
-	    } catch(UnsupportedFlavorException e) {
+		Clipboard.Item<CharSequence> item = c.fetch().find(Clipboard.Format.TEXT);
+		if(item != null)
+		    return(item.fetch().toString());
+	    } catch(Exception e) {
+		owner.ui().error("Clipboard error: " + e.getMessage());
 	    }
 	    return("");
 	}

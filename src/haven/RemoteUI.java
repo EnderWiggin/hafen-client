@@ -72,7 +72,8 @@ public class RemoteUI implements UI.Receiver, UI.Runner {
 	    sendua("ui.scale", String.format("%.2f", UI.scale(1.0)));
 	    haven.render.Environment env = ui.getenv();
 	    if(env != null) {
-		sendua("render.env", env.getClass().getSimpleName());
+		sendua("tk.name", ui.wnd.toolkit().getClass().getSimpleName());
+		sendua("tk.desc", ui.wnd.toolkit().description());
 		sendua("render.vendor", env.caps().vendor());
 		sendua("render.device", env.caps().device());
 		sendua("render.driver", env.caps().driver());

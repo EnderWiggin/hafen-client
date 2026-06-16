@@ -24,37 +24,10 @@
  *  Boston, MA 02111-1307 USA
  */
 
-package haven;
+package haven.ffi.x11;
 
-import java.awt.Desktop;
-import java.net.*;
-
-public class DesktopBrowser extends WebBrowser {
-    private final Desktop desktop;
-    
-    private DesktopBrowser(Desktop desktop) {
-	this.desktop = desktop;
-    }
-    
-    public static DesktopBrowser create() {
-	try {
-	    Class.forName("java.awt.Desktop");
-	    if(!Desktop.isDesktopSupported())
-		return(null);
-	    Desktop desktop = Desktop.getDesktop();
-	    if(!desktop.isSupported(Desktop.Action.BROWSE))
-		return(null);
-	    return(new DesktopBrowser(desktop));
-	} catch(Exception e) {
-	    return(null);
-	}
-    }
-    
-    public void show(URL url) {
-	try {
-	    desktop.browse(url.toURI());
-	} catch(Exception e) {
-	    throw(new BrowserException(e));
-	}
+public class XIOException extends XLibException {
+    public String getMessage() {
+	return("Fatal X error");
     }
 }

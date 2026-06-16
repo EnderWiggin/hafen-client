@@ -26,26 +26,21 @@
 
 package haven;
 
+import haven.iosys.audio.*;
 import java.util.*;
 import java.io.*;
 import java.nio.file.*;
-import javax.sound.sampled.*;
 import dolda.xiphutil.*;
 
 public class Audio {
-    public static final Config.Variable<String> outname = Config.Variable.prop("haven.audio-output", "");
-    public static final AudioFormat fmt = new AudioFormat(44100, 16, 2, true, false);
+    /* XXX: Surprisingly, 44.1 kHz seems to not be so universally
+     * supported as I thought it was. The audio system should probably
+     * support dynamic sample rates. */
+    public static final int SAMPLE_RATE = 44100;
+    @Deprecated public static final javax.sound.sampled.AudioFormat fmt =
+	new javax.sound.sampled.AudioFormat(SAMPLE_RATE, 16, 2, true, false);
+    public static final Config.Variable<String> outname = Config.Variable.prop("haven.audio-output", null);
     public static boolean enabled = true;
-    public static double volume = Double.parseDouble(Utils.getpref("sfxvol", "1.0"));
-    //FIXME: check if we can use loftar's buffer settings, or switch to custom
-    //public static int bufsize = CFG.AUDIO_BUFFER.get();
-    private static int bufsize = Utils.getprefi("audiobuf", Math.round(fmt.getSampleRate() * 0.05f)) * fmt.getFrameSize();
-    private static Player player;
-
-    public static void setvolume(double volume) {
-	Audio.volume = volume;
-	Utils.setpref("sfxvol", Double.toString(volume));
-    }
 
     public interface CS {
 	public int get(double[][] buf, int len);
@@ -303,7 +298,7 @@ public class Audio {
 		    if(nch < 0)
 			throw(new IOException("Malformed wave file (no fmt chunk)"));
 		    CS ret = new PCMClip(clip, nch, fmt).size(sz);
-		    int orate = Math.round(Audio.fmt.getSampleRate());
+		    int orate = Math.round(SAMPLE_RATE);
 		    if(rate != orate)
 			ret = new Resampler(ret, rate, orate);
 		    return(ret);
@@ -419,11 +414,11 @@ public class Audio {
 	}
 
 	public Resampler(CS bk, double irate) {
-	    this(bk, irate, fmt.getSampleRate());
+	    this(bk, irate, SAMPLE_RATE);
 	}
 
 	public Resampler(CS bk) {
-	    this(bk, fmt.getSampleRate());
+	    this(bk, SAMPLE_RATE);
 	}
 
 	public int get(double[][] dst, int ns) {
@@ -546,166 +541,6 @@ public class Audio {
 	}
     }
 
-    private static class Player extends HackThread {
-	private final CS stream;
-	private final int nch;
-	private volatile boolean reopen = false;
-
-	Player(CS stream) {
-	    super("Haven audio player");
-	    this.stream = stream;
-	    nch = fmt.getChannels();
-	    setDaemon(true);
-	}
-
-	private int fillbuf(byte[] dst, int off, int len) {
-	    int ns = len / (2 * nch);
-	    double[][] val = new double[nch][ns];
-	    int left = ns, wr = 0;
-	    while(left > 0) {
-		int ret = stream.get(val, left);
-		if(ret <= 0)
-		    return((wr > 0)?wr:-1);
-		for(int i = 0; i < ret; i++) {
-		    for(int o = 0; o < nch; o++) {
-			int iv = (int)(val[o][i] * volume * 32767.0);
-			if(iv < 0) {
-			    if(iv < -32768)
-				iv = -32768;
-			    iv += 65536;
-			} else {
-			    if(iv > 32767)
-				iv = 32767;
-			}
-			dst[off++] = (byte)(iv & 0xff);
-			dst[off++] = (byte)((iv & 0xff00) >> 8);
-			wr += 2;
-		    }
-		}
-		left -= ret;
-	    }
-	    return(wr);
-	}
-
-	static SourceDataLine getline() throws LineUnavailableException {
-	    javax.sound.sampled.Mixer mixer;
-	    String spec = outname.get();
-	    if(spec.equals("")) {
-		mixer = AudioSystem.getMixer(null);
-	    } else {
-		javax.sound.sampled.Mixer.Info f = null, f2 = null;
-		int fs = 0;
-		for(javax.sound.sampled.Mixer.Info info : AudioSystem.getMixerInfo()) {
-		    String nm = info.getName();
-		    int s = 0;
-		    if(nm.equals(spec))
-			s = 3;
-		    else if(nm.equalsIgnoreCase(spec))
-			s = 2;
-		    else if(nm.toLowerCase().indexOf(spec.toLowerCase()) >= 0)
-			s = 1;
-		    if(s > fs) {
-			f = info;
-			f2 = null;
-			fs = s;
-		    } else if((s > 0) && (s == fs)) {
-			f2 = info;
-		    }
-		}
-		if(f == null)
-		    throw(new LineUnavailableException(String.format("no mixer found by name: %s", spec)));
-		else if(f2 != null)
-		    throw(new LineUnavailableException(String.format("multiple mixers found by name `%s': %s and %s", spec, f.getName(), f2.getName())));
-		mixer = AudioSystem.getMixer(f);
-	    }
-	    return((SourceDataLine)mixer.getLine(new DataLine.Info(SourceDataLine.class, fmt)));
-	}
-
-	public void run() {
-	    SourceDataLine line = null;
-	    try {
-		while(true) {
-		    synchronized(this) {
-			reopen = false;
-			this.notifyAll();
-		    }
-		    try {
-			line = getline();
-			line.open(fmt, bufsize);
-			line.start();
-		    } catch(Exception e) {
-			new Warning(e, "could not open audio output").issue();
-			return;
-		    }
-		    byte[] buf = new byte[bufsize / 2];
-		    while(true) {
-			if(Thread.interrupted())
-			    throw(new InterruptedException());
-			int ret = fillbuf(buf, 0, buf.length);
-			if(ret < 0)
-			    return;
-			for(int off = 0; off < ret; off += line.write(buf, off, ret - off));
-			if(reopen)
-			    break;
-		    }
-		    line.close();
-		    line = null;
-		}
-	    } catch(InterruptedException e) {
-	    } finally {
-		synchronized(Audio.class) {
-		    player = null;
-		}
-		if(line != null)
-		    line.close();
-	    }
-	}
-
-	void reopen(boolean async) {
-	    try {
-		synchronized(this) {
-		    reopen = true;
-		    while(!async && reopen && isAlive())
-			this.wait();
-		}
-	    } catch(InterruptedException e) {
-		Thread.currentThread().interrupt();
-	    }
-	}
-    }
-
-    private static Player ckpl(boolean creat) {
-	synchronized(Audio.class) {
-	    if(enabled) {
-		if(player == null) {
-		    if(creat) {
-			player = new Player(new Mixer(true));
-			player.start();
-		    } else {
-			return(null);
-		    }
-		}
-		return(player);
-	    } else {
-		return(null);
-	    }
-	}
-    }
-
-    public static void play(CS clip) {
-	if(clip == null)
-	    throw(new NullPointerException());
-	Player pl = ckpl(true);
-	if(pl != null)
-	    ((Mixer)pl.stream).add(clip);
-    }
-
-    public static void stop(CS clip) {
-	Player pl = ckpl(false);;
-	if(pl != null)
-	    ((Mixer)pl.stream).stop(clip);
-    }
-
     private static Map<Resource, Clip> resclips = new HashMap<>();
     public static Clip resclip(Resource res) {
 	Collection<Clip> clips = res.layers(Audio.clip, null);
@@ -751,62 +586,103 @@ public class Audio {
 	return(resclip(res).stream());
     }
 
-    public static void play(Resource res) {
-	play(fromres(res));
+    public static class Root implements Console.Directory {
+	public final AudioSystem.SinkLine line;
+	public final Mixer mixer = new Mixer(true);
+	private int bufsize = Utils.getprefi("audiobuf", Math.round(SAMPLE_RATE * 0.05f));
+	private final VolAdjust adj = new VolAdjust(mixer, Double.parseDouble(Utils.getpref("sfxvol", "1.0")));
+	private AudioSystem.Player player;
+
+	public Root(AudioSystem.SinkLine line) {
+	    this.line = line;
+	    open();
+	}
+
+	public Root(AudioSystem sys) {
+	    this(sys.sinkline(Utils.map().put(AudioSystem.SPEC_RATE, SAMPLE_RATE).map()));
+	}
+
+	private void open() {
+	    try {
+		player = line.open(adj, bufsize);
+	    } catch(haven.iosys.Unavailable e) {
+		new Warning(e, "could not open audio output").issue();
+		player = new DummyAudio.DummyPlayer(mixer);
+	    }
+	}
+
+	public double volume() {
+	    return(adj.vol);
+	}
+
+	public void volume(double volume) {
+	    adj.vol = volume;
+	    Utils.setpref("sfxvol", Double.toString(volume));
+	}
+
+	public int bufsize() {
+	    return(bufsize);
+	}
+
+	public void bufsize(int nsz) {
+	    player.stop(true);
+	    open();
+	    Utils.setprefi("audiobuf", nsz);
+	}
+
+	private Map<String, Console.Command> cmdmap = new TreeMap<String, Console.Command>();
+	{
+	    Console.setscmd("sfx", (cons, args) -> {
+		mixer.add(fromres(Loading.waitfor(Resource.remote().load(args[1]))));
+	    });
+	    Console.setscmd("sfxvol", (cons, args) -> {
+		volume(Double.parseDouble(args[1]));
+	    });
+	    Console.setscmd("audiobuf", (cons, args) -> {
+		int nsz = Integer.parseInt(args[1]);
+		if(nsz > SAMPLE_RATE)
+		    throw(new Exception("Rejecting buffer longer than 1 second"));
+		bufsize(nsz);
+	    });
+	}
+	public Map<String, Console.Command> findcmds() {
+	    return(cmdmap);
+	}
     }
 
-    public static int bufsize() {
-	return(bufsize / fmt.getFrameSize());
-    }
-
-    public static void bufsize(int nsz, boolean async) {
-	bufsize = nsz * fmt.getFrameSize();
-	Player pl = ckpl(false);
-	if(pl != null)
-	    pl.reopen(async);
-	Utils.setprefi("audiobuf", nsz);
+    public static Map<Object, Object> defspec() {
+	Map<Object, Object> spec = new HashMap<>();
+	spec.put(AudioSystem.SPEC_RATE, SAMPLE_RATE);
+	spec.put(AudioSystem.SPEC_SINKDEV, outname.get());
+	return(spec);
     }
 
     public static void main(String[] args) throws Exception {
 	if(args[0].equals("play")) {
 	    Collection<Monitor> clips = new LinkedList<Monitor>();
+	    Map<Object, Object> spec = defspec();
 	    for(int i = 1; i < args.length; i++) {
-		if(args[i].equals("-b")) {
-		    bufsize = Integer.parseInt(args[++i]);
+		if(args[i].equals("-o")) {
+		    int p = args[i].indexOf('=');
+		    if(p < 0)
+			spec.put(args[i], true);
+		    else
+			spec.put(args[i].substring(0, p), args[i].substring(p + 1));
 		} else {
 		    Monitor c = new Monitor(PCMClip.fromwav(Files.newInputStream(Utils.path(args[i]))));
 		    clips.add(c);
 		}
 	    }
+	    Mixer out = new Mixer(true);
+	    AudioSystem.instance().sinkline(spec).open(out);
 	    for(Monitor c : clips)
-		play(c);
+		out.add(c);
 	    for(Monitor c : clips)
 		c.finwait();
 	} else if(args[0].equals("outputs")) {
-	    for(javax.sound.sampled.Mixer.Info m : AudioSystem.getMixerInfo()) {
-		System.out.printf("%s\t%s (%s %s)\n", m.getName(), m.getDescription(), m.getVendor(), m.getVersion());
+	    for(AudioSystem.SinkDevice dev : AudioSystem.instance().sinkdevs()) {
+		System.out.printf("%s\t%s\n", dev.id(), dev.desc());
 	    }
 	}
-    }
-
-    static {
-	Console.setscmd("sfx", new Console.Command() {
-		public void run(Console cons, String[] args) {
-		    play(Loading.waitfor(Resource.remote().load(args[1])));
-		}
-	    });
-	Console.setscmd("sfxvol", new Console.Command() {
-		public void run(Console cons, String[] args) {
-		    setvolume(Double.parseDouble(args[1]));
-		}
-	    });
-	Console.setscmd("audiobuf", new Console.Command() {
-		public void run(Console cons, String[] args) throws Exception {
-		    int nsz = Integer.parseInt(args[1]);
-		    if(nsz > fmt.getSampleRate())
-			throw(new Exception("Rejecting buffer longer than 1 second"));
-		    bufsize(nsz, false);
-		}
-	    });
     }
 }

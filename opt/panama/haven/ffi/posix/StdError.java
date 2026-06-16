@@ -24,40 +24,16 @@
  *  Boston, MA 02111-1307 USA
  */
 
-package haven;
+package haven.ffi.posix;
 
-import java.net.*;
-import java.io.*;
+public class StdError extends RuntimeException {
+    public final int errno;
 
-public abstract class BrowserAuth extends AuthClient.Credentials {
-    public abstract String method();
+    public StdError(int errno) {
+	this.errno = errno;
+    }
 
-    public String tryauth(AuthClient cl) throws IOException {
-	if(WebBrowser.self == null)
-	    throw(new AuthException("Could not find any web browser to launch"));
-	Message rpl = cl.cmd("web", method());
-	String stat = rpl.string();
-	URL url;
-	if(stat.equals("ok")) {
-	    url = Utils.url(rpl.string());
-	} else if(stat.equals("no")) {
-	    throw(new AuthException(rpl.string()));
-	} else {
-	    throw(new RuntimeException("Unexpected reply `" + stat + "' from auth server"));
-	}
-	try {
-	    WebBrowser.self.show(url);
-	} catch(WebBrowser.BrowserException e) {
-	    throw(new AuthException("Could not launch web browser"));
-	}
-	rpl = cl.cmd("wait");
-	stat = rpl.string();
-	if(stat.equals("ok")) {
-	    return(rpl.string());
-	} else if(stat.equals("no")) {
-	    throw(new AuthException(rpl.string()));
-	} else {
-	    throw(new RuntimeException("Unexpected reply `" + stat + "' from auth server"));
-	}
+    public String getMessage() {
+	return(LibC.get().strerror(errno));
     }
 }

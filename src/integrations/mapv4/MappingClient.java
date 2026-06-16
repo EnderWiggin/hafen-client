@@ -12,6 +12,7 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -211,7 +212,7 @@ public class MappingClient {
     public void OpenMap(MapRef mapRef) {
 	try {
 	    if(mapRef == null) {return;}
-	    WebBrowser.self.show(new URL(
+	    glob.sess.ui.wnd.toolkit().browse(new URI(
 		String.format(endpoint + "/#/grid/%d/%d/%d/6", mapRef.mapID, mapRef.gc.x, mapRef.gc.y)));
 	} catch (Exception ex) {}
     }

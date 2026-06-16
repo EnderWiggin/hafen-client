@@ -165,7 +165,7 @@ public class Bootstrap implements UI.Receiver, UI.Runner {
 	}
     }
 
-    private static void preferhost(List<InetSocketAddress> hosts, SocketAddress prev) {
+    public static void preferhost(List<InetSocketAddress> hosts, SocketAddress prev) {
 	if((prev == null) || !(prev instanceof InetSocketAddress))
 	    return;
 	InetAddress host = ((InetSocketAddress)prev).getAddress();

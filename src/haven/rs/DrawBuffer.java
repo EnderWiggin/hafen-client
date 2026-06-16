@@ -88,11 +88,20 @@ public class DrawBuffer implements Disposable {
 	    rnd.draw(cmd);
 	    BufferedImage[] retbuf = {null};
 	    GOut.getimage(cmd, basic.state(), FragColor.fragcol, Area.sized(Coord.z, this.sz), img -> {
-		    retbuf[0] = img;
+		    synchronized(retbuf) {
+			retbuf[0] = img;
+			retbuf.notifyAll();
+		    }
 		});
 	    env.submit(cmd);
-	    if(retbuf[0] == null)
-		throw(new AssertionError());
+	    try {
+		synchronized(retbuf) {
+		    while(retbuf[0] == null)
+			retbuf.wait();
+		}
+	    } catch(InterruptedException e) {
+		throw(new RuntimeException(e));
+	    }
 	    return(retbuf[0]);
 	} finally {
 	    rnd.dispose();

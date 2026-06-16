@@ -9,6 +9,9 @@
     <mkdir dir="build/classes" />
     <available property="has-res-jar" file="bin/builtin-res.jar" />
     <available property="unpacked-lib" file="build/classes-lib" />
+    <condition property="has-panama">
+      <javaversion atleast="22" />
+    </condition>
   </target>
 
   <target name="make-buildinfo" depends="build-env">
@@ -116,6 +119,23 @@
     <copy todir="build/classes/haven" file="etc/font.ttf" />
     <copy file="local-boot.properties" tofile="build/classes/haven/boot-props" failonerror="false" quiet="true" />
   </target>
+
+  <target name="opt/panama" if="has-panama" depends="build-env, hafen-client">
+    <mkdir dir="build/opt/panama" />
+    <javac srcdir="opt/panama" destdir="build/opt/panama" release="22"
+	   debug="on" includeantruntime="no">
+      <classpath>
+	<pathelement path="build/classes" />
+	<pathelement path="lib/jglob.jar" />
+      </classpath>
+      <compilerarg value="-proc:full" />
+      <compilerarg value="-Xlint:unchecked" />
+      <compilerarg value="-Xlint:deprecation" />
+    </javac>
+    <jar destfile="build/hafen-panama.jar" update="true">
+      <fileset dir="build/opt/panama" />
+    </jar>
+  </target>
   
   <target name="client-res-java" depends="hafen-client">
     <mkdir dir="resources/classes" />
@@ -176,9 +196,10 @@
       <fileset dir="build/classes-lib" />
       <fileset file="changelog.txt" />
       <manifest>
-	<attribute name="Main-Class" value="haven.MainFrame" />
-	<attribute name="Class-Path" value="jogl-all.jar gluegen-rt.jar lwjgl-fat.jar lwjgl-awt.jar client-res.jar lwjgl-opengl-fat.jar steamworks4j.jar builtin-res.jar hafen-res.jar" />
-        <attribute name="Enable-Native-Access" value="ALL-UNNAMED" />
+	<attribute name="Main-Class" value="haven.Client" />
+	<attribute name="Class-Path" value="hafen-panama.jar jogl-all.jar gluegen-rt.jar lwjgl-fat.jar lwjgl-awt.jar lwjgl-opengl-fat.jar steamworks4j.jar client-res.jar builtin-res.jar hafen-res.jar" />
+	<attribute name="Add-Exports" value="java.base/java.lang java.desktop/sun.awt java.desktop/sun.java2d" />
+	<attribute name="Enable-Native-Access" value="ALL-UNNAMED" />
       </manifest>
     </jar>
     <chmod file="build/hafen.jar" perm="a+x" />
@@ -225,11 +246,16 @@
       <fileset dir="lib/ext/lwjgl"><include name="*.jar" /></fileset>
       <fileset dir="lib/ext/steamworks"><include name="*.jar" /></fileset>
     </copy>
+    <copy todir="bin" failonerror="false" quiet="true">
+      <fileset dir="build">
+	<include name="hafen-panama.jar" />
+      </fileset>
+    </copy>
     <copy file="etc/ansgar-config.properties" tofile="bin/haven-config.properties" />
     <chmod file="bin/hafen.jar" perm="a+x" />
   </target>
-  
-  <target name="deftgt" depends="res-jar, jars, bin" />
+
+  <target name="deftgt" depends="res-jar, jars, opt/panama, bin" />
   <target name="buildprocess" depends="jars"/>
 
   <target name="run" depends="bin">

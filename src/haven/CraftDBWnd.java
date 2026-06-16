@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 import static haven.CraftDBWnd.Mode.*;
 import static haven.ItemFilter.*;
 
-public class CraftDBWnd extends WindowX implements ICraftParent {
+public class CraftDBWnd extends WindowX implements ICraftParent, ReadLine.Owner {
     private static final int PANEL_H = UI.scale(52);
     private static final Coord WND_SZ = UI.scale(635, 360).addy(PANEL_H);
     private static final Coord ICON_SZ = UI.scale(20, 20);
@@ -50,7 +50,7 @@ public class CraftDBWnd extends WindowX implements ICraftParent {
     private final Pattern category = Pattern.compile("paginae/craft/.+");
     private int pagseq = 0;
     private boolean needfilter = false;
-    private final ReadLine filter = ReadLine.make(null, "");
+    private final ReadLine filter = ReadLine.make(this, "");
     private Mode mode = All;
     
     static {

@@ -24,15 +24,28 @@
  *  Boston, MA 02111-1307 USA
  */
 
-package haven.rs;
+package haven.ffi.posix;
 
 import haven.*;
-import haven.render.*;
 
-public interface Context extends Disposable {
-    public Environment env();
+public class FileDescriptor {
+    public final int fileno;
+    private final Runnable clean;
 
-    public static Context getdefault() {
-	return(GLOffscreen.get());
+    private FileDescriptor(int fileno) {
+	this.fileno = fileno;
+	clean = Finalizer.finalize(this, () -> LibC.get().close(fileno));
+    }
+    public static FileDescriptor of(int fileno) {return(new FileDescriptor(fileno));}
+
+    public void close() {
+	clean.run();
+    }
+
+    public int hashCode() {return(Integer.hashCode(fileno));}
+    public boolean equals(Object that) {return((that instanceof FileDescriptor) && (this.fileno == ((FileDescriptor)that).fileno));}
+
+    public String toString() {
+	return("fd " + fileno);
     }
 }

@@ -44,6 +44,12 @@ public class HashBMap<K, V> extends AbstractMap<K, V> implements BMap<K, V> {
 	rev = new HashBMap<V, K>(rmap, fmap, this);
     }
 
+    public HashBMap(Map<K, V> from) {
+	this();
+	for(Map.Entry<K, V> ent : from.entrySet())
+	    put(ent.getKey(), ent.getValue());
+    }
+
     public boolean containsKey(Object k) {
 	return(fmap.containsKey(k));
     }

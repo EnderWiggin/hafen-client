@@ -335,7 +335,6 @@ public class Resource implements Serializable {
 					"com5", "com6", "com7", "com8", "com9",
 					"lpt0", "lpt1", "lpt2", "lpt3", "lpt4",
 					"lpt5", "lpt6", "lpt7", "lpt8", "lpt9"));
-	public static final boolean windows = System.getProperty("os.name", "").startsWith("Windows");
 	private static final boolean[] winsafe;
 	public final Path base;
 
@@ -356,7 +355,7 @@ public class Resource implements Serializable {
 	}
 
 	private static String checkpart(String part, String whole) throws FileNotFoundException {
-	    if(windows && wintraps.contains(part))
+	    if(Config.windows && wintraps.contains(part))
 		throw(new FileNotFoundException(whole));
 	    return(part);
 	}

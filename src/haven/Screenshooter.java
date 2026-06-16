@@ -74,12 +74,8 @@ public class Screenshooter extends WindowX {
 	pack();
     }
 
-    public void wdgmsg(Widget sender, String msg, Object... args) {
-	if((sender == this) && (msg == "close")) {
-	    ui.destroy(this);
-	} else {
-	    super.wdgmsg(sender, msg, args);
-	}
+    public void reqclose() {
+	reqdestroy();
     }
 
     public static class Shot {
@@ -307,8 +303,11 @@ public class Screenshooter extends WindowX {
 	    synchronized(ui) {
 		ui.destroy(btn);
 		btn = add(new Button(125, "Open in browser", false, () -> {
-			    if(WebBrowser.self != null)
-				WebBrowser.self.show(result);
+			    try {
+				ui.wnd.toolkit().browse(result.toURI());
+			    } catch(IOException | URISyntaxException e) {
+				ui.error("Could not open browser: " + e.getMessage());
+			    }
 			}), btnc);
 	    }
 	}

@@ -42,7 +42,7 @@ import static haven.Utils.*;
 
 public class WorkshopLauncher {
     static {
-	MainFrame.initlocale();
+	Utils.initlocale();
     }
 
     public static class Client {
@@ -168,7 +168,7 @@ public class WorkshopLauncher {
 
     public static boolean launch(Client cl) throws IOException {
 	if(cl == null) {
-	    MainFrame.main(new String[] {});
+	    haven.Client.main(new String[] {});
 	    return(false);
 	}
 	String desc;
@@ -344,7 +344,7 @@ public class WorkshopLauncher {
 	}
 
 	static {
-	    MainFrame.initawt();
+	    haven.iosys.tk.AWTToolkit.initawt();
 	}
     }
 
@@ -472,7 +472,7 @@ public class WorkshopLauncher {
     public static void main2(String[] args) {
 	Steam api = Steam.get();
 	if(api == null) {
-	    MainFrame.main(args);
+	    haven.Client.main(args);
 	    return;
 	}
 	Collection<UGItem> items = api.ugitems();
@@ -501,7 +501,7 @@ public class WorkshopLauncher {
 	    }
 	}
 	if(clients.isEmpty()) {
-	    MainFrame.main(args);
+	    haven.Client.main(args);
 	    return;
 	}
 	if(!launchlast(clients)) {

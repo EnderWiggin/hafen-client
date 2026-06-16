@@ -37,53 +37,22 @@ public class BaseFileCache implements ResCache {
     public final URI id;
     private final Path base;
 
-    public static Path findroot() {
-	try {
-	    windows: {
-		String path = System.getenv("APPDATA");
-		if(path == null)
-		    break windows;
-		Path appdata = Utils.path(path);
-		if(!Files.exists(appdata) || !Files.isDirectory(appdata) || !Files.isReadable(appdata) || !Files.isWritable(appdata))
-		    break windows;
-		Path base = pj(appdata, "Haven and Hearth", "cache");
-		if(!Files.exists(base)) {
-		    try {
-			Files.createDirectories(base);
-		    } catch(IOException e) {
-			break windows;
-		    }
-		}
-		return(base);
-	    }
-	    fallback: {
-		String path = System.getProperty("user.home", null);
-		if(path == null)
-		    break fallback;
-		Path home = Utils.path(path);
-		if(!Files.exists(home) || !Files.isDirectory(home) || !Files.isReadable(home) || !Files.isWritable(home))
-		    break fallback;
-		Path base = pj(home, ".haven", "cache");
-		if(!Files.exists(base)) {
-		    try {
-			Files.createDirectories(base);
-		    } catch(IOException e) {
-			break fallback;
-		    }
-		}
-		return(base);
-	    }
-	} catch(SecurityException e) {
-	}
-	throw(new UnsupportedOperationException("Found no reasonable place to store local files"));
-    }
-
     public static Path findbase(URI id) throws IOException {
+	Path home = Config.localdir();
+	if(home == null)
+	    throw(new UnsupportedOperationException("Found no reasonable place to store local files"));
+	Path root = pj(home, "cache");
+	if(!Files.exists(root)) {
+	    try {
+		Files.createDirectories(root);
+	    } catch(IOException e) {
+		throw(new UnsupportedOperationException("Could not create cache directory", e));
+	    }
+	}
 	String idstr = id.toString();
 	int idhash = 0;
 	for(int i = 0; i < idstr.length(); i++)
 	    idhash = (idhash * 31) + idstr.charAt(i);
-	Path root = findroot();
 	Path lfn = pj(root, ".index-lock");
 	synchronized(BaseFileCache.class) {
 	    /* Note: Synchronization is only because Java doesn't
@@ -161,7 +130,7 @@ public class BaseFileCache implements ResCache {
     }
 
     private String mangle(String el) {
-	if(Resource.FileSource.windows) {
+	if(Config.windows) {
 	    StringBuilder buf = new StringBuilder();
 	    for(int i = 0; i < el.length(); i++) {
 		char c = el.charAt(i);
@@ -177,7 +146,7 @@ public class BaseFileCache implements ResCache {
 	    }
 	    el = buf.toString();
 	}
-	if(Resource.FileSource.windows &&
+	if(Config.windows &&
 	   (el.startsWith("windows-special-") ||
 	    Resource.FileSource.wintraps.contains(el)))
 	{

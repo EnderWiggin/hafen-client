@@ -72,7 +72,7 @@ public class NewsFeed extends SListBox<NewsFeed.Entry, Widget> {
 
 	public boolean mousedown(MouseDownEvent ev) {
 	    try {
-		WebBrowser.sshow(entry.href().toURL());
+		ui.wnd.toolkit().browse(entry.href());
 	    } catch(Exception e) {
 		ui.error("Could not launch web browser: " + e.getMessage());
 		return(true);

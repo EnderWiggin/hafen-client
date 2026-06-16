@@ -26,45 +26,34 @@
 
 package haven;
 
-import java.awt.event.*;
-import java.awt.dnd.*;
-import java.awt.datatransfer.*;
-import java.io.IOException;
+import haven.iosys.tk.*;
 
 public interface SystemDrop {
-    public boolean supports(DataFlavor f);
-    public Object receive(DataFlavor f) throws IOException ;
+    public Clipboard.Contents contents();
+    public Clipboard.Contents contents(DropHandler.Action act);
 
-    public static SystemDrop of(DropTargetDragEvent ev) {
+    public static SystemDrop of(DropHandler.DropHoverEvent ev) {
 	return(new SystemDrop() {
-		public boolean supports(DataFlavor f) {
-		    return(ev.isDataFlavorSupported(f));
-		}
+	    public Clipboard.Contents contents() {
+		return(ev.contents());
+	    }
 
-		public Object receive(DataFlavor f) throws IOException {
-		    try {
-			return(ev.getTransferable().getTransferData(f));
-		    } catch(UnsupportedFlavorException e) {
-			return(null);
-		    }
-		}
-	    });
+	    public Clipboard.Contents contents(DropHandler.Action act) {
+		throw(new IllegalStateException("Cannot accept transfer when hovering"));
+	    }
+	});
     }
 
-    public static SystemDrop of(DropTargetDropEvent ev) {
+    public static SystemDrop of(DropHandler.DroppedEvent ev) {
 	return(new SystemDrop() {
-		public boolean supports(DataFlavor f) {
-		    return(ev.isDataFlavorSupported(f));
-		}
+	    public Clipboard.Contents contents() {
+		return(ev.contents());
+	    }
 
-		public Object receive(DataFlavor f) throws IOException {
-		    ev.acceptDrop(ev.getDropAction());
-		    try {
-			return(ev.getTransferable().getTransferData(f));
-		    } catch(UnsupportedFlavorException e) {
-			return(null);
-		    }
-		}
-	    });
+	    public Clipboard.Contents contents(DropHandler.Action act) {
+		ev.accept(act);
+		return(contents());
+	    }
+	});
     }
 }

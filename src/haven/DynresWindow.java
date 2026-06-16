@@ -26,18 +26,17 @@
 
 package haven;
 
+import haven.iosys.tk.*;
 import haven.render.*;
 import java.util.*;
 import java.util.function.*;
 import java.io.*;
+import java.nio.file.*;
 import java.net.*;
 import java.awt.event.*;
-import java.awt.datatransfer.*;
-import javax.swing.filechooser.*;
 import javax.imageio.*;
 import java.awt.Color;
 import java.awt.image.*;
-import javax.swing.JFileChooser;
 import static haven.PUtils.*;
 import static haven.render.Texture.Filter.*;
 
@@ -140,16 +139,16 @@ public class DynresWindow extends WindowX {
 	return(rasterimg(buf));
     }
 
-    public static class PaletteCopy implements Transferable, ClipboardOwner {
+    public static class PaletteCopy {
 	public final Color[] pal;
-	private final Map<DataFlavor, Supplier<Object>> types;
+	public final Clipboard.Contents cc;
 
 	public PaletteCopy(Color[] pal) {
 	    this.pal = pal;
-	    types = Utils.<DataFlavor, Supplier<Object>>map()
-		.put(DataFlavor.imageFlavor, this::img)
-		.put(DataFlavor.stringFlavor, this::text)
-		.map();
+	    cc = new Clipboard.Contents(Arrays.asList(new Clipboard.Item<?>[] {
+		new Clipboard.Item<BufferedImage>(Clipboard.Format.IMAGE, () -> Promise.of(this::img)),
+		new Clipboard.Item<CharSequence>(Clipboard.Format.TEXT, () -> Promise.of(this::text)),
+	    }));
 	}
 
 	private BufferedImage img() {
@@ -184,18 +183,6 @@ public class DynresWindow extends WindowX {
 	    for(Color c : pal)
 		buf.append(String.format("#%02X%02X%02X\n", c.getRed(), c.getGreen(), c.getBlue()));
 	    return(buf.toString());
-	}
-
-	public DataFlavor[] getTransferDataFlavors() {
-	    return(types.keySet().toArray(new DataFlavor[0]));
-	}
-	public boolean isDataFlavorSupported(DataFlavor f) {
-	    return(types.containsKey(f));
-	}
-	public Object getTransferData(DataFlavor f) {
-	    return(types.get(f).get());
-	}
-	public void lostOwnership(Clipboard c, Transferable t) {
 	}
     }
 
@@ -265,10 +252,10 @@ public class DynresWindow extends WindowX {
 	    }
 	}
 
-	private void open(File file) {
+	private void open(Path path) {
 	    create(() -> {
 		    try {
-			BufferedImage img = ImageIO.read(file);
+			BufferedImage img = ImageIO.read(path.toFile());
 			if(img == null)
 			    throw(new IOException("File format not recognized."));
 			return(img);
@@ -279,64 +266,36 @@ public class DynresWindow extends WindowX {
 	}
 
 	private void open() {
-	    java.awt.EventQueue.invokeLater(() -> {
-		    JFileChooser fc = new JFileChooser();
-		    fc.setFileFilter(new FileNameExtensionFilter("Image file", "png", "jpg", "jpeg", "bmp"));
-		    if(fc.showOpenDialog(null) != JFileChooser.APPROVE_OPTION)
-			return;
-		    open(fc.getSelectedFile());
-		});
+	    FilePicker dialog = ui.wnd.toolkit().picker().make(FilePicker.Mode.OPEN, ui.wnd);
+	    dialog.filter("Image file", "png", "jpg", "jpeg", "bmp");
+	    dialog.show().map(Promise.cnonnull(this::open)).report(ui);
 	}
 
-	private BufferedImage getpaste(Clipboard c) throws IOException {
-	    if(c == null)
-		return(null);
-	    try {
-		return((BufferedImage)c.getData(DataFlavor.imageFlavor));
-	    } catch(ClassCastException e) {
-	    } catch(IllegalStateException e) {
-		throw(new IOException(e.getMessage(), e));
-	    } catch(UnsupportedFlavorException e) {
-	    }
-	    return(null);
+	private void paste(Clipboard c) {
+	    c.get().then(cnt -> {
+		Clipboard.Item<BufferedImage> item = cnt.find(Clipboard.Format.IMAGE);
+		if(item == null)
+		    throw(new RuntimeException("The clipboard contains no image."));
+		return(item.get());
+	    }).map(img -> {
+		create(() -> img);
+	    }).report(ui);
 	}
 
 	private void paste() {
-	    create(() -> {
-		    try {
-			BufferedImage img = getpaste(java.awt.Toolkit.getDefaultToolkit().getSystemClipboard());
-			if(img == null)
-			    throw(new RuntimeException("The clipboard contains no image."));
-			return(img);
-		    } catch(IOException e) {
-			throw(new RuntimeException(e));
-		    }
-		});
+	    paste(ui.wnd.clipboard(Clipboard.Std.CLIPBOARD));
 	}
 
 	public boolean mousedown(MouseDownEvent ev) {
 	    if(ev.b == 2) {
-		create(() -> {
-			try {
-			    return(getpaste(java.awt.Toolkit.getDefaultToolkit().getSystemSelection()));
-			} catch(IOException e) {
-			    throw(new RuntimeException(e));
-			}
-		    });
+		paste(ui.wnd.clipboard(Clipboard.Std.PRIMARY));
 		return(true);
 	    }
 	    return(super.mousedown(ev));
 	}
 
 	private void copypal() {
-	    Clipboard cb = java.awt.Toolkit.getDefaultToolkit().getSystemClipboard();
-	    if(cb != null) {
-		PaletteCopy xf = new PaletteCopy(pal);
-		try {
-		    cb.setContents(xf, xf);
-		} catch(IllegalStateException e) {
-		}
-	    }
+	    ui.wnd.clipboard(Clipboard.Std.CLIPBOARD).put(new PaletteCopy(pal).cc);
 	}
 
 	public boolean mousehover(MouseHoverEvent ev, boolean hovering) {
@@ -357,41 +316,27 @@ public class DynresWindow extends WindowX {
 	public boolean drophover(Coord c, boolean hovering, Object thing) {
 	    if(thing instanceof SystemDrop) {
 		SystemDrop d = (SystemDrop)thing;
-		return(hovering && (d.supports(DataFlavor.imageFlavor) || d.supports(DataFlavor.javaFileListFlavor)));
+		return(hovering && ((d.contents().find(Clipboard.Format.IMAGE) != null) ||
+				    (d.contents().find(Clipboard.Format.PATHS) != null)));
 	    }
 	    return(false);
 	}
 
 	public boolean dropthing(Coord c, Object thing) {
 	    if(thing instanceof SystemDrop) {
-		SystemDrop d = (SystemDrop)thing;
+		Clipboard.Contents cc = ((SystemDrop)thing).contents(DropHandler.Action.COPY);
 		boolean rv = false;
-		if(d.supports(DataFlavor.imageFlavor)) {
-		    try {
-			BufferedImage img = (BufferedImage)d.receive(DataFlavor.imageFlavor);
-			if(img != null) {
-			    create(() -> img);
-			    rv = true;
-			}
-		    } catch(ClassCastException e) {
-		    } catch(IOException e) {
-			ui.error(e.getMessage());
-		    }
-		} else if(d.supports(DataFlavor.javaFileListFlavor)) {
-		    List files = null;
-		    try {
-			files = (List)d.receive(DataFlavor.javaFileListFlavor);
-		    } catch(ClassCastException e) {
-		    } catch(IOException e) {
-			ui.error(e.getMessage());
-		    }
-		    if(files != null) {
-			for(Object o : files) {
-			    File f = (File)o;
-			    open(f);
-			}
-			rv = true;
-		    }
+		if(cc.find(Clipboard.Format.IMAGE) != null) {
+		    cc.find(Clipboard.Format.IMAGE).get().map(img -> {
+			create(() -> img);
+		    }).report(ui, "Clipboard error");
+		    return(true);
+		} else if(cc.find(Clipboard.Format.PATHS) != null) {
+		    cc.find(Clipboard.Format.PATHS).get().map(files -> {
+			for(Path p : files)
+			    open(p);
+		    }).report(ui, "Clipboard error");
+		    return(true);
 		}
 		return(rv);
 	    }
@@ -411,10 +356,9 @@ public class DynresWindow extends WindowX {
 	return(super.keydown(ev));
     }
 
-    public class Image extends Widget implements Transferable, ClipboardOwner {
+    public class Image extends Widget {
 	public final UID id;
 	public final Indir<Resource> res;
-	private BufferedImage img;
 	private SListMenu menu;
 
 	public Image(Coord sz, UID id) {
@@ -466,27 +410,10 @@ public class DynresWindow extends WindowX {
 	}
 
 	private void copy() {
-	    Clipboard c = java.awt.Toolkit.getDefaultToolkit().getSystemClipboard();
-	    if(c != null) {
-		try {
-		    if(this.img == null)
-			this.img = res.get().flayer(TexR.class).tex().fill();
-		    c.setContents(this, this);
-		} catch(Loading l) {
-		}
-	    }
-	}
-
-	public DataFlavor[] getTransferDataFlavors() {
-	    return(new DataFlavor[] {DataFlavor.imageFlavor});
-	}
-	public boolean isDataFlavorSupported(DataFlavor f) {
-	    return(Utils.eq(f, DataFlavor.imageFlavor));
-	}
-	public BufferedImage getTransferData(DataFlavor f) {
-	    return(img);
-	}
-	public void lostOwnership(Clipboard c, Transferable t) {
+	    Clipboard.Item<BufferedImage> item =
+		new Clipboard.Item<BufferedImage>(Clipboard.Format.IMAGE,
+						  () -> Promise.of(res.get().flayer(TexR.class).tex()::fill));
+	    ui.wnd.clipboard(Clipboard.Std.CLIPBOARD).put(new Clipboard.Contents(item));
 	}
 
 	public boolean mousehover(MouseHoverEvent ev, boolean hovering) {

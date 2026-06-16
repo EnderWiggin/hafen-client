@@ -79,17 +79,16 @@ directory structures tend to devolve into a bit of a dumping-ground of
 files of small and large relevance alike, some points of particular
 interest may be useful, as follows.
 
- * MainFrame.java contains the main() function executed when running
-   the client normally. It constitutes the main window of the client
-   and starts everything running in it.
+ * Client.java contains the main() function executed when running the
+   client normally. It constitutes the main window of the client and
+   starts everything running in it.
 
  * Config.java loads all runtime configuration and handles any system
    properties, command-line arguments and the like to modify said
    configuration.
 
- * JOGLPanel.java constitutes the main AWT component for running and
-   rendering the game, and also contains the main-loop and all the
-   event-dispatching machinery.
+ * UILoop.java handles the main rendering loop and basically tie the
+   client's main window to the widget-based user interface.
 
  * Session.java handles the fundamentals of the main game protocol and
    maintaining the connection to the server.

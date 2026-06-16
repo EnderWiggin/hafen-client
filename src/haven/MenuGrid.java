@@ -54,8 +54,8 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
     private static Coord gsz = new Coord(4, 4);
     public final Set<Pagina> paginae = new HashSet<Pagina>();
     public Pagina cur;
-    private final Map<Object, Pagina> pmap = new CacheMap<>(CacheMap.RefType.WEAK);
     public int pagseq = 0;
+    private final Map<Object, Pagina> pmap = new CacheMap<>(CacheMap.RefType.WEAK);
     private Pagina dragging;
     private Collection<PagButton> curbtns = Collections.emptyList();
     private PagButton pressed, layout[][] = new PagButton[gsz.x][gsz.y];
@@ -755,6 +755,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 			paginae.remove(pag);
 		    }
 		}
+		pagseq++;
 		updlayout();
 	    	pagseq++;
 	    }

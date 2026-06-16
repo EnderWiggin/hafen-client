@@ -116,6 +116,12 @@ public interface PType<T> {
 	    return(opt(arr[idx]));
 	return(Maybe.not(() -> new MissingArgumentException(arr, idx)));
     }
+    public default T of(Object[] arr, int idx) {
+	return(opt(arr, idx).get());
+    }
+    public default boolean is(Object[] arr, int idx) {
+	return(opt(arr, idx).has());
+    }
 
     public static class PTypes {
 	public static class Or<T> implements PType<T> {

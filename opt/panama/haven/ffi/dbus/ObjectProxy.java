@@ -24,38 +24,36 @@
  *  Boston, MA 02111-1307 USA
  */
 
-package haven;
+package haven.ffi.dbus;
 
-import java.net.URL;
+import java.util.*;
+import haven.*;
+import haven.ffi.dbus.DBus.*;
+import static haven.PType.*;
 
-public abstract class WebBrowser {
-    public static WebBrowser self;
+public class ObjectProxy {
+    public static final String IF_PROPS = "org.freedesktop.DBus.Properties";
+    public static final String IF_INTROSPECT = "org.freedesktop.DBus.Introspectable";
+    public final DBus bus;
+    public final String name, path;
 
-    public WebBrowser() {}
-    
-    public abstract void show(URL url);
-
-    static {
-	Console.setscmd("browse", new Console.Command() {
-		public void run(Console cons, String[] args) throws Exception {
-		    WebBrowser.sshow(Utils.url(args[1]));
-		}
-	    });
+    public ObjectProxy(DBus bus, String name, String path) {
+	this.bus = bus;
+	this.name = name;
+	this.path = path;
     }
 
-    public static class BrowserException extends RuntimeException {
-	public BrowserException(String msg) {
-	    super(msg);
-	}
-
-	public BrowserException(Throwable cause) {
-	    super(cause);
-	}
+    public Promise<List<Object>> call(List<Type> sig, String iface, String member, Object... args) {
+	return(bus.call(sig, name, path, iface, member, args));
     }
 
-    public static void sshow(URL url) {
-	if(self == null)
-	    throw(new BrowserException("No web browser available"));
-	self.show(url);
+    private Introspec spec = null;
+    public Introspec introspect() {
+	if(spec == null) {
+	    Promise<List<Object>> call = call(Collections.emptyList(), IF_INTROSPECT, "Introspect");
+	    String desc = STR.of(LIST.of(call.waitfor()).get(0));
+	    spec = new Introspec(desc);
+	}
+	return(spec);
     }
 }

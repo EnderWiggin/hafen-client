@@ -391,8 +391,12 @@ public abstract class PView extends Widget {
 	lights();
     }
 
+    protected ActAudio makeaudio() {
+	return(new ActAudio(ui.audio));
+    }
+
     protected void attached() {
-	basic(ActAudio.class, this.audio = new ActAudio(ui.audio));
+	basic(ActAudio.class, this.audio = makeaudio());
     }
 
     protected void lights() {

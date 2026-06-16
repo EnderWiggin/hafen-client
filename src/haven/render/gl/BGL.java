@@ -568,6 +568,12 @@ public abstract class BGL {
 	    });
     }
 
+    public void glFinish() {
+	add(new Command() {
+		public void run(GL gl) {gl.glFinish();}
+	    });
+    }
+
     public void glFramebufferTexture2D(final int target, final int attachment, final int textarget, final ID texture, final int level) {
 	add(new Command() {
 		public void run(GL gl) {gl.glFramebufferTexture2D(target, attachment, textarget, texture.glid(), level);}

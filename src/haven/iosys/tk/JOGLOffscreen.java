@@ -24,29 +24,35 @@
  *  Boston, MA 02111-1307 USA
  */
 
-package haven.rs;
+package haven.iosys.tk;
 
 import haven.*;
+import haven.iosys.*;
 import haven.render.*;
 import haven.render.gl.*;
 import haven.render.jogl.*;
 import com.jogamp.opengl.*;
 import haven.render.gl.GL;
 
-public class GLOffscreen implements Context {
+@Acephal.Available(name = "jogl")
+public class JOGLOffscreen implements Acephal {
     public final GLProfile prof;
     public final GLAutoDrawable buf;
-    private final Object dmon = new Object();
+    private Thread processor = null;
     private JOGLEnvironment benv = null;
     private final Environment penv;
 
-    public GLOffscreen() {
-	prof = GLProfile.getMaxProgrammableCore(true);
+    public JOGLOffscreen() {
+	try {
+	    prof = GLProfile.getMaxProgrammableCore(true);
+	} catch(Throwable e) {
+	    throw(new Unavailable("could not initialize JOGL", e));
+	}
 	GLDrawableFactory df = GLDrawableFactory.getFactory(prof);
 	this.buf = df.createOffscreenAutoDrawable(null, caps(prof), null, 1, 1);
 	buf.addGLEventListener(new GLEventListener() {
 		public void display(GLAutoDrawable d) {
-		    redraw(d.getGL().getGL3());
+		    process(d.getGL().getGL3());
 		}
 
 		public void init(GLAutoDrawable d) {
@@ -58,7 +64,11 @@ public class GLOffscreen implements Context {
 		public void dispose(GLAutoDrawable d) {
 		}
 	    });
-	buf.display();
+	try {
+	    buf.display();
+	} catch(com.jogamp.opengl.GLException e) {
+	    throw(new Unavailable("could not initialize JOGL", e));
+	}
 	if(benv == null)
 	    throw(new AssertionError("offscreen display call was not honored"));
 	penv = new ProxyEnv();
@@ -69,9 +79,7 @@ public class GLOffscreen implements Context {
 
 	public void submit(Render r) {
 	    super.submit(r);
-	    synchronized(dmon) {
-		buf.display();
-	    }
+	    ckproc();
 	}
     }
 
@@ -85,7 +93,7 @@ public class GLOffscreen implements Context {
 	return(ret);
     }
 
-    private void redraw(GL3 gl) {
+    private void process(GL3 gl) {
 	// gl = new TraceGL3(gl, System.err);
 	GLContext ctx = gl.getContext();
 	if(benv == null)
@@ -101,6 +109,26 @@ public class GLOffscreen implements Context {
 	}
     }
 
+    private void loop() {
+	try {
+	    while(true) {
+		benv.submitwait();
+		buf.display();
+	    }
+	} catch(InterruptedException e) {
+	}
+    }
+
+    private void ckproc() {
+	synchronized(this) {
+	    if(processor == null) {
+		processor = new HackThread(this::loop, "JOGL offscreen processor");
+		processor.setDaemon(true);
+		processor.start();
+	    }
+	}
+    }
+
     public Environment env() {
 	return(penv);
     }
@@ -108,14 +136,20 @@ public class GLOffscreen implements Context {
     public void dispose() {
     }
 
-    private static GLOffscreen defctx = null;
-    public static GLOffscreen get() {
-	if(defctx == null) {
-	    synchronized(GLOffscreen.class) {
-		if(defctx == null)
-		    defctx = new GLOffscreen();
+    private static Factory factory = new Factory() {
+	private JOGLOffscreen instance = null;
+
+	public Acephal open(String... args) {
+	    synchronized(this) {
+		if(instance == null)
+		    instance = new JOGLOffscreen();
 	    }
+	    return(instance);
 	}
-	return(defctx);
+
+	public int priority() {return(-10);}
+    };
+    public static Factory get() {
+	return(factory);
     }
 }

@@ -95,7 +95,6 @@ public class Chatwindow extends WindowX implements Console.Host {
     public void stdio(boolean on) {
 	synchronized(this) {
 	    this.stdio = on;
-	    Debug.dump(on);
 	    if(stdio && (reader == null)) {
 		reader = new HackThread(this::stdin, "stdin reader");
 		reader.start();

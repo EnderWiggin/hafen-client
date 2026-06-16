@@ -63,7 +63,7 @@ public class RootWidget extends ConsoleHost implements UI.Notice.Handler, Widget
 	    return true;
 	}
 	if(ev.c == '`') {
-	    if(UIPanel.profile.get()) {
+	    if(UILoop.profile.get()) {
 		add(new Profwnd(guprof, "UI profile"), UI.scale(100, 100));
 		add(new Profwnd(grprof, "GL profile"), UI.scale(500, 100));
 		/* XXXRENDER

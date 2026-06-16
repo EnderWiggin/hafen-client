@@ -36,7 +36,7 @@ import java.util.*;
 import java.awt.Font;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
-
+import static haven.PType.*;
 import static haven.Inventory.invsq;
 
 public class Makewindow extends Widget {
@@ -65,23 +65,27 @@ public class Makewindow extends Widget {
 	.add(Glob.class, wdg -> wdg.ui.sess.glob)
 	.add(Session.class, wdg -> wdg.ui.sess);
     public class Spec implements GSprite.Owner, ItemInfo.SpriteOwner, RandomSource {
-	public Indir<Resource> res;
-	public MessageBuf sdt;
+	public ResData item, constraint;
 	public int num;
 	private GSprite spr;
 	private Object[] rawinfo;
 	private List<ItemInfo> info;
 
-	public Spec(Indir<Resource> res, Message sdt, int num, Object[] info) {
-	    this.res = res;
-	    this.sdt = new MessageBuf(sdt);
+	public Spec(ResData item, int num, Object[] info) {
+	    this.item = item;
 	    this.num = num;
 	    this.rawinfo = (info.length > 0) ? info : new Object[][] {{new ItemInfo.Name.Default()}};
 	}
 
+	private ResData display() {
+	    if(constraint != null)
+		return(constraint);
+	    return(item);
+	}
+
 	public GSprite sprite() {
 	    if(spr == null)
-		spr = GSprite.create(this, res.get(), sdt.clone());;
+		spr = GSprite.create(this, display().res.get(), display().sdt.clone());;
 	    return(spr);
 	}
 
@@ -120,7 +124,7 @@ public class Makewindow extends Widget {
 	public SpecTip longtip() {
 	    List<ItemInfo> info = info();
 	    BufferedImage img = ItemInfo.longtip(info);
-	    Resource.Pagina pg = res.get().layer(Resource.pagina);
+	    Resource.Pagina pg = item.res.get().layer(Resource.pagina);
 	    if(pg != null)
 		img = ItemInfo.catimgs(0, img, RichText.render("\n" + pg.text, 200).img);
 	    return(new SpecTip(info, img));
@@ -132,7 +136,7 @@ public class Makewindow extends Widget {
 		rnd = new Random();
 	    return(rnd);
 	}
-	public Resource getres() {return(res.get());}
+	public Resource getres() {return(display().res.get());}
 	public <T> T context(Class<T> cl) {return(ctxr.context(cl, Makewindow.this));}
 
 	public List<ItemInfo> info() {
@@ -140,7 +144,7 @@ public class Makewindow extends Widget {
 		info = ItemInfo.buildinfo(this, rawinfo);
 	    return(info);
 	}
-	public Resource resource() {return(res.get());}
+	public Resource resource() {return(item.res.get());}
     }
 
     public static final KeyBinding kb_make = KeyBinding.get("make/one", KeyMatch.forcode(java.awt.event.KeyEvent.VK_ENTER, 0));
@@ -160,17 +164,37 @@ public class Makewindow extends Widget {
 	this.rcpnm = rcpnm;
     }
 
+    private Spec parsespec(Object[] desc) {
+	int a = 0;
+	Indir<Resource> res = ui.sess.getresv(desc[a++]);
+	Message sdt = BYTES.is(desc, a) ? new MessageBuf(BYTES.of(desc, a++)) : MessageBuf.nil;
+	int num = INT.of(desc, a++);
+	Object[] info = OBJS.is(desc, a) ? OBJS.of(desc, a++) : new Object[0];
+	Spec ret = new Spec(new ResData(res, sdt), num, info);
+	while(a < desc.length) {
+	    Object[] arg = OBJS.of(desc[a++]);
+	    switch(STR.of(arg[0])) {
+	    case "constraint":
+		ret.constraint = new ResData(ui.sess.getresv(arg[1]), Message.nil);
+		if(BYTES.is(arg, 2))
+		    ret.constraint.sdt = new MessageBuf(BYTES.of(arg, 2));
+		break;
+	    }
+	}
+	return(ret);
+    }
+
     public void uimsg(String msg, Object... args) {
 	if(msg == "inpop") {
-	    List<Spec> inputs = new ArrayList<>();
-	    for(int i = 0; i < args.length;) {
-		Indir<Resource> res = ui.sess.getresv(args[i++]);
-		Message sdt = (args[i] instanceof byte[]) ? new MessageBuf((byte[])args[i++]) : MessageBuf.nil;
-		int num = Utils.iv(args[i++]);
-		Object[] info = {};
-		if((i < args.length) && (args[i] instanceof Object[]))
-		    info = (Object[])args[i++];
-		inputs.add(new Spec(res, sdt, num, info));
+	    List<Spec> inputs;
+	    if(INT.is(args, 0)) {
+		inputs = Arrays.asList(this.inputs.stream().map(w -> w.spec).toArray(Spec[]::new));
+		for(int i = 0; i < args.length; i += 2)
+		    inputs.set(INT.of(args, i), parsespec(OBJS.of(args, i + 1)));
+	    } else {
+		inputs = new ArrayList<>();
+		for(int i = 0; i < args.length; i++)
+		    inputs.add(parsespec(OBJS.of(args[i])));
 	    }
 	    List<Input> wdgs = new ArrayList<>();
 	    int idx = 0;
@@ -191,15 +215,15 @@ public class Makewindow extends Widget {
 		this.inputs = wdgs;
 	    }
 	} else if(msg == "opop") {
-	    List<Spec> outputs = new ArrayList<Spec>();
-	    for(int i = 0; i < args.length;) {
-		Indir<Resource> res = ui.sess.getresv(args[i++]);
-		Message sdt = (args[i] instanceof byte[]) ? new MessageBuf((byte[])args[i++]) : MessageBuf.nil;
-		int num = Utils.iv(args[i++]);
-		Object[] info = {};
-		if((i < args.length) && (args[i] instanceof Object[]))
-		    info = (Object[])args[i++];
-		outputs.add(new Spec(res, sdt, num, info));
+	    List<Spec> outputs;
+	    if(INT.is(args, 0)) {
+		outputs = Arrays.asList(this.outputs.stream().map(w -> w.spec).toArray(Spec[]::new));
+		for(int i = 0; i < args.length; i += 2)
+		    outputs.set(INT.of(args, i), parsespec(OBJS.of(args, i + 1)));
+	    } else {
+		outputs = new ArrayList<>();
+		for(int i = 0; i < args.length; i++)
+		    outputs.add(parsespec(OBJS.of(args[i])));
 	    }
 	    List<SpecWidget> wdgs = new ArrayList<>();
 	    for(Spec spec : outputs)
@@ -226,9 +250,9 @@ public class Makewindow extends Widget {
 	} else if(msg == "tool") {
 	    tools.add(ui.sess.getresv(args[0]));
 	} else if(msg == "use") {
-	    inputs.get(Utils.iv(args[0])).using(Utils.iv(args[1]));
+	    inputs.get(INT.of(args[0])).using(INT.of(args[1]));
 	} else if(msg == "inprcps") {
-	    int idx = Utils.iv(args[0]);
+	    int idx = INT.of(args[0]);
 	    List<MenuGrid.Pagina> rcps = new ArrayList<>();
 	    GameUI gui = getparent(GameUI.class);
 	    if((gui != null) && (gui.menu != null)) {
@@ -320,7 +344,7 @@ public class Makewindow extends Widget {
 	}
     }
 
-    public class Input extends SpecWidget {
+    public class Input extends SpecWidget implements DTarget {
 	public final int idx;
 	public int using = 0;
 	private List<MenuGrid.Pagina> rpag = null;
@@ -342,7 +366,7 @@ public class Makewindow extends Widget {
 
 	public boolean mousedown(MouseDownEvent ev) {
 	    if(ev.b == 1) {
-		Makewindow.this.wdgmsg("choose", idx);
+		Makewindow.this.wdgmsg("choose", idx, ui.modflags());
 		return(true);
 	    } else if(ev.b == 3) {
 		if(rpag == null)
@@ -368,6 +392,16 @@ public class Makewindow extends Widget {
 		}
 		cc = null;
 	    }
+	}
+
+	public boolean drop(Coord cc, Coord ul) {
+	    Makewindow.this.wdgmsg("itemact", idx, ui.modflags());
+	    return(true);
+	}
+
+	public boolean iteminteract(Coord cc, Coord ul) {
+	    Makewindow.this.wdgmsg("itemact", idx, ui.modflags());
+	    return(true);
 	}
 
 	public void recipes(List<MenuGrid.Pagina> pag) {
