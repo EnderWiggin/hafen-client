@@ -1,3 +1,7 @@
+$size[14]{$u{Update for 16.06.26:}
+  * merged loftar's changes
+  * fixed wound treatment sometimes not loading properly
+ 
 $size[14]{$u{Update for 28.05.26:}
   * merged loftar's changes
  
