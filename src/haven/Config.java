@@ -37,6 +37,7 @@ import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.function.*;
@@ -78,6 +79,10 @@ public class Config {
 	if(isUpdate){
 	    CFG.VERSION.set(version);
 	}
+	Map<String, Object> ua = Utils.useragent;
+	ua.put("ender.client", Config.clientType);
+	ua.put("ender.theme", CFG.THEME.get().name());
+	ua.put("ender.lang", L10N.language);
     }
     
     private static void loadBuildVersion() {

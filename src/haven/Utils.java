@@ -2695,9 +2695,6 @@ public class Utils {
 	useragent.put("os.version", getprop("os.version", null));
 	useragent.put("mem.heap", String.valueOf(Runtime.getRuntime().maxMemory()));
 	useragent.put("cpu.num", String.valueOf(Runtime.getRuntime().availableProcessors()));
-	useragent.put("ender.client", Config.clientType);
-	useragent.put("ender.theme", CFG.THEME.get().name());
-	useragent.put("ender.lang", L10N.language);
 	try {
 	    InputStream in = Utils.class.getResourceAsStream("/buildinfo");
 	    if(in != null) {
