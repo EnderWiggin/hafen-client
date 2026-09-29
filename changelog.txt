@@ -1,3 +1,7 @@
+$size[14]{$u{Update for 29.09.26:}
+  * merged loftar's changes
+  * fixed crash when mouse is moved outside of window while drag selecting mining area
+ 
 $size[14]{$u{Update for 20.09.26:}
   * fixed a crash that was happening on startup on some machines
  
