@@ -115,7 +115,7 @@ public abstract class Foundation {
     public abstract NSProcessInfo processInfo();
 
     static class VersionC extends Foundation {
-	private final SymbolLookup dylib = SymbolLookup.libraryLookup("/System/Library/Frameworks/Foundation.framework/Foundation", Arena.global());
+	private final SymbolLookup dylib = loadlib("/System/Library/Frameworks/Foundation.framework/Foundation", Arena.global());
 	private final Runtime rt = Runtime.get();
 	private final SEL sel_alloc = rt.sel_registerName("alloc");
 	private final SEL sel_retain = rt.sel_registerName("retain");
@@ -353,9 +353,8 @@ public abstract class Foundation {
     public static Foundation get() {
 	if(instance == null) {
 	    synchronized(Foundation.class) {
-		if(instance == null) {
-		    instance = new VersionC();
-		}
+		if(instance == null)
+		    instance = tryload("Foundation", VersionC::new);
 	    }
 	}
 	return(instance);

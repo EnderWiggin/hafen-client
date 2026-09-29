@@ -208,7 +208,7 @@ public abstract class Carbon {
     public abstract String UCKeyTranslate(Carbon.UCKeyboardLayout layout, int virtualKeyCode, int keyAction, int modifierKeyState, int keyboardType, int keyTranslateOptions);
 
     static class VersionA extends Carbon {
-	private final SymbolLookup dylib = SymbolLookup.libraryLookup("/System/Library/Frameworks/Carbon.framework/Carbon", Arena.global());
+	private final SymbolLookup dylib = loadlib("/System/Library/Frameworks/Carbon.framework/Carbon", Arena.global());
 	private final CoreFoundation cf = CoreFoundation.get();
 	private static final Charset C_UNICHARSET = Charset.forName(ByteOrder.nativeOrder() == ByteOrder.LITTLE_ENDIAN ? "UTF-16LE" : "UTF-16BE");
 	private static final MemoryLayout CFTypeRef = CoreFoundation.VersionA.CFTypeRef;
@@ -248,7 +248,7 @@ public abstract class Carbon {
 	    MemorySegment property(MemorySegment key) {
 		try {
 		    return((MemorySegment)TISGetInputSourceProperty.invoke(ref, key));
-		} catch(Throwable e) {throw(new RuntimeException(e));}
+		} catch(Throwable e) {throw(new InvocationException(e));}
 	    }
 
 	    public String inputSourceCategory() {
@@ -273,7 +273,7 @@ public abstract class Carbon {
 	    MemorySegment rv;
 	    try {
 		rv = (MemorySegment)TISCreateInputSourceList.invoke(MemorySegment.NULL, all ? (byte)1 : (byte)0);
-	    } catch(Throwable e) {throw(new RuntimeException(e));}
+	    } catch(Throwable e) {throw(new InvocationException(e));}
 	    NSArray list = fnd.NSArray(rt.id(rv), false, true);
 	    ArrayList<Carbon.TISInputSource> ret = new ArrayList<>();
 	    for(int i = 0; i < list.size(); i++)
@@ -286,7 +286,7 @@ public abstract class Carbon {
 	    MemorySegment rv;
 	    try {
 		rv = (MemorySegment)TISCopyCurrentKeyboardLayoutInputSource.invoke();
-	    } catch(Throwable e) {throw(new RuntimeException(e));}
+	    } catch(Throwable e) {throw(new InvocationException(e));}
 	    return(new TISInputSource(rv, true));
 	}
 
@@ -295,7 +295,7 @@ public abstract class Carbon {
 	    MemorySegment rv;
 	    try {
 		rv = (MemorySegment)TISCopyCurrentASCIICapableKeyboardLayoutInputSource.invoke();
-	    } catch(Throwable e) {throw(new RuntimeException(e));}
+	    } catch(Throwable e) {throw(new InvocationException(e));}
 	    return(new TISInputSource(rv, true));
 	}
 
@@ -303,7 +303,7 @@ public abstract class Carbon {
 	public int LMGetKbdType() {
 	    try {
 		return(0xff & (byte)LMGetKbdType.invoke());
-	    } catch(Throwable e) {throw(new RuntimeException(e));}
+	    } catch(Throwable e) {throw(new InvocationException(e));}
 	}
 
 	private final MethodHandle UCKeyTranslate = ld.downcallHandle(dylib.find("UCKeyTranslate").get(), FunctionDescriptor.of(OSStatus, ADDRESS, UInt16, UInt16, UInt32, UInt32, UInt32, ADDRESS, UniCharCount, ADDRESS, ADDRESS));
@@ -314,7 +314,7 @@ public abstract class Carbon {
 		int rv;
 		try {
 		    rv = (int)UCKeyTranslate.invoke(((UCKeyboardLayout)layout).mem, (short)virtualKeyCode, (short)keyAction, modifierKeyState, keyboardType, keyTranslateOptions, stbuf, max, lbuf, buf);
-		} catch(Throwable e) {throw(new RuntimeException(e));}
+		} catch(Throwable e) {throw(new InvocationException(e));}
 		if(rv != 0)
 		    return(null);
 		return(nstring(buf, 0, (int)(UniChar.byteSize() * getint(lbuf, 0, UniCharCount, false)), C_UNICHARSET));
@@ -326,9 +326,8 @@ public abstract class Carbon {
     public static Carbon get() {
 	if(instance == null) {
 	    synchronized(Carbon.class) {
-		if(instance == null) {
-		    instance = new VersionA();
-		}
+		if(instance == null)
+		    instance = tryload("Carbon", VersionA::new);
 	    }
 	}
 	return(instance);

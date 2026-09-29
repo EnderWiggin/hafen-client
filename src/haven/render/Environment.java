@@ -26,6 +26,8 @@
 
 package haven.render;
 
+import java.util.*;
+
 public interface Environment extends haven.Disposable {
     public Render render();
     public FillBuffer fillbuf(DataBuffer target, int from, int to);
@@ -54,6 +56,7 @@ public interface Environment extends haven.Disposable {
     }
 
     public Caps caps();
+    public default void stats(Collection<String> buf) {}
 
     public abstract static class Proxy implements Environment {
 	public abstract Environment back();
@@ -64,6 +67,7 @@ public interface Environment extends haven.Disposable {
 	public void submit(Render cmd) {back().submit(cmd);}
 	public void dispose() {back().dispose();}
 	public Caps caps() {return(back().caps());}
+	public void stats(Collection<String> buf) {back().stats(buf);}
 
 	public boolean compatible(DrawList ob) {return(back().compatible(ob));}
 	public boolean compatible(Texture ob) {return(back().compatible(ob));}

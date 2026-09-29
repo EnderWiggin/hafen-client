@@ -77,7 +77,7 @@ public abstract class CGL {
 
     static class VersionA extends CGL {
 	private static final MemoryLayout NSOpenGLPixelFormatAttribute = ValueLayout.JAVA_INT;
-	private final SymbolLookup dylib = SymbolLookup.libraryLookup("/System/Library/Frameworks/OpenGL.framework/OpenGL", Arena.global());
+	private final SymbolLookup dylib = loadlib("/System/Library/Frameworks/OpenGL.framework/OpenGL", Arena.global());
 	private final Runtime rt = Runtime.get();
 	private final SEL sel_alloc = rt.sel_registerName("alloc");
 
@@ -180,9 +180,8 @@ public abstract class CGL {
     public static CGL get() {
 	if(instance == null) {
 	    synchronized(CGL.class) {
-		if(instance == null) {
-		    instance = new VersionA();
-		}
+		if(instance == null)
+		    instance = tryload("CGL", VersionA::new);
 	    }
 	}
 	return(instance);

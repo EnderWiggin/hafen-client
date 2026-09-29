@@ -24,50 +24,31 @@
  *  Boston, MA 02111-1307 USA
  */
 
-package haven.render.lwjgl;
+package haven.iosys;
 
-import java.nio.*;
 import haven.*;
-import haven.render.gl.*;
-import org.lwjgl.opengl.awt.*;
-import haven.render.gl.GL;
+import java.io.*;
+import java.nio.file.*;
 
-public class LWJGLEnvironment extends GLEnvironment {
-    public LWJGLEnvironment() {
-	super(LWJGLWrap.instance);
-    }
-
-    public static class LWJGLCaps extends Caps {
-	public final boolean coreprof;
-
-	public LWJGLCaps(GL gl, LWJGLEnvironment env) {
-	    super(gl);
-	    if((major > 3) || ((major == 3) && (minor >= 2)))
-		this.coreprof = glgeti(gl, GL.GL_CONTEXT_PROFILE_MASK) == GL.GL_CONTEXT_CORE_PROFILE_BIT;
-	    else
-		this.coreprof = false;
+@Init
+public class LinuxInit {
+    public static void sysinit() {
+	try(BufferedReader fp = Files.newBufferedReader(Paths.get("/proc/cpuinfo"))) {
+	    while(true) {
+		String ln = fp.readLine();
+		if(ln == null)
+		    break;
+		if(ln.startsWith("model name\t")) {
+		     int p = ln.indexOf(':');
+		     if(p >= 0) {
+			 Utils.useragent.put("cpu.name", ln.substring(p + 1).trim());
+			 break;
+		     }
+		}
+	    }
+	} catch(NoSuchFileException e) {
+	} catch(IOException e) {
+	    new Warning(e, "unexpected error in linux-init").issue();
 	}
-
-	public void checkreq() {
-	    super.checkreq();
-	    if(!coreprof || ((major < 3) || ((major == 3) && (minor < 2))))
-		throw(new HardwareException("Graphics context is not a core OpenGL profile.", this));
-	}
-    }
-
-    public LWJGLCaps mkcaps(GL initgl) {
-	return(new LWJGLCaps(initgl, this));
-    }
-
-    public SysBuffer malloc(int sz) {
-	return(new LWJGLBuffer(this, sz));
-    }
-
-    public SysBuffer subsume(ByteBuffer data, int sz) {
-	SysBuffer ret = new LWJGLBuffer(this, sz);
-	ByteBuffer cp = ret.data();
-	cp.put(data);
-	cp.rewind();
-	return(ret);
     }
 }

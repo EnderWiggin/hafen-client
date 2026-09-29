@@ -252,7 +252,7 @@ public abstract class LibDBus {
     static class libdbus_1_so_3 extends LibDBus {
 	static final ValueLayout DBUS_UINT32_T = ValueLayout.JAVA_INT;
 	static final ValueLayout DBUS_BOOL_T = DBUS_UINT32_T;
-	private final SymbolLookup dbus = SymbolLookup.libraryLookup("libdbus-1.so.3", Arena.global());
+	private final SymbolLookup dbus = loadlib("libdbus-1.so.3", Arena.global());
 
 	static final StructLayout _Error = struct(new MemoryLayout[] {
 		ADDRESS.withName("name"),
@@ -354,7 +354,7 @@ public abstract class LibDBus {
 	    try {
 		dbus_free.invoke(mem);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -363,7 +363,7 @@ public abstract class LibDBus {
 	    try {
 		dbus_error_init.invoke(((Error)error).mem());
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -372,7 +372,7 @@ public abstract class LibDBus {
 	    try {
 		dbus_error_free.invoke(p);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -381,7 +381,7 @@ public abstract class LibDBus {
 	    try {
 		return((int)dbus_error_is_set.invoke(((Error)error).mem()) != 0);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -390,7 +390,7 @@ public abstract class LibDBus {
 	    try {
 		dbus_pending_call_unref.invoke(call);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -399,7 +399,7 @@ public abstract class LibDBus {
 	    try {
 		return((int)dbus_pending_call_get_completed.invoke(((PendingCall)call).mem()) != 0);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -409,7 +409,7 @@ public abstract class LibDBus {
 	    try {
 		rv = (MemorySegment)dbus_pending_call_steal_reply.invoke(((PendingCall)call).mem());
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    if(nullp(rv))
 		throw(new IllegalStateException());
@@ -423,7 +423,7 @@ public abstract class LibDBus {
 	    try {
 		dbus_connection_unref.invoke(conn);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -435,7 +435,7 @@ public abstract class LibDBus {
 		try {
 		    rv = (int)dbus_connection_get_unix_fd.invoke(((Connection)conn).mem(), buf);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		}
 		if(rv == 0)
 		    throw(new UnsupportedOperationException());
@@ -451,7 +451,7 @@ public abstract class LibDBus {
 		try {
 		    rv = (int)dbus_connection_send_with_reply.invoke(((Connection)conn).mem(), ((Message)msg).mem(), rbuf, timeout);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		}
 		if(rv == 0)
 		    throw(new RuntimeException("dbus allocation failure"));
@@ -470,7 +470,7 @@ public abstract class LibDBus {
 	    try {
 		rv = (int)dbus_connection_has_messages_to_send.invoke(((Connection)conn).mem());
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    return(rv != 0);
 	}
@@ -481,7 +481,7 @@ public abstract class LibDBus {
 	    try {
 		rv = (int)dbus_connection_read_write.invoke(((Connection)conn).mem(), timeout);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    return(rv != 0);
 	}
@@ -492,7 +492,7 @@ public abstract class LibDBus {
 	    try {
 		rv = (int)dbus_connection_dispatch.invoke(((Connection)conn).mem());
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    if(rv == DBUS_DISPATCH_DATA_REMAINS)
 		return(true);
@@ -526,7 +526,7 @@ public abstract class LibDBus {
 	    try {
 		rv = (int)dbus_connection_add_filter.invoke(((Connection)conn).mem(), handlerp, MemorySegment.NULL, MemorySegment.NULL);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    if(rv == 0)
 		throw(new RuntimeException("dbus allocation failure"));
@@ -538,7 +538,7 @@ public abstract class LibDBus {
 	    try {
 		dbus_connection_remove_filter.invoke(((Connection)conn).mem(), handlerp, MemorySegment.NULL);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -548,7 +548,7 @@ public abstract class LibDBus {
 	    try {
 		rv = (MemorySegment)dbus_connection_pop_message.invoke(((Connection)conn).mem());
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    if(nullp(rv))
 		return(null);
@@ -563,7 +563,7 @@ public abstract class LibDBus {
 	    try {
 		rv = (MemorySegment)dbus_bus_get.invoke(type, ((Error)error).mem());
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    if(nullp(rv))
 		return(null);
@@ -578,7 +578,7 @@ public abstract class LibDBus {
 	    try {
 		rv = (MemorySegment)dbus_bus_get_unique_name.invoke(((Connection)conn).mem());
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    return(nullp(rv) ? null : rv.reinterpret(Long.MAX_VALUE).getString(0, C_CHARSET));
 	}
@@ -589,7 +589,7 @@ public abstract class LibDBus {
 		try {
 		    dbus_bus_add_match.invoke(((Connection)conn).mem(), st.allocateFrom(rule, C_CHARSET), ((Error)error).mem());
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		}
 	    }
 	}
@@ -600,7 +600,7 @@ public abstract class LibDBus {
 		try {
 		    dbus_bus_remove_match.invoke(((Connection)conn).mem(), st.allocateFrom(rule, C_CHARSET), ((Error)error).mem());
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		}
 	    }
 	}
@@ -610,7 +610,7 @@ public abstract class LibDBus {
 	    try {
 		dbus_message_ref.invoke(((Message)message).mem());
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    return((Message)message);
 	}
@@ -620,7 +620,7 @@ public abstract class LibDBus {
 	    try {
 		dbus_message_unref.invoke(message);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -630,7 +630,7 @@ public abstract class LibDBus {
 	    try(Arena st = Arena.ofConfined()) {
 		rv = (MemorySegment)dbus_message_new_method_call.invoke(st.allocateFrom(destination, C_CHARSET), st.allocateFrom(path, C_CHARSET), st.allocateFrom(iface, C_CHARSET), st.allocateFrom(method, C_CHARSET));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    Message msg = new Message(rv);
 	    Finalizer.finalize(msg, () -> dbus_message_unref(rv));
@@ -642,7 +642,7 @@ public abstract class LibDBus {
 	    try {
 		dbus_message_set_no_reply.invoke(((Message)message).mem(), noreply ? 1 : 0);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -651,7 +651,7 @@ public abstract class LibDBus {
 	    try {
 		return((int)dbus_message_get_type.invoke(((Message)msg).mem()));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -661,7 +661,7 @@ public abstract class LibDBus {
 	    try {
 		rv = (MemorySegment)dbus_message_get_signature.invoke(((Message)msg).mem());
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    return(nullp(rv) ? null : rv.reinterpret(Long.MAX_VALUE).getString(0, C_CHARSET));
 	}
@@ -672,7 +672,7 @@ public abstract class LibDBus {
 	    try {
 		rv = (MemorySegment)dbus_message_get_error_name.invoke(((Message)msg).mem());
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    return(nullp(rv) ? null : rv.reinterpret(Long.MAX_VALUE).getString(0, C_CHARSET));
 	}
@@ -683,7 +683,7 @@ public abstract class LibDBus {
 	    try {
 		rv = (MemorySegment)dbus_message_get_sender.invoke(((Message)msg).mem());
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    return(nullp(rv) ? null : rv.reinterpret(Long.MAX_VALUE).getString(0, C_CHARSET));
 	}
@@ -694,7 +694,7 @@ public abstract class LibDBus {
 	    try {
 		rv = (MemorySegment)dbus_message_get_path.invoke(((Message)msg).mem());
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    return(nullp(rv) ? null : rv.reinterpret(Long.MAX_VALUE).getString(0, C_CHARSET));
 	}
@@ -705,7 +705,7 @@ public abstract class LibDBus {
 	    try {
 		rv = (MemorySegment)dbus_message_get_interface.invoke(((Message)msg).mem());
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    return(nullp(rv) ? null : rv.reinterpret(Long.MAX_VALUE).getString(0, C_CHARSET));
 	}
@@ -716,7 +716,7 @@ public abstract class LibDBus {
 	    try {
 		rv = (MemorySegment)dbus_message_get_member.invoke(((Message)msg).mem());
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    return(nullp(rv) ? null : rv.reinterpret(Long.MAX_VALUE).getString(0, C_CHARSET));
 	}
@@ -727,7 +727,7 @@ public abstract class LibDBus {
 	    try {
 		rv = (int)dbus_message_iter_init.invoke(((Message)message).mem(), ((MessageIter)iter).mem());
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    if(rv == 0)
 		throw(new IllegalArgumentException());
@@ -738,7 +738,7 @@ public abstract class LibDBus {
 	    try {
 		dbus_message_iter_init_closed.invoke(((MessageIter)iter).mem());
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -747,7 +747,7 @@ public abstract class LibDBus {
 	    try {
 		return((int)dbus_message_iter_has_next.invoke(((MessageIter)iter).mem()) != 0);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -756,7 +756,7 @@ public abstract class LibDBus {
 	    try {
 		return((int)dbus_message_iter_next.invoke(((MessageIter)iter).mem()) != 0);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -765,7 +765,7 @@ public abstract class LibDBus {
 	    try {
 		return((int)dbus_message_iter_get_arg_type.invoke(((MessageIter)iter).mem()));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -774,7 +774,7 @@ public abstract class LibDBus {
 	    try {
 		return((int)dbus_message_iter_get_element_type.invoke(((MessageIter)iter).mem()));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -783,7 +783,7 @@ public abstract class LibDBus {
 	    try {
 		dbus_message_iter_recurse.invoke(((MessageIter)iter).mem(), ((MessageIter)sub).mem());
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -793,7 +793,7 @@ public abstract class LibDBus {
 	    try {
 		rv = (MemorySegment)dbus_message_iter_get_signature.invoke(((MessageIter)iter).mem());
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    String ret = rv.reinterpret(Long.MAX_VALUE).getString(0, C_CHARSET);
 	    dbus_free(rv);
@@ -805,7 +805,7 @@ public abstract class LibDBus {
 	    try {
 		dbus_message_iter_get_basic.invoke(((MessageIter)iter).mem(), buf);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -814,7 +814,7 @@ public abstract class LibDBus {
 	    try {
 		return((int)dbus_message_iter_get_element_count.invoke(((MessageIter)iter).mem()));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -823,7 +823,7 @@ public abstract class LibDBus {
 	    try {
 		dbus_message_iter_init_append.invoke(((Message)message).mem(), ((MessageIter)iter).mem());
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -833,7 +833,7 @@ public abstract class LibDBus {
 	    try {
 		rv = (int)dbus_message_iter_append_basic.invoke(((MessageIter)iter).mem(), type, value);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    if(rv == 0)
 		throw(new RuntimeException("dbus allocation failure"));
@@ -847,7 +847,7 @@ public abstract class LibDBus {
 								  (contained_signature == null) ? MemorySegment.NULL : st.allocateFrom(contained_signature, Utils.ascii),
 								  ((MessageIter)sub).mem());
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    if(rv == 0)
 		throw(new RuntimeException("dbus allocation failure"));
@@ -859,7 +859,7 @@ public abstract class LibDBus {
 	    try {
 		rv = (int)dbus_message_iter_close_container.invoke(((MessageIter)iter).mem(), ((MessageIter)sub).mem());
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    if(rv == 0)
 		throw(new RuntimeException("dbus allocation failure"));
@@ -870,9 +870,8 @@ public abstract class LibDBus {
     public static LibDBus get() {
 	if(instance == null) {
 	    synchronized(LibDBus.class) {
-		if(instance == null) {
-		    instance = new libdbus_1_so_3();
-		}
+		if(instance == null)
+		    instance = tryload("dbus", libdbus_1_so_3::new);
 	    }
 	}
 	return(instance);

@@ -30,6 +30,7 @@ import haven.*;
 import java.util.*;
 import java.util.function.*;
 import java.lang.annotation.*;
+import java.lang.reflect.*;
 
 public class Providers<S, A extends Annotation> {
     private final String desc;
@@ -52,6 +53,7 @@ public class Providers<S, A extends Annotation> {
     }
 
     private Map<String, Factory<? extends S>> find() {
+	init();
 	Map<String, Factory<? extends S>> ret = new HashMap<>();
 	ClassLoader loader = annotation.getClassLoader();
 	for(String clnm : dolda.jglob.Loader.get(annotation).names()) {
@@ -145,5 +147,41 @@ public class Providers<S, A extends Annotation> {
 	    }
 	}
 	return(instance);
+    }
+
+    private static boolean inited = false;
+    public static synchronized void init() {
+	if(!inited) {
+	    inited = true;
+	    class InitFun {
+		final Method m;
+		final int order;
+
+		InitFun(Class<?> cl) throws ClassNotFoundException, NoSuchMethodException {
+		    Init decl = cl.getAnnotation(Init.class);
+		    if(decl == null)
+			throw(new ClassNotFoundException());
+		    order = -decl.priority();
+		    m = cl.getDeclaredMethod("sysinit");
+		}
+
+		void run() {
+		    Utils.invoke(m, null);
+		}
+	    }
+	    List<InitFun> found = new ArrayList<>();
+	    ClassLoader loader = Init.class.getClassLoader();
+	    for(String clnm : dolda.jglob.Loader.get(Init.class).names()) {
+		try {
+		    Class<?> cl = loader.loadClass(clnm);
+		    found.add(new InitFun(cl));
+		} catch(NoSuchMethodException e) {
+		    throw(new AssertionError(e));
+		} catch(ClassNotFoundException | LinkageError e) {
+		}
+	    }
+	    Collections.sort(found, Comparator.comparing(f -> f.order));
+	    found.forEach(InitFun::run);
+	}
     }
 }

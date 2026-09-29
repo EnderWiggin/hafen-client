@@ -109,7 +109,6 @@ public class JOGLToolkit extends AWTToolkit {
     }
 
     public class JOGLPanel extends GLCanvas {
-	public Area shape = Area.sized(Coord.z);
 	public PanelEnvironment env;
 	private int cursi, pstate = 0;
 
@@ -133,7 +132,6 @@ public class JOGLToolkit extends AWTToolkit {
 		}
 
 		public void reshape(GLAutoDrawable d, int x, int y, int w, int h) {
-		    shape = Area.sized(Coord.of(x, y), Coord.of(w, h));
 		}
 
 		public void dispose(GLAutoDrawable d) {
@@ -153,8 +151,8 @@ public class JOGLToolkit extends AWTToolkit {
 	}
 
 	public class PanelEnvironment extends JOGLEnvironment {
-	    public PanelEnvironment(GL initgl, GLContext ctx, Area shaoe) {
-		super(initgl, ctx, shape);
+	    public PanelEnvironment(GL initgl, GLContext ctx) {
+		super(initgl, ctx);
 	    }
 
 	    public void submit(Render cmd) {
@@ -178,13 +176,11 @@ public class JOGLToolkit extends AWTToolkit {
 		if((this.env == null) || (this.env.ctx != ctx)) {
 		    if(this.env != null)
 			this.env.dispose();
-		    this.env = new PanelEnvironment(gl, ctx, shape);
+		    this.env = new PanelEnvironment(gl, ctx);
 		    notifyAll();
 		    initgl(gl);
 		}
 		env = this.env;
-		if(!env.shape().equals(shape))
-		    env.reshape(shape);
 	    }
 	    GL3 gl3 = gl.getGL3();
 	    if(false) {

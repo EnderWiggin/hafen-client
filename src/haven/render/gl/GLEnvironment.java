@@ -45,7 +45,6 @@ public abstract class GLEnvironment implements Environment {
     final Queue<Runnable> callbacks = new LinkedList<>();
     Thread cbthread = null;
     final Queue<GLRender> submitted = new LinkedList<>();
-    Area wnd;
     private GLRender prep = null;
     private Applier curstate = new Applier(this);
     private boolean invalid = false;
@@ -166,15 +165,15 @@ public abstract class GLEnvironment implements Environment {
     }
 
     static enum MemStats {
-	INDICES, VERTICES, TEXTURES, VAOS, FBOS
+	INDICES, VERTICES, TEXTURES,
+	VAOS, FBOS, SHADERS, PROGRAMS
     }
     final int[] stats_obj = new int[MemStats.values().length];
     final long[] stats_mem = new long[MemStats.values().length];
 
     protected abstract Caps mkcaps(GL initgl);
 
-    public GLEnvironment(GL initgl, Area wnd) {
-	this.wnd = wnd;
+    public GLEnvironment(GL initgl) {
 	this.caps = mkcaps(initgl);
 	this.caps.checkreq();
 	initialize(initgl);
@@ -195,14 +194,6 @@ public abstract class GLEnvironment implements Environment {
 
     public GLDrawList drawlist() {
 	return(new GLDrawList(this));
-    }
-
-    public void reshape(Area wnd) {
-	this.wnd = wnd;
-    }
-
-    public Area shape() {
-	return(wnd);
     }
 
     private void ckcbt() {
@@ -317,54 +308,64 @@ public abstract class GLEnvironment implements Environment {
 	    System.err.println();
     }
 
+    protected void process(GL gl, GLRender ctx, Consumer<GL> cmd) {
+	cmd.accept(gl);
+    }
+
     public void process(GL gl) {
 	GLRender prep;
 	Collection<GLRender> copy;
 	synchronized(submitted) {
 	    /* It is important to fetch the submitted renders before
-	     * prep, so that additional once aren't submitted during
+	     * prep, so that additional ones aren't submitted during
 	     * processing that haven't been prepared. */
 	    copy = new ArrayList<>(submitted);
 	    submitted.clear();
 	}
+	if(copy.isEmpty())
+	    return;
 	synchronized(prepmon) {
 	    prep = this.prep;
 	    this.prep = null;
 	}
 	try {
 	    synchronized(drawmon) {
-		checkqueries(gl);
-		if((prep != null) && (prep.gl != null)) {
-		    BufferBGL xf = new BufferBGL(16);
-		    this.curstate.apply(xf, prep.init);
-		    xf.run(gl);
-		    prep.gl.run(gl);
-		    this.curstate = prep.state;
-		    try {
-			GLException.checkfor(gl, this);
-		    } catch(Exception exc) {
-			throw(new BGL.BGLException(prep.gl, null, exc));
-		    }
-		    prep.dispose();
-		}
+		GLRender last = null;
 		for(GLRender cmd : copy) {
+		    if(last == null) {
+			process(gl, cmd, this::checkqueries);
+			if((prep != null) && (prep.gl != null)) {
+			    BufferBGL xf = new BufferBGL(16);
+			    this.curstate.apply(xf, prep.init);
+			    process(gl, cmd, xf::run);
+			    process(gl, cmd, prep.gl::run);
+			    this.curstate = prep.state;
+			    try {
+				process(gl, cmd, x -> GLException.checkfor(x, this));
+			    } catch(Exception exc) {
+				throw(new BGL.BGLException(prep.gl, null, exc));
+			    }
+			    prep.dispose();
+			}
+		    }
+		    last = cmd;
 		    BufferBGL xf = new BufferBGL(16);
 		    this.curstate.apply(xf, cmd.init);
-		    xf.run(gl);
-		    cmd.gl.run(gl);
+		    process(gl, cmd, xf::run);
+		    process(gl, cmd, cmd.gl::run);
 		    this.curstate = cmd.state;
 		    try {
-			GLException.checkfor(gl, this);
+			process(gl, cmd, x -> GLException.checkfor(x, this));
 		    } catch(Exception exc) {
 			throw(new BGL.BGLException(cmd.gl, null, exc));
 		    }
 		    cmd.dispose();
 		}
-		checkqueries(gl);
-		disposeall().run(gl);
+		process(gl, last, this::checkqueries);
+		process(gl, last, disposeall()::run);
 		clean();
 		if(debuglog)
-		    checkdebuglog(gl);
+		    process(gl, last, this::checkdebuglog);
 	    }
 	} catch(Exception e) {
 	    for(Throwable c = e; c != null; c = c.getCause()) {
@@ -1012,8 +1013,32 @@ public abstract class GLEnvironment implements Environment {
 	}
     }
 
-    public int numprogs() {return(nprog);}
     public Caps caps() {return(caps);}
+
+    public void stats(Collection<String> dst) {
+	StringBuilder buf = new StringBuilder();
+	MemStats[] sta = MemStats.values();
+	for(int i = 0; i < sta.length; i++) {
+	    if(stats_obj[i] > 0) {
+		if(buf.length() > 0)
+		    buf.append(" / ");
+		buf.append(String.format("%c %,d", sta[i].name().charAt(0), stats_obj[i]));
+	    }
+	}
+	if(buf.length() > 0)
+	    dst.add("V-Obj: " + buf.toString());
+
+	buf = new StringBuilder();
+	for(int i = 0; i < sta.length; i++) {
+	    if(stats_mem[i] > 0) {
+		if(buf.length() > 0)
+		    buf.append(" / ");
+		buf.append(String.format("%c %,d", sta[i].name().charAt(0), stats_mem[i]));
+	    }
+	}
+	if(buf.length() > 0)
+	    dst.add("V-Mem: " + buf.toString());
+    }
 
     public String memstats() {
 	StringBuilder buf = new StringBuilder();

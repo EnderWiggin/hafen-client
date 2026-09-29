@@ -43,8 +43,8 @@ public class JOGLEnvironment extends GLEnvironment {
 	}
     }
 
-    public JOGLEnvironment(com.jogamp.opengl.GL initgl, GLContext ctx, Area wnd) {
-	super(bestwrap(initgl), wnd);
+    public JOGLEnvironment(com.jogamp.opengl.GL initgl, GLContext ctx) {
+	super(bestwrap(initgl));
 	if(debuglog)
 	    ctx.enableGLDebugMessage(true);
 	this.ctx = ctx;

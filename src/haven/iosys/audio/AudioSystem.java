@@ -33,7 +33,7 @@ import java.util.function.*;
 import java.lang.annotation.*;
 import haven.Audio.*;
 
-public interface AudioSystem {
+public interface AudioSystem extends Disposable {
     public static final Config.Variable<String> audiosystem = Config.Variable.prop("haven.audio-system", null);
     public static final Object SPEC_RATE = "rate";
     public static final Object SPEC_CHANNELS = "ch";
@@ -57,6 +57,7 @@ public interface AudioSystem {
 
     public List<SinkDevice> sinkdevs();
     public SinkLine sinkline(Map<?, ?> spec);
+    public default void dispose() {}
 
     public static int intspec(Map<?, ?> spec, Object key, Integer defval) {
 	Object val = spec.get(key);

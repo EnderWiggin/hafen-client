@@ -24,50 +24,10 @@
  *  Boston, MA 02111-1307 USA
  */
 
-package haven.render.lwjgl;
+package haven.ffi;
 
-import java.nio.*;
-import haven.*;
-import haven.render.gl.*;
-import org.lwjgl.opengl.awt.*;
-import haven.render.gl.GL;
-
-public class LWJGLEnvironment extends GLEnvironment {
-    public LWJGLEnvironment() {
-	super(LWJGLWrap.instance);
-    }
-
-    public static class LWJGLCaps extends Caps {
-	public final boolean coreprof;
-
-	public LWJGLCaps(GL gl, LWJGLEnvironment env) {
-	    super(gl);
-	    if((major > 3) || ((major == 3) && (minor >= 2)))
-		this.coreprof = glgeti(gl, GL.GL_CONTEXT_PROFILE_MASK) == GL.GL_CONTEXT_CORE_PROFILE_BIT;
-	    else
-		this.coreprof = false;
-	}
-
-	public void checkreq() {
-	    super.checkreq();
-	    if(!coreprof || ((major < 3) || ((major == 3) && (minor < 2))))
-		throw(new HardwareException("Graphics context is not a core OpenGL profile.", this));
-	}
-    }
-
-    public LWJGLCaps mkcaps(GL initgl) {
-	return(new LWJGLCaps(initgl, this));
-    }
-
-    public SysBuffer malloc(int sz) {
-	return(new LWJGLBuffer(this, sz));
-    }
-
-    public SysBuffer subsume(ByteBuffer data, int sz) {
-	SysBuffer ret = new LWJGLBuffer(this, sz);
-	ByteBuffer cp = ret.data();
-	cp.put(data);
-	cp.rewind();
-	return(ret);
+public class InvocationException extends RuntimeException {
+    public InvocationException(Throwable cause) {
+	super(cause);
     }
 }

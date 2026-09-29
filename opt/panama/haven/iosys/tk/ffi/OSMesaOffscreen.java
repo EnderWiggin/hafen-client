@@ -68,7 +68,7 @@ public class OSMesaOffscreen implements Acephal {
 	    throw(new Unavailable("no OSMesa context available"));
 	this.ctx = ctx;
 	this.gl = osmesa.gl();
-	this.env = glrun(() -> new FFIEnvironment(gl, Area.sized(Coord.of(1, 1))));
+	this.env = glrun(() -> new FFIEnvironment(gl));
 	this.processor = new HackThread(this::loop, "OSMesa GL processor");
 	this.processor.setDaemon(true);
 	this.processor.start();

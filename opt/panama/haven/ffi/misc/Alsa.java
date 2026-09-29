@@ -145,7 +145,7 @@ public abstract class Alsa {
     public static class libasound_so_2 extends Alsa {
 	static final MemoryLayout SFRAMES_T = C_LONG;
 	static final MemoryLayout UFRAMES_T = C_LONG;
-	private final SymbolLookup asound = SymbolLookup.libraryLookup("libasound.so.2", Arena.global());
+	private final SymbolLookup asound = loadlib("libasound.so.2", Arena.global());
 
 	public static class Pcm implements Alsa.Pcm {
 	    final MemorySegment mem;
@@ -291,7 +291,7 @@ public abstract class Alsa {
 	    try {
 		rv = (MemorySegment)snd_strerror.invoke(errnum);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    return(nullp(rv) ? null : rv.reinterpret(Long.MAX_VALUE).getString(0, C_CHARSET));
 	}
@@ -304,7 +304,7 @@ public abstract class Alsa {
 		try {
 		    rv = (int)snd_pcm_close.invoke(mem);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		}
 		if(rv < 0)
 		    throw(new AlsaException(snd_strerror(rv), rv));
@@ -319,7 +319,7 @@ public abstract class Alsa {
 		try {
 		    rv = (int)snd_pcm_open.invoke(buf, st.allocateFrom(name, C_CHARSET), stream, mode);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		}
 		if(rv < 0)
 		    throw(new AlsaException(snd_strerror(rv), rv));
@@ -334,7 +334,7 @@ public abstract class Alsa {
 	    try {
 		rv = (int)snd_pcm_prepare.invoke(((Pcm)pcm).mem());
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    if(rv < 0)
 		throw(new AlsaException(snd_strerror(rv), rv));
@@ -346,7 +346,7 @@ public abstract class Alsa {
 	    try {
 		rv = (MemorySegment)snd_pcm_name.invoke(((Pcm)pcm).mem());
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    return(nullp(rv) ? null : rv.reinterpret(Long.MAX_VALUE).getString(0, C_CHARSET));
 	}
@@ -357,7 +357,7 @@ public abstract class Alsa {
 	    try {
 		rv = (long)snd_pcm_avail_update.invoke(((Pcm)pcm).mem());
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    if(rv < 0)
 		throw(new AlsaException(snd_strerror((int)rv), (int)rv));
@@ -370,7 +370,7 @@ public abstract class Alsa {
 	    try {
 		rv = (int)snd_pcm_wait.invoke(((Pcm)pcm).mem(), timeout);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    if(rv < 0)
 		throw(new AlsaException(snd_strerror(rv), rv));
@@ -384,7 +384,7 @@ public abstract class Alsa {
 		try {
 		    rv = (long)snd_pcm_writei.invoke(((Pcm)pcm).mem(), bufcpy(st, buffer, buffer.remaining()), samples);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		}
 		if(rv < 0)
 		    throw(new AlsaException(snd_strerror((int)rv), (int)rv));
@@ -399,7 +399,7 @@ public abstract class Alsa {
 	    try {
 		return((long)snd_pcm_hw_params_sizeof.invoke());
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -412,7 +412,7 @@ public abstract class Alsa {
 	    try {
 		return((long)snd_pcm_sw_params_sizeof.invoke());
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -425,7 +425,7 @@ public abstract class Alsa {
 	    try {
 		return((long)snd_pcm_info_sizeof.invoke());
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -434,7 +434,7 @@ public abstract class Alsa {
 	    try {
 		snd_pcm_hw_params_copy.invoke(((HwParams)dst).mem(), ((HwParams)src).mem());
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -444,7 +444,7 @@ public abstract class Alsa {
 	    try {
 		rv = (int)snd_pcm_hw_params_any.invoke(((Pcm)pcm).mem(), ((HwParams)params).mem());
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    if(rv < 0)
 		throw(new AlsaException(snd_strerror(rv), rv));
@@ -456,7 +456,7 @@ public abstract class Alsa {
 	    try {
 		rv = (int)snd_pcm_hw_params.invoke(((Pcm)pcm).mem(), ((HwParams)params).mem());
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    if(rv < 0)
 		throw(new AlsaException(snd_strerror(rv), rv));
@@ -470,7 +470,7 @@ public abstract class Alsa {
 		try {
 		    rv = (int)snd_pcm_hw_params_get_channels.invoke(((HwParams)params).mem(), vbuf);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		}
 		if(rv < 0)
 		    throw(new AlsaException(snd_strerror(rv), rv));
@@ -486,7 +486,7 @@ public abstract class Alsa {
 		try {
 		    rv = (int)snd_pcm_hw_params_get_rate.invoke(((HwParams)params).mem(), vbuf, dbuf);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		}
 		if(rv < 0)
 		    throw(new AlsaException(snd_strerror(rv), rv));
@@ -502,7 +502,7 @@ public abstract class Alsa {
 		try {
 		    rv = (int)snd_pcm_hw_params_get_rate_numden.invoke(((HwParams)params).mem(), nbuf, dbuf);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		}
 		if(rv < 0)
 		    throw(new AlsaException(snd_strerror(rv), rv));
@@ -518,7 +518,7 @@ public abstract class Alsa {
 		try {
 		    rv = (int)snd_pcm_hw_params_get_period_time.invoke(((HwParams)params).mem(), vbuf, dbuf);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		}
 		if(rv < 0)
 		    throw(new AlsaException(snd_strerror(rv), rv));
@@ -534,7 +534,7 @@ public abstract class Alsa {
 		try {
 		    rv = (int)snd_pcm_hw_params_get_period_time_min.invoke(((HwParams)params).mem(), vbuf, dbuf);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		}
 		if(rv < 0)
 		    throw(new AlsaException(snd_strerror(rv), rv));
@@ -550,7 +550,7 @@ public abstract class Alsa {
 		try {
 		    rv = (int)snd_pcm_hw_params_get_period_time_max.invoke(((HwParams)params).mem(), vbuf, dbuf);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		}
 		if(rv < 0)
 		    throw(new AlsaException(snd_strerror(rv), rv));
@@ -566,7 +566,7 @@ public abstract class Alsa {
 		try {
 		    rv = (int)snd_pcm_hw_params_get_period_size.invoke(((HwParams)params).mem(), vbuf, dbuf);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		}
 		if(rv < 0)
 		    throw(new AlsaException(snd_strerror(rv), rv));
@@ -582,7 +582,7 @@ public abstract class Alsa {
 		try {
 		    rv = (int)snd_pcm_hw_params_get_period_size_min.invoke(((HwParams)params).mem(), vbuf, dbuf);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		}
 		if(rv < 0)
 		    throw(new AlsaException(snd_strerror(rv), rv));
@@ -598,7 +598,7 @@ public abstract class Alsa {
 		try {
 		    rv = (int)snd_pcm_hw_params_get_period_size_max.invoke(((HwParams)params).mem(), vbuf, dbuf);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		}
 		if(rv < 0)
 		    throw(new AlsaException(snd_strerror(rv), rv));
@@ -614,7 +614,7 @@ public abstract class Alsa {
 		try {
 		    rv = (int)snd_pcm_hw_params_get_periods.invoke(((HwParams)params).mem(), vbuf, dbuf);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		}
 		if(rv < 0)
 		    throw(new AlsaException(snd_strerror(rv), rv));
@@ -630,7 +630,7 @@ public abstract class Alsa {
 		try {
 		    rv = (int)snd_pcm_hw_params_get_periods_min.invoke(((HwParams)params).mem(), vbuf, dbuf);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		}
 		if(rv < 0)
 		    throw(new AlsaException(snd_strerror(rv), rv));
@@ -646,7 +646,7 @@ public abstract class Alsa {
 		try {
 		    rv = (int)snd_pcm_hw_params_get_periods_max.invoke(((HwParams)params).mem(), vbuf, dbuf);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		}
 		if(rv < 0)
 		    throw(new AlsaException(snd_strerror(rv), rv));
@@ -662,7 +662,7 @@ public abstract class Alsa {
 		try {
 		    rv = (int)snd_pcm_hw_params_get_buffer_size.invoke(((HwParams)params).mem(), vbuf);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		}
 		if(rv < 0)
 		    throw(new AlsaException(snd_strerror(rv), rv));
@@ -676,7 +676,7 @@ public abstract class Alsa {
 	    try {
 		rv = (int)snd_pcm_hw_params_set_access.invoke(((Pcm)pcm).mem(), ((HwParams)params).mem(), access);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    if(rv < 0)
 		throw(new AlsaException(snd_strerror(rv), rv));
@@ -688,7 +688,7 @@ public abstract class Alsa {
 	    try {
 		rv = (int)snd_pcm_hw_params_set_format.invoke(((Pcm)pcm).mem(), ((HwParams)params).mem(), format);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    if(rv < 0)
 		throw(new AlsaException(snd_strerror(rv), rv));
@@ -700,7 +700,7 @@ public abstract class Alsa {
 	    try {
 		rv = (int)snd_pcm_hw_params_set_channels.invoke(((Pcm)pcm).mem(), ((HwParams)params).mem(), channels);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    if(rv < 0)
 		throw(new AlsaException(snd_strerror(rv), rv));
@@ -712,7 +712,7 @@ public abstract class Alsa {
 	    try {
 		rv = (int)snd_pcm_hw_params_set_rate.invoke(((Pcm)pcm).mem(), ((HwParams)params).mem(), rate, dir);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    if(rv < 0)
 		throw(new AlsaException(snd_strerror(rv), rv));
@@ -727,7 +727,7 @@ public abstract class Alsa {
 		try {
 		    rv = (int)snd_pcm_hw_params_set_rate_near.invoke(((Pcm)pcm).mem(), ((HwParams)params).mem(), vbuf, dbuf);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		}
 		if(rv < 0)
 		    throw(new AlsaException(snd_strerror(rv), rv));
@@ -741,7 +741,7 @@ public abstract class Alsa {
 	    try {
 		rv = (int)snd_pcm_hw_params_set_buffer_size.invoke(((Pcm)pcm).mem(), ((HwParams)params).mem(), size);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    if(rv < 0)
 		throw(new AlsaException(snd_strerror(rv), rv));
@@ -755,7 +755,7 @@ public abstract class Alsa {
 		try {
 		    rv = (int)snd_pcm_hw_params_set_buffer_size_min.invoke(((Pcm)pcm).mem(), ((HwParams)params).mem(), vbuf);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		}
 		if(rv < 0)
 		    throw(new AlsaException(snd_strerror(rv), rv));
@@ -771,7 +771,7 @@ public abstract class Alsa {
 		try {
 		    rv = (int)snd_pcm_hw_params_set_buffer_size_near.invoke(((Pcm)pcm).mem(), ((HwParams)params).mem(), vbuf);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		}
 		if(rv < 0)
 		    throw(new AlsaException(snd_strerror(rv), rv));
@@ -784,7 +784,7 @@ public abstract class Alsa {
 	    try {
 		snd_pcm_sw_params_copy.invoke(((SwParams)dst).mem(), ((SwParams)src).mem());
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -794,7 +794,7 @@ public abstract class Alsa {
 	    try {
 		rv = (int)snd_pcm_sw_params_current.invoke(((Pcm)pcm).mem(), ((SwParams)params).mem());
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    if(rv < 0)
 		throw(new AlsaException(snd_strerror(rv), rv));
@@ -806,7 +806,7 @@ public abstract class Alsa {
 	    try {
 		rv = (int)snd_pcm_sw_params.invoke(((Pcm)pcm).mem(), ((SwParams)params).mem());
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    if(rv < 0)
 		throw(new AlsaException(snd_strerror(rv), rv));
@@ -820,7 +820,7 @@ public abstract class Alsa {
 		try {
 		    rv = (int)snd_pcm_sw_params_get_avail_min.invoke(((SwParams)params).mem(), vbuf);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		}
 		if(rv < 0)
 		    throw(new AlsaException(snd_strerror(rv), rv));
@@ -834,7 +834,7 @@ public abstract class Alsa {
 	    try {
 		rv = (int)snd_pcm_sw_params_set_avail_min.invoke(((Pcm)pcm).mem(), ((SwParams)params).mem(), size);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    if(rv < 0)
 		throw(new AlsaException(snd_strerror(rv), rv));
@@ -846,7 +846,7 @@ public abstract class Alsa {
 	    try {
 		rv = (int)snd_pcm_sw_params_set_start_threshold.invoke(((Pcm)pcm).mem(), ((SwParams)params).mem(), size);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    if(rv < 0)
 		throw(new AlsaException(snd_strerror(rv), rv));
@@ -859,7 +859,7 @@ public abstract class Alsa {
 	    try {
 		rv = (int)snd_pcm_info.invoke(((Pcm)pcm).mem(), ret.mem());
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    if(rv < 0)
 		throw(new AlsaException(snd_strerror(rv), rv));
@@ -871,7 +871,7 @@ public abstract class Alsa {
 	    try {
 		return((int)snd_pcm_info_get_device.invoke(((PcmInfo)info).mem()));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -880,7 +880,7 @@ public abstract class Alsa {
 	    try {
 		return((int)snd_pcm_info_get_subdevice.invoke(((PcmInfo)info).mem()));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -889,7 +889,7 @@ public abstract class Alsa {
 	    try {
 		return((int)snd_pcm_info_get_card.invoke(((PcmInfo)info).mem()));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -899,7 +899,7 @@ public abstract class Alsa {
 	    try {
 		rv = (MemorySegment)snd_pcm_info_get_id.invoke(((PcmInfo)info).mem());
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    return(rv.reinterpret(Long.MAX_VALUE).getString(0, C_CHARSET));
 	}
@@ -910,7 +910,7 @@ public abstract class Alsa {
 	    try {
 		rv = (MemorySegment)snd_pcm_info_get_name.invoke(((PcmInfo)info).mem());
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    return(rv.reinterpret(Long.MAX_VALUE).getString(0, C_CHARSET));
 	}
@@ -921,7 +921,7 @@ public abstract class Alsa {
 	    try {
 		rv = (MemorySegment)snd_pcm_info_get_subdevice_name.invoke(((PcmInfo)info).mem());
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    return(rv.reinterpret(Long.MAX_VALUE).getString(0, C_CHARSET));
 	}
@@ -934,7 +934,7 @@ public abstract class Alsa {
 		try {
 		    rv = (int)snd_card_next.invoke(buf);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		}
 		if(rv < 0)
 		    throw(new AlsaException(snd_strerror(rv), rv));
@@ -948,7 +948,7 @@ public abstract class Alsa {
 	    try {
 		rv = (int)snd_device_name_free_hint.invoke(mem);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    if(rv < 0)
 		throw(new AlsaException(snd_strerror(rv), rv));
@@ -962,7 +962,7 @@ public abstract class Alsa {
 		try {
 		    rv = (int)snd_device_name_hint.invoke(card, st.allocateFrom(iface, C_CHARSET), buf);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		}
 		if(rv < 0)
 		    throw(new AlsaException(snd_strerror(rv), rv));
@@ -977,7 +977,7 @@ public abstract class Alsa {
 		try {
 		    rv = (MemorySegment)snd_device_name_get_hint.invoke(hint, st.allocateFrom(id, C_CHARSET));
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		}
 		if(nullp(rv))
 		    return(null);
@@ -992,9 +992,8 @@ public abstract class Alsa {
     public static Alsa get() {
 	if(instance == null) {
 	    synchronized(Alsa.class) {
-		if(instance == null) {
-		    instance = new libasound_so_2();
-		}
+		if(instance == null)
+		    instance = tryload("libasound", libasound_so_2::new);
 	    }
 	}
 	return(instance);

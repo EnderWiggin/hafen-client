@@ -55,21 +55,21 @@ public abstract class CoreFoundation {
     abstract CFData CFData(MemorySegment ref, boolean release, Object keep);
 
     static class VersionA extends CoreFoundation {
-	private final SymbolLookup dylib = SymbolLookup.libraryLookup("/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation", Arena.global());
+	private final SymbolLookup dylib = loadlib("/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation", Arena.global());
 	static final MemoryLayout CFTypeRef = ADDRESS;
 
 	private final MethodHandle CFRelease = ld.downcallHandle(dylib.find("CFRelease").get(), FunctionDescriptor.ofVoid(CFTypeRef));
 	void CFRelease(MemorySegment object) {
 	    try {
 		CFRelease.invoke(object);
-	    } catch(Throwable e) {throw(new RuntimeException(e));}
+	    } catch(Throwable e) {throw(new InvocationException(e));}
 	}
 
 	private final MethodHandle CFRetain = ld.downcallHandle(dylib.find("CFRetain").get(), FunctionDescriptor.of(CFTypeRef, CFTypeRef));
 	MemorySegment CFRetain(MemorySegment object) {
 	    try {
 		return((MemorySegment)CFRetain.invoke(object));
-	    } catch(Throwable e) {throw(new RuntimeException(e));}
+	    } catch(Throwable e) {throw(new InvocationException(e));}
 	}
 
 	void gcrelease(Object obj, MemorySegment object) {
@@ -93,7 +93,7 @@ public abstract class CoreFoundation {
 	    public MemorySegment getBytePtr() {
 		try {
 		    return((MemorySegment)CFDataGetBytePtr.invoke(ref));
-		} catch(Throwable e) {throw(new RuntimeException(e));}
+		} catch(Throwable e) {throw(new InvocationException(e));}
 	    }
 	}
 
@@ -106,9 +106,8 @@ public abstract class CoreFoundation {
     public static CoreFoundation get() {
 	if(instance == null) {
 	    synchronized(CoreFoundation.class) {
-		if(instance == null) {
-		    instance = new VersionA();
-		}
+		if(instance == null)
+		    instance = tryload("CoreFoundation", VersionA::new);
 	    }
 	}
 	return(instance);

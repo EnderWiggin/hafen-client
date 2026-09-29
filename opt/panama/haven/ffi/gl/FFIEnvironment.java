@@ -33,8 +33,8 @@ import java.nio.*;
 import java.lang.foreign.*;
 
 public class FFIEnvironment extends GLEnvironment {
-    public FFIEnvironment(OpenGL gl, Area wnd) {
-	super(gl, wnd);
+    public FFIEnvironment(OpenGL gl) {
+	super(gl);
     }
 
     public static class FFIBuffer extends GLObject implements SysBuffer {

@@ -212,10 +212,12 @@ public class GLProgram implements Disposable {
 		}
 		throw(new ShaderException("Failed to compile shader", this, info));
 	    }
+	    setmem(GLEnvironment.MemStats.SHADERS, 0);
 	}
 
 	protected void delete(GL gl) {
 	    gl.glDeleteShader(id);
+	    setmem(null, 0);
 	}
 
 	public int glid() {
@@ -350,10 +352,12 @@ public class GLProgram implements Disposable {
 		}
 		throw(new LinkException("Failed to link GL program", GLProgram.this, info));
 	    }
+	    setmem(GLEnvironment.MemStats.PROGRAMS, 0);
 	}
 
 	protected void delete(GL gl) {
 	    gl.glDeleteProgram(id);
+	    setmem(null, 0);
 	}
 
 	public void dispose() {

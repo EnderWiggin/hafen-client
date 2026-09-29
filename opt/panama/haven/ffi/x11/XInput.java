@@ -275,7 +275,7 @@ public abstract class XInput {
 	private static final MemoryLayout C_XID = XLib.libX11_so_6.C_XID;
 	private static final MemoryLayout C_Atom = XLib.libX11_so_6.C_Atom;
 	private static final MemoryLayout C_Time = XLib.libX11_so_6.C_Time;
-	private final SymbolLookup xi = SymbolLookup.libraryLookup("libXi.so.6", Arena.global());
+	private final SymbolLookup xi = loadlib("libXi.so.6", Arena.global());
 
 	private final MethodHandle XIQueryVersion = ld.downcallHandle(xi.find("XIQueryVersion").get(), FunctionDescriptor.of(C_Status, ADDRESS, ADDRESS, ADDRESS));
 	public int XIQueryVersion(Display dpy, int[] version) {
@@ -288,7 +288,7 @@ public abstract class XInput {
 		try {
 		    ret = (int)XIQueryVersion.invoke(dpy.mem(), major, minor);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		} finally {
 		    checkerror();
 		}
@@ -502,7 +502,7 @@ public abstract class XInput {
 	    try {
 		XIFreeDeviceInfo.invoke(info);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -516,7 +516,7 @@ public abstract class XInput {
 		try {
 		    mem = (MemorySegment)XIQueryDevice.invoke(dpy.mem(), deviceid, ndev);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		} finally {
 		    checkerror();
 		}
@@ -584,7 +584,7 @@ public abstract class XInput {
 		    else
 			return((int)XISelectEvents.invoke(dpy.mem(), (int)win.bits, evmem, n));
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		} finally {
 		    checkerror();
 		}
@@ -789,9 +789,8 @@ public abstract class XInput {
     public static XInput get() {
 	if(instance == null) {
 	    synchronized(XInput.class) {
-		if(instance == null) {
-		    instance = new libXi_so_6();
-		}
+		if(instance == null)
+		    instance = tryload("libXi", libXi_so_6::new);
 	    }
 	}
 	return(instance);

@@ -32,7 +32,6 @@ import haven.iosys.audio.*;
 import haven.iosys.tk.*;
 import java.awt.image.BufferedImage;
 import haven.GSettings.SyncMode;
-import haven.render.gl.GLEnvironment;
 import haven.render.gl.GLRender;
 
 public abstract class UILoop implements Console.Directory {
@@ -230,12 +229,7 @@ public abstract class UILoop implements Console.Directory {
 	prevfree = free;
 	buf.add(String.format("Mem: %,011d/%,011d/%,011d/%,011d (%,d)", free, total - free, total, rt.maxMemory(), framealloc));
 	buf.add(String.format("State slots: %d", State.Slot.numslots()));
-	Environment env = ui.getenv();
-	if(env instanceof GLEnvironment) {
-	    GLEnvironment gl = (GLEnvironment)env;
-	    buf.add(String.format("GL progs: %d", gl.numprogs()));
-	    buf.add(String.format("V-Mem: %s", gl.memstats()));
-	}
+	ui.getenv().stats(buf);
 	@SuppressWarnings("deprecation") MapView map = ui.root.findchild(MapView.class);
 	if((map != null) && (map.back != null)) {
 	    buf.add(String.format("Camera: %s", map.camstats()));

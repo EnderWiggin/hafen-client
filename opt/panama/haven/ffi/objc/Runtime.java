@@ -238,7 +238,7 @@ public abstract class Runtime {
 	static final MemoryLayout OC_BOOL = C_CHAR;
 	static final MemoryLayout NSInteger = C_LONG;
 	static final MemoryLayout NSUInteger = C_LONG;
-	private final SymbolLookup rt = SymbolLookup.libraryLookup("libobjc.A.dylib", Arena.global());
+	private final SymbolLookup rt = loadlib("libobjc.A.dylib", Arena.global());
 
 	objc4() {
 	    /* x86-64 support would require eg. snd_msgSend_stret and such */
@@ -367,7 +367,7 @@ public abstract class Runtime {
 		try {
 		    rv = (MemorySegment)objc_getClass.invoke(st.allocateFrom(name, Utils.utf8));
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		}
 		return(nullp(rv) ? null : new Class(this, rv));
 	    }
@@ -379,7 +379,7 @@ public abstract class Runtime {
 	    try {
 		rv = (MemorySegment)object_getClassName.invoke(((ID)id).mem());
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    return(nullp(rv) ? null : rv.reinterpret(Long.MAX_VALUE).getString(0, Utils.utf8));
 	}
@@ -391,7 +391,7 @@ public abstract class Runtime {
 		try {
 		    rv = (MemorySegment)objc_getProtocol.invoke(st.allocateFrom(name, Utils.utf8));
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		}
 		return(nullp(rv) ? null : new Protocol(this, rv));
 	    }
@@ -403,7 +403,7 @@ public abstract class Runtime {
 	    try {
 		rv = (MemorySegment)protocol_getName.invoke(((Protocol)p).mem());
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    return(nullp(rv) ? null : rv.reinterpret(Long.MAX_VALUE).getString(0, Utils.utf8));
 	}
@@ -414,7 +414,7 @@ public abstract class Runtime {
 	    try {
 		rv = (int)class_addProtocol.invoke(((Class)cls).mem(), ((Protocol)protocol).mem());
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    return((rv == 0) ? false : true);
 	}
@@ -426,7 +426,7 @@ public abstract class Runtime {
 		try {
 		    rv = (MemorySegment)class_getInstanceVariable.invoke(((Class)cls).mem(), st.allocateFrom(name, Utils.utf8));
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		}
 		return(nullp(rv) ? null : new Ivar(this, rv));
 	    }
@@ -438,7 +438,7 @@ public abstract class Runtime {
 	    try {
 		rv = (MemorySegment)ivar_getName.invoke(((Ivar)v).mem());
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    return(nullp(rv) ? null : rv.reinterpret(Long.MAX_VALUE).getString(0, Utils.utf8));
 	}
@@ -449,7 +449,7 @@ public abstract class Runtime {
 	    try {
 		rv = (long)ivar_getOffset.invoke(((Ivar)v).mem());
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    return(rv);
 	}
@@ -461,7 +461,7 @@ public abstract class Runtime {
 		try {
 		    rv = (MemorySegment)objc_allocateClassPair.invoke(((Class)superclass).mem(), st.allocateFrom(name, Utils.utf8), extraBytes);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		}
 		if(nullp(rv))
 		    throw(new RuntimeException("failed to allocate class pair: " + name));
@@ -474,7 +474,7 @@ public abstract class Runtime {
 	    try {
 		objc_registerClassPair.invoke(((Class)cls).mem());
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -485,7 +485,7 @@ public abstract class Runtime {
 		try {
 		    rv = (int)class_addIvar.invoke(((Class)cls).mem(), st.allocateFrom(name, Utils.utf8), size, (byte)alignment, st.allocateFrom(types, Utils.utf8));
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		}
 		if(rv == 0)
 		    throw(new RuntimeException("failed to add ivar"));
@@ -499,7 +499,7 @@ public abstract class Runtime {
 		try {
 		    rv = (int)class_addMethod.invoke(((Class)cls).mem(), ((SEL)name).mem(), imp, st.allocateFrom(types, Utils.utf8));
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		}
 		if(rv == 0)
 		    throw(new RuntimeException("failed to add method"));
@@ -513,7 +513,7 @@ public abstract class Runtime {
 		try {
 		    rv = (MemorySegment)sel_registerName.invoke(st.allocateFrom(name, Utils.utf8));
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		}
 		return(nullp(rv) ? null : new SEL(this, rv));
 	    }
@@ -525,7 +525,7 @@ public abstract class Runtime {
 	    try {
 		rv = (MemorySegment)sel_getName.invoke(sel.mem());
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    return(nullp(rv) ? null : rv.reinterpret(Long.MAX_VALUE).getString(0, Utils.utf8));
 	}
@@ -546,7 +546,7 @@ public abstract class Runtime {
 	    try {
 		objc_msgSend_void.invoke(self.mem(), sel.mem());
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -555,7 +555,7 @@ public abstract class Runtime {
 	    try {
 		objc_msgSend_void_bool.invoke(self.mem(), sel.mem(), arg1 ? (byte)1 : (byte)0);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -564,7 +564,7 @@ public abstract class Runtime {
 	    try {
 		objc_msgSend_void_ptr_int.invoke(self.mem(), sel.mem(), arg1, arg2);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -573,7 +573,7 @@ public abstract class Runtime {
 	    try {
 		objc_msgSend_void_id.invoke(self.mem(), sel.mem(), nid(arg1));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -582,7 +582,7 @@ public abstract class Runtime {
 	    try {
 		objc_msgSend_void_id_bool.invoke(self.mem(), sel.mem(), nid(arg1), arg2 ? (byte)1 : (byte)0);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -591,7 +591,7 @@ public abstract class Runtime {
 	    try {
 		objc_msgSend_void_id_id.invoke(self.mem(), sel.mem(), nid(arg1), nid(arg2));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -600,7 +600,7 @@ public abstract class Runtime {
 	    try {
 		objc_msgSend_void_SEL_id_bool.invoke(self.mem(), sel.mem(), ((SEL)arg1).mem(), nid(arg2), arg3 ? (byte)1 : (byte)0);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -609,7 +609,7 @@ public abstract class Runtime {
 	    try {
 		return(id((MemorySegment)objc_msgSend_id.invoke(self.mem(), sel.mem())));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -618,7 +618,7 @@ public abstract class Runtime {
 	    try {
 		return(id((MemorySegment)objc_msgSend_id_NSUInt.invoke(self.mem(), sel.mem(), arg1)));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -627,7 +627,7 @@ public abstract class Runtime {
 	    try {
 		return(id((MemorySegment)objc_msgSend_id_ptr.invoke(self.mem(), sel.mem(), arg1)));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -636,7 +636,7 @@ public abstract class Runtime {
 	    try {
 		return(id((MemorySegment)objc_msgSend_id_ptr_NSUInt.invoke(self.mem(), sel.mem(), arg1, arg2)));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -645,7 +645,7 @@ public abstract class Runtime {
 	    try {
 		return(id((MemorySegment)objc_msgSend_id_id.invoke(self.mem(), sel.mem(), nid(arg1))));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -654,7 +654,7 @@ public abstract class Runtime {
 	    try {
 		return(id((MemorySegment)objc_msgSend_id_id_id.invoke(self.mem(), sel.mem(), nid(arg1), nid(arg2))));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -663,7 +663,7 @@ public abstract class Runtime {
 	    try {
 		return((MemorySegment)objc_msgSend_id.invoke(self.mem(), sel.mem()));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -672,7 +672,7 @@ public abstract class Runtime {
 	    try {
 		return((int)objc_msgSend_bool.invoke(self.mem(), sel.mem()) != 0);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -681,7 +681,7 @@ public abstract class Runtime {
 	    try {
 		return((int)objc_msgSend_bool_int.invoke(self.mem(), sel.mem(), arg1) != 0);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -690,7 +690,7 @@ public abstract class Runtime {
 	    try {
 		return((int)objc_msgSend_bool_id.invoke(self.mem(), sel.mem(), arg1.mem()) != 0);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -699,7 +699,7 @@ public abstract class Runtime {
 	    try {
 		return((int)objc_msgSend_bool_id_id.invoke(self.mem(), sel.mem(), arg1.mem(), arg2.mem()) != 0);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -708,7 +708,7 @@ public abstract class Runtime {
 	    try {
 		return((int)objc_msgSend_int.invoke(self.mem(), sel.mem()));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -717,7 +717,7 @@ public abstract class Runtime {
 	    try {
 		return((int)(long)objc_msgSend_NSUInt.invoke(self.mem(), sel.mem()));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -726,7 +726,7 @@ public abstract class Runtime {
 	    try {
 		return((double)objc_msgSend_double.invoke(self.mem(), sel.mem()));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -799,9 +799,8 @@ public abstract class Runtime {
     public static Runtime get() {
 	if(instance == null) {
 	    synchronized(Runtime.class) {
-		if(instance == null) {
-		    instance = new objc4();
-		}
+		if(instance == null)
+		    instance = tryload("obj-c runtime", objc4::new);
 	    }
 	}
 	return(instance);

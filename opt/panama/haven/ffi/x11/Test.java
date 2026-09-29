@@ -29,7 +29,6 @@ package haven.ffi.x11;
 import haven.*;
 import haven.ffi.gl.*;
 import java.util.*;
-import java.lang.invoke.*;
 import java.lang.foreign.*;
 
 public class Test {

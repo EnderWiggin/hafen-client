@@ -221,7 +221,7 @@ public abstract class AWTToolkit implements Toolkit {
 	public Set<Key.Mod> mods() {return(mods);}
 
 	public String toString() {
-	    return(String.format("#<%s %s str=\"%s\" %s>", getClass().getSimpleName(), key, (string() == null) ? "" : Utils.bprint.enc(string().getBytes(Utils.utf8)), awt));
+	    return(String.format("#<%s %s str=\"%s\" %s>", getClass().getSimpleName(), key, (string() == null) ? "" : Utils.strsafe(string()), awt));
 	}
     }
     public static class AWTKeyDownEvent extends AWTKeyEvent implements KeyDownEvent {

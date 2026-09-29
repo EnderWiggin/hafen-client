@@ -24,50 +24,25 @@
  *  Boston, MA 02111-1307 USA
  */
 
-package haven.render.lwjgl;
+package haven.iosys.ffi;
 
-import java.nio.*;
 import haven.*;
-import haven.render.gl.*;
-import org.lwjgl.opengl.awt.*;
-import haven.render.gl.GL;
+import haven.iosys.*;
+import haven.ffi.*;
+import haven.ffi.windows.*;
 
-public class LWJGLEnvironment extends GLEnvironment {
-    public LWJGLEnvironment() {
-	super(LWJGLWrap.instance);
-    }
-
-    public static class LWJGLCaps extends Caps {
-	public final boolean coreprof;
-
-	public LWJGLCaps(GL gl, LWJGLEnvironment env) {
-	    super(gl);
-	    if((major > 3) || ((major == 3) && (minor >= 2)))
-		this.coreprof = glgeti(gl, GL.GL_CONTEXT_PROFILE_MASK) == GL.GL_CONTEXT_CORE_PROFILE_BIT;
-	    else
-		this.coreprof = false;
+@Init
+public class Win32Init {
+    public static void sysinit() {
+	try {
+	    String value = (String)Win32.get().RegGetValue(Win32.HKEY_LOCAL_MACHINE,
+							   "HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0",
+							   "ProcessorNameString",
+							   Win32.RRF_RT_ANY);
+	    Utils.useragent.put("cpu.name", value.trim());
+	} catch(LibraryLoadException e) {
+	} catch(RuntimeException e) {
+	    new Warning(e, "unexpected error in win32-init").issue();
 	}
-
-	public void checkreq() {
-	    super.checkreq();
-	    if(!coreprof || ((major < 3) || ((major == 3) && (minor < 2))))
-		throw(new HardwareException("Graphics context is not a core OpenGL profile.", this));
-	}
-    }
-
-    public LWJGLCaps mkcaps(GL initgl) {
-	return(new LWJGLCaps(initgl, this));
-    }
-
-    public SysBuffer malloc(int sz) {
-	return(new LWJGLBuffer(this, sz));
-    }
-
-    public SysBuffer subsume(ByteBuffer data, int sz) {
-	SysBuffer ret = new LWJGLBuffer(this, sz);
-	ByteBuffer cp = ret.data();
-	cp.put(data);
-	cp.rewind();
-	return(ret);
     }
 }

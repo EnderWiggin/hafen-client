@@ -34,7 +34,7 @@ public class Test {
 
 	public LWJGLEnvironment mkenv() {
 	    org.lwjgl.opengl.GL.createCapabilities();
-	    return(new LWJGLEnvironment(Area.sized(Coord.of(getWidth(), getHeight()))));
+	    return(new LWJGLEnvironment());
 	}
     }
 

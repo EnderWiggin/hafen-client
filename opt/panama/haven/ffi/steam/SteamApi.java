@@ -254,14 +254,14 @@ public abstract class SteamApi {
 	public boolean Init() {
 	    try {
 		return((int)SteamAPI_Init.invoke() != 0);
-	    } catch(Throwable e) {throw(new RuntimeException(e));}
+	    } catch(Throwable e) {throw(new InvocationException(e));}
 	}
 
 	private final MethodHandle SteamAPI_IsSteamRunning = lookup("SteamAPI_IsSteamRunning", FunctionDescriptor.of(C_BOOL));
 	public boolean IsSteamRunning() {
 	    try {
 		return((int)SteamAPI_IsSteamRunning.invoke() != 0);
-	    } catch(Throwable e) {throw(new RuntimeException(e));}
+	    } catch(Throwable e) {throw(new InvocationException(e));}
 	}
 
 	private final MethodHandle SteamAPI_GetHSteamPipe = lookup("SteamAPI_GetHSteamPipe", FunctionDescriptor.of(HSteamPipe));
@@ -269,7 +269,7 @@ public abstract class SteamApi {
 	    int rv;
 	    try {
 		rv = (int)SteamAPI_GetHSteamPipe.invoke();
-	    } catch(Throwable e) {throw(new RuntimeException(e));}
+	    } catch(Throwable e) {throw(new InvocationException(e));}
 	    return(new HSteamPipe(rv));
 	}
 
@@ -277,14 +277,14 @@ public abstract class SteamApi {
 	public void ManualDispatch_Init() {
 	    try {
 		SteamAPI_ManualDispatch_Init.invoke();
-	    } catch(Throwable e) {throw(new RuntimeException(e));}
+	    } catch(Throwable e) {throw(new InvocationException(e));}
 	}
 
 	private final MethodHandle SteamAPI_ManualDispatch_RunFrame = lookup("SteamAPI_ManualDispatch_RunFrame", FunctionDescriptor.ofVoid(HSteamPipe));
 	public void ManualDispatch_RunFrame(SteamApi.HSteamPipe pipe) {
 	    try {
 		SteamAPI_ManualDispatch_RunFrame.invoke(((HSteamPipe)pipe).handle);
-	    } catch(Throwable e) {throw(new RuntimeException(e));}
+	    } catch(Throwable e) {throw(new InvocationException(e));}
 	}
 
 	public static final StructLayout _CallbackMsg_t = struct(new MemoryLayout[] {
@@ -305,7 +305,7 @@ public abstract class SteamApi {
 		MemorySegment buf = st.allocate(_CallbackMsg_t);
 		try {
 		    rv = (int)SteamAPI_ManualDispatch_GetNextCallback.invoke(((HSteamPipe)pipe).handle, buf);
-		} catch(Throwable e) {throw(new RuntimeException(e));}
+		} catch(Throwable e) {throw(new InvocationException(e));}
 		if(rv == 0)
 		    return(null);
 		MemorySegment data = (MemorySegment)_CallbackMsg_pubParam.get(buf, 0);
@@ -319,7 +319,7 @@ public abstract class SteamApi {
 	public void ManualDispatch_FreeLastCallback(SteamApi.HSteamPipe pipe) {
 	    try {
 		SteamAPI_ManualDispatch_FreeLastCallback.invoke(((HSteamPipe)pipe).handle);
-	    } catch(Throwable e) {throw(new RuntimeException(e));}
+	    } catch(Throwable e) {throw(new InvocationException(e));}
 	}
 
 	public class SteamUtils implements SteamApi.SteamUtils {
@@ -333,14 +333,14 @@ public abstract class SteamApi {
 	    public int GetAppID() {
 		try {
 		    return((int)SteamAPI_ISteamUtils_GetAppID.invoke(self));
-		} catch(Throwable e) {throw(new RuntimeException(e));}
+		} catch(Throwable e) {throw(new InvocationException(e));}
 	    }
 
 	    private final MethodHandle SteamAPI_ISteamUtils_SetOverlayNotificationPosition = lookup("SteamAPI_ISteamUtils_SetOverlayNotificationPosition", FunctionDescriptor.ofVoid(C_ENUM));
 	    public void SetOverlayNotificationPosition(int position) {
 		try {
 		    SteamAPI_ISteamUtils_SetOverlayNotificationPosition.invoke(position);
-		} catch(Throwable e) {throw(new RuntimeException(e));}
+		} catch(Throwable e) {throw(new InvocationException(e));}
 	    }
 	}
 
@@ -352,7 +352,7 @@ public abstract class SteamApi {
 	    MemorySegment self;
 	    try {
 		self = (MemorySegment)SteamAPI_SteamUtils_v010.invoke();
-	    } catch(Throwable e) {throw(new RuntimeException(e));}
+	    } catch(Throwable e) {throw(new InvocationException(e));}
 	    if(nullp(self))
 		return(null);
 	    return(SteamUtils = new SteamUtils(self));
@@ -369,21 +369,21 @@ public abstract class SteamApi {
 	    public long GetSteamID() {
 		try {
 		    return((long)SteamAPI_ISteamUser_GetSteamID.invoke(self));
-		} catch(Throwable e) {throw(new RuntimeException(e));}
+		} catch(Throwable e) {throw(new InvocationException(e));}
 	    }
 
 	    private final MethodHandle SteamAPI_ISteamUser_GetAuthTicketForWebApi = lookup("SteamAPI_ISteamUser_GetAuthTicketForWebApi", FunctionDescriptor.of(HAuthTicket, ADDRESS, ADDRESS));
 	    public int GetAuthTicketForWebApi(String identity) {
 		try(Arena st = Arena.ofConfined()) {
 		    return((int)SteamAPI_ISteamUser_GetAuthTicketForWebApi.invoke(self, identity == null ? MemorySegment.NULL : st.allocateFrom(identity, Utils.utf8)));
-		} catch(Throwable e) {throw(new RuntimeException(e));}
+		} catch(Throwable e) {throw(new InvocationException(e));}
 	    }
 
 	    private final MethodHandle SteamAPI_ISteamUser_CancelAuthTicket = lookup("SteamAPI_ISteamUser_CancelAuthTicket", FunctionDescriptor.ofVoid(ADDRESS, HAuthTicket));
 	    public void CancelAuthTicket(int ticket) {
 		try {
 		    SteamAPI_ISteamUser_CancelAuthTicket.invoke(self, ticket);
-		} catch(Throwable e) {throw(new RuntimeException(e));}
+		} catch(Throwable e) {throw(new InvocationException(e));}
 	    }
 	}
 
@@ -395,7 +395,7 @@ public abstract class SteamApi {
 	    MemorySegment self;
 	    try {
 		self = (MemorySegment)SteamAPI_SteamUser_v023.invoke();
-	    } catch(Throwable e) {throw(new RuntimeException(e));}
+	    } catch(Throwable e) {throw(new InvocationException(e));}
 	    if(nullp(self))
 		return(null);
 	    return(SteamUser = new SteamUser(self));
@@ -413,7 +413,7 @@ public abstract class SteamApi {
 		MemorySegment rv;
 		try {
 		    rv = (MemorySegment)SteamAPI_ISteamFriends_GetPersonaName.invoke(self);
-		} catch(Throwable e) {throw(new RuntimeException(e));}
+		} catch(Throwable e) {throw(new InvocationException(e));}
 		return(rv.reinterpret(Long.MAX_VALUE).getString(0, Utils.utf8));
 	    }
 
@@ -423,7 +423,7 @@ public abstract class SteamApi {
 		    int rv;
 		    try {
 			rv = (int)SteamAPI_ISteamFriends_SetRichPresence.invoke(self, st.allocateFrom(key, Utils.utf8), st.allocateFrom(value, Utils.utf8));
-		    } catch(Throwable e) {throw(new RuntimeException(e));}
+		    } catch(Throwable e) {throw(new InvocationException(e));}
 		    return(rv != 0);
 		}
 	    }
@@ -433,7 +433,7 @@ public abstract class SteamApi {
 		try(Arena st = Arena.ofConfined()) {
 		    try {
 			SteamAPI_ISteamFriends_ActivateGameOverlayToWebPage.invoke(self, st.allocateFrom(url, Utils.utf8), mode);
-		    } catch(Throwable e) {throw(new RuntimeException(e));}
+		    } catch(Throwable e) {throw(new InvocationException(e));}
 		}
 	    }
 	}
@@ -446,7 +446,7 @@ public abstract class SteamApi {
 	    MemorySegment self;
 	    try {
 		self = (MemorySegment)SteamAPI_SteamFriends_v017.invoke();
-	    } catch(Throwable e) {throw(new RuntimeException(e));}
+	    } catch(Throwable e) {throw(new InvocationException(e));}
 	    if(nullp(self))
 		return(null);
 	    return(SteamFriends = new SteamFriends(self));
@@ -483,7 +483,7 @@ public abstract class SteamApi {
 	private SymbolLookup lib = null;
 	protected MethodHandle lookup(String name, FunctionDescriptor sig, Linker.Option... options) {
 	    if(lib == null)
-		lib = loadlib("libsteam_api.so", Arena.global());
+		lib = jloadlib("libsteam_api.so", Arena.global());
 	    MemorySegment addr = lib.find(name).get();
 	    if(nullp(addr))
 		throw(new MissingFunction("name"));
@@ -496,7 +496,7 @@ public abstract class SteamApi {
 	if(instance == null) {
 	    synchronized(SteamApi.class) {
 		if(instance == null) {
-		    instance = new libsteam_api_so();
+		    instance = tryload("steam api", libsteam_api_so::new);
 		    instance.Init();
 		}
 	    }

@@ -97,7 +97,7 @@ public class JOGLOffscreen implements Acephal {
 	// gl = new TraceGL3(gl, System.err);
 	GLContext ctx = gl.getContext();
 	if(benv == null)
-	    benv = new JOGLEnvironment(gl, ctx, Area.sized(Coord.z, new Coord(1, 1)));
+	    benv = new JOGLEnvironment(gl, ctx);
 	if(benv.ctx != ctx)
 	    throw(new AssertionError());
 	benv.process(new JOGLWrap(gl));

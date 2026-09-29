@@ -57,14 +57,14 @@ public abstract class Xcursor {
 	private static final MemoryLayout C_XcursorBool = C_INT;
 	private static final ValueLayout.OfInt C_XcursorUint = ValueLayout.JAVA_INT;
 	private static final ValueLayout.OfInt C_XcursorDim = C_XcursorUint;
-	private final SymbolLookup Xcursor = SymbolLookup.libraryLookup("libXcursor.so.1", Arena.global());
+	private final SymbolLookup Xcursor = loadlib("libXcursor.so.1", Arena.global());
 
 	private final MethodHandle XcursorSupportsARGB = ld.downcallHandle(Xcursor.find("XcursorSupportsARGB").get(), FunctionDescriptor.of(C_XcursorBool, ADDRESS));
 	public boolean XcursorSupportsARGB(Display dpy) {
 	    try {
 		return(((long)XcursorSupportsARGB.invoke(dpy.mem())) != 0);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -75,7 +75,7 @@ public abstract class Xcursor {
 	    try {
 		return((int)XcursorGetDefaultSize.invoke(dpy.mem()));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -117,7 +117,7 @@ public abstract class Xcursor {
 		img = new XcursorImage(mem);
 		Finalizer.finalize(img, () -> XcursorImageDestroy(mem));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -133,7 +133,7 @@ public abstract class Xcursor {
 	    try {
 		XcursorImageDestroy.invoke(img);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -144,7 +144,7 @@ public abstract class Xcursor {
 	    try {
 		return(XID.of((long)XcursorImageLoadCursor.invoke(dpy.mem(), img.mem())));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -155,7 +155,7 @@ public abstract class Xcursor {
 	    try(Arena st = Arena.ofConfined()) {
 		return(XID.of((long)XcursorLibraryLoadCursor.invoke(dpy.mem(), st.allocateFrom(name, C_CHARSET))));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    } finally {
 		checkerror();
 	    }
@@ -167,7 +167,7 @@ public abstract class Xcursor {
 	if(instance == null) {
 	    synchronized(Xcursor.class) {
 		if(instance == null) {
-		    instance = new libXcursor_so_1();
+		    instance = tryload("libXcursor", libXcursor_so_1::new);
 		}
 	    }
 	}

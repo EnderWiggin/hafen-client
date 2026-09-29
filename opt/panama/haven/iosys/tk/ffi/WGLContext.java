@@ -617,7 +617,7 @@ public class WGLContext implements Providers.Factory<Toolkit> {
 		private int qstate;
 
 		private WGLEnvironment() {
-		    super(gl, Area.sized(size));
+		    super(gl);
 		}
 
 		private void process() {
@@ -958,6 +958,10 @@ public class WGLContext implements Providers.Factory<Toolkit> {
 		public String string() {return("");}
 		public Key key() {return(key);}
 		public Set<Key.Mod> mods() {return(mods);}
+
+		public String toString() {
+		    return(String.format("#<%s %s %s>", getClass().getSimpleName(), key, mods));
+		}
 	    }
 	    public class W32KeyDownEvent extends W32KeyEvent implements KeyDownEvent {
 		public String string;
@@ -987,6 +991,10 @@ public class WGLContext implements Providers.Factory<Toolkit> {
 
 		public Key.Sym sym() {return(sym);}
 		public String string() {return(string);}
+
+		public String toString() {
+		    return(String.format("#<%s %s %s sym=%s, str=\"%s\">", getClass().getSimpleName(), key, mods, sym, Utils.strsafe(string)));
+		}
 	    }
 	    public class W32KeyUpEvent extends W32KeyEvent implements KeyUpEvent {
 		public W32KeyUpEvent(long wparam, long lparam) {super(wparam, lparam);}

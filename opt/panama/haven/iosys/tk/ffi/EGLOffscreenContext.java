@@ -102,7 +102,7 @@ public class EGLOffscreenContext implements Providers.Factory<EGLOffscreenContex
 		} catch(EGLException e) {
 		    throw(new Unavailable("could not create EGL context", e));
 		}
-		this.env = glrun(() -> new FFIEnvironment(gl, Area.sized(Coord.of(1, 1))));
+		this.env = glrun(() -> new FFIEnvironment(gl));
 		this.processor = new HackThread(this::loop, "EGL command processor");
 		this.processor.setDaemon(true);
 		this.processor.start();

@@ -48,7 +48,7 @@ public class GLRender implements Render, Disposable {
 	this.seq = env.new Sequence(this);
     }
 
-    public GLEnvironment env() {return(env);}
+    public Environment env() {return(env);}
 
     BGL gl() {
 	if(this.gl == null) {

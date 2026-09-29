@@ -191,14 +191,14 @@ public abstract class EGL {
 	static final ValueLayout EGLint = ValueLayout.JAVA_INT;
 	static final MemoryLayout EGLAttrib = PTRINT_T;
 	static final ValueLayout EGLNativeDisplayType = ADDRESS;
-	private final SymbolLookup egl = SymbolLookup.libraryLookup("libEGL.so.1", Arena.global());
+	private final SymbolLookup egl = loadlib("libEGL.so.1", Arena.global());
 
 	private final MethodHandle eglGetProcAddress = ld.downcallHandle(egl.find("eglGetProcAddress").get(), FunctionDescriptor.of(ADDRESS, ADDRESS));
 	MemorySegment eglGetProcAddress(String funcName) {
 	    try(Arena st = Arena.ofConfined()) {
 		return((MemorySegment)eglGetProcAddress.invoke(st.allocateFrom(funcName, C_CHARSET)));
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -208,7 +208,7 @@ public abstract class EGL {
 	    try {
 		rv = (MemorySegment)eglGetDisplay.invoke(native_display);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    if(nullp(rv))
 		throw(lasterror());
@@ -228,7 +228,7 @@ public abstract class EGL {
 		try {
 		    rv = (MemorySegment)eglGetPlatformDisplay.invoke(platform, native_display, acopy);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		}
 		if(nullp(rv))
 		    throw(lasterror());
@@ -244,7 +244,7 @@ public abstract class EGL {
 		try {
 		    rv = (int)eglInitialize.invoke(dpy.mem(), major, minor);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		}
 		if(rv == 0)
 		    throw(lasterror());
@@ -257,7 +257,7 @@ public abstract class EGL {
 	    try {
 		return((int)eglGetError.invoke());
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 
@@ -267,7 +267,7 @@ public abstract class EGL {
 	    try {
 		rv = (MemorySegment)eglQueryString.invoke(dpy.mem(), name);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    if(nullp(rv))
 		return(null);
@@ -289,7 +289,7 @@ public abstract class EGL {
 		try {
 		    rv = (int)eglChooseConfig.invoke(dpy.mem(), acopy, confbuf, maxret, numbuf);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		}
 		if(rv == 0)
 		    throw(lasterror());
@@ -314,7 +314,7 @@ public abstract class EGL {
 		try {
 		    rv = (MemorySegment)eglCreatePbufferSurface.invoke(dpy.mem(), conf.mem(), acopy);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		}
 		if(nullp(rv))
 		    throw(lasterror());
@@ -335,7 +335,7 @@ public abstract class EGL {
 		try {
 		    rv = (MemorySegment)eglCreateContext.invoke(dpy.mem(), conf.mem(), (share == null) ? MemorySegment.NULL : share.mem(), acopy);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		}
 		if(nullp(rv))
 		    throw(lasterror());
@@ -349,7 +349,7 @@ public abstract class EGL {
 	    try {
 		rv = (int)eglBindAPI.invoke(api);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    if(rv == 0)
 		throw(lasterror());
@@ -364,7 +364,7 @@ public abstract class EGL {
 						(read == null) ? MemorySegment.NULL : read.mem(),
 						(ctx == null) ? MemorySegment.NULL : ctx.mem());
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    if(rv == 0)
 		throw(lasterror());
@@ -376,7 +376,7 @@ public abstract class EGL {
 	    try {
 		rv = (int)eglDestroyContext.invoke(dpy.mem(), ctx.mem());
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    if(rv == 0)
 		throw(lasterror());
@@ -388,7 +388,7 @@ public abstract class EGL {
 	    try {
 		rv = (int)eglDestroySurface.invoke(dpy.mem(), srf.mem());
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    if(rv == 0)
 		throw(lasterror());
@@ -400,7 +400,7 @@ public abstract class EGL {
 	    try {
 		rv = (int)eglTerminate.invoke(dpy.mem());
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    if(rv == 0)
 		throw(lasterror());
@@ -421,7 +421,7 @@ public abstract class EGL {
 	    try {
 		return((int)eglQueryDevicesEXT.invoke(max_devices, devices, num_devices) != 0);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	}
 	public EGLDeviceEXT[] eglQueryDevicesEXT() {
@@ -448,7 +448,7 @@ public abstract class EGL {
 		try {
 		    rv = (int)eglQueryDeviceAttribEXT.invoke(((EGLDeviceEXT)device).mem, name, buf);
 		} catch(Throwable e) {
-		    throw(new RuntimeException(e));
+		    throw(new InvocationException(e));
 		}
 		if(rv == 0)
 		    throw(lasterror());
@@ -462,7 +462,7 @@ public abstract class EGL {
 	    try {
 		rv = (MemorySegment)eglQueryDeviceStringEXT.invoke(((EGLDeviceEXT)device).mem, name);
 	    } catch(Throwable e) {
-		throw(new RuntimeException(e));
+		throw(new InvocationException(e));
 	    }
 	    if(nullp(rv))
 		throw(lasterror());
@@ -487,9 +487,8 @@ public abstract class EGL {
     public static EGL get() {
 	if(instance == null) {
 	    synchronized(EGL.class) {
-		if(instance == null) {
-		    instance = new libEGL_so_1();
-		}
+		if(instance == null)
+		    instance = tryload("egl", libEGL_so_1::new);
 	    }
 	}
 	return(instance);

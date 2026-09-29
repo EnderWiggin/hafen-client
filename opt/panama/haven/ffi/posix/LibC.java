@@ -143,7 +143,7 @@ public abstract class LibC {
 		try {
 		    ret = fun.call(st, errnobuf);
 		} catch(Throwable t) {
-		    throw(new RuntimeException(t));
+		    throw(new InvocationException(t));
 		}
 		errno.set((int)errnovar.get(errnobuf, 0));
 		return(ret);
@@ -168,7 +168,7 @@ public abstract class LibC {
 	    try {
 		ret = (MemorySegment)strerror.invoke(errnum);
 	    } catch(Throwable t) {
-		throw(new RuntimeException(t));
+		throw(new InvocationException(t));
 	    }
 	    return(nullp(ret) ? null : ret.reinterpret(Long.MAX_VALUE).getString(0, C_CHARSET));
 	}
@@ -178,7 +178,7 @@ public abstract class LibC {
 	    try {
 		free.invoke(mem);
 	    } catch(Throwable t) {
-		throw(new RuntimeException(t));
+		throw(new InvocationException(t));
 	    }
 	}
 
@@ -187,7 +187,7 @@ public abstract class LibC {
 	    try {
 		return((int)getpid.invoke());
 	    } catch(Throwable t) {
-		throw(new RuntimeException(t));
+		throw(new InvocationException(t));
 	    }
 	}
 
